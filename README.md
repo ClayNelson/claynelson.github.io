@@ -6,4 +6,4 @@
 
 
 # Research
-- [Digital Transformation Themes](/Transformation%20and%20Change%20Research%20(Autosaved)%20(Autosaved)%20(Autosaved)%20(Autosaved)%202.htmlTransformation and Change Research (Autosaved) (Autosaved) (Autosaved) (Autosaved) 2.html)
+- [Digital Transformation Research](https://github.com/ClayNelson/claynelson.github.io/blob/3dce485bd2be047bbb924a3cd7f5fc985afce084/Transformation%20and%20Change%20Research%20(Autosaved)%20(Autosaved)%20(Autosaved)%20(Autosaved)%202.png)
