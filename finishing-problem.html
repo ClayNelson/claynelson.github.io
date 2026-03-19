@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Finishing Problem — GitHub &amp; the Verification Gate</title>
+<style>
+  :root {
+    --bg: #ffffff; --bg2: #f6f6f4; --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
+    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
+    --blue: #0969da; --blue-bg: #e6f1fb; --blue-text: #0c447c;
+    --green: #1a7f37; --green-bg: #eaf3de; --green-text: #27500a;
+    --red: #cf222e; --red-bg: #fcebeb; --red-text: #791f1f;
+    --amber: #ba7517; --amber-bg: #faeeda; --amber-text: #633806;
+    --purple: #7f77dd; --purple-bg: #eeedfe; --purple-text: #3c3489;
+    --teal-bg: #e1f5ee; --teal-text: #085041;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .page { max-width: 860px; margin: 0 auto; padding: 32px 20px 60px; }
+  h1 { font-size: 26px; font-weight: 600; margin-bottom: 6px; }
+  h2 { font-size: 18px; font-weight: 600; margin: 36px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  p { color: var(--text2); margin-bottom: 12px; }
+  .lede { font-size: 16px; color: var(--text2); margin-bottom: 28px; border-bottom: 0.5px solid var(--border); padding-bottom: 20px; }
+  .section { margin-bottom: 40px; }
+  .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+  .surface { background: var(--bg2); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 12px; }
+
+  /* Nav tabs */
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tab { padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--border2); cursor: pointer;
+    font-size: 13px; font-weight: 500; background: transparent; color: var(--text); transition: all .15s; }
+  .tab:hover { background: var(--bg2); }
+  .tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .tabview { display: none; } .tabview.on { display: block; }
+
+  /* Controls */
+  .ctrl-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 14px; }
+  .ctrl-group { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text2); }
+  input[type=range] { accent-color: var(--blue); width: 120px; }
+  .val-badge { font-size: 12px; font-weight: 700; color: var(--blue); min-width: 30px; }
+  label.toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text2); }
+  .track { width: 32px; height: 18px; border-radius: 9px; background: #ccc; position: relative;
+    cursor: pointer; flex-shrink: 0; transition: background .2s; }
+  .track.on { background: var(--blue); }
+  .thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; position: absolute;
+    top: 2px; left: 2px; transition: transform .2s; pointer-events: none; }
+  .track.on .thumb { transform: translateX(14px); }
+
+  /* Pipeline */
+  .phase-rows { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .prow { display: flex; align-items: center; gap: 6px; }
+  .pbadge { width: 110px; flex-shrink: 0; padding: 4px 8px; border-radius: 6px; font-size: 10px; text-align: center; }
+  .pbadge .pn { font-weight: 700; font-size: 11px; }
+  .pbadge .pt { opacity: .7; font-size: 9px; }
+  .steps-wrap { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+  .step { width: 24px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; color: #fff; cursor: default; transition: background .15s; }
+  .step.pending { background: #d0d7de; color: transparent; }
+  .step.ok { background: var(--green); }
+  .step.fail { background: var(--red); }
+  .step.caught { background: #e36209; }
+  .gate-box { width: 100px; flex-shrink: 0; padding: 4px 6px; border-radius: 6px;
+    border: 0.5px solid var(--border); font-size: 10px; text-align: center; transition: all .3s; }
+  .gate-box .gt { font-weight: 700; font-size: 9px; text-transform: uppercase; letter-spacing: .4px; }
+
+  /* Metrics */
+  .mets { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .met { flex: 1; min-width: 90px; padding: 10px; border-radius: var(--radius); border: 0.5px solid var(--border); text-align: center; }
+  .met-l { font-size: 10px; text-transform: uppercase; letter-spacing: .3px; color: var(--text3); margin-bottom: 3px; }
+  .met-v { font-size: 24px; font-weight: 700; line-height: 1; }
+  .met-v.g { color: var(--green); } .met-v.r { color: var(--red); } .met-v.n { color: #e36209; }
+  .met-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* Buttons */
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  button.pri { padding: 7px 18px; border-radius: var(--radius); background: var(--blue); color: #fff;
+    border: none; cursor: pointer; font-size: 13px; font-weight: 500; }
+  button.pri:disabled { background: #94b4d5; cursor: default; }
+  button.sec { padding: 7px 18px; border-radius: var(--radius); background: var(--green); color: #fff;
+    border: none; cursor: pointer; font-size: 13px; font-weight: 500; }
+  button.sec:disabled { background: #8cc4a1; cursor: default; }
+  button.plain { padding: 6px 14px; border-radius: var(--radius); background: transparent;
+    border: 0.5px solid var(--border2); cursor: pointer; font-size: 13px; color: var(--text); }
+  .status { font-size: 11px; color: var(--text3); min-height: 16px; margin-bottom: 8px; }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .leg { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text2); }
+  .ldot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* Compare bars */
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .blbl { font-size: 11px; width: 120px; text-align: right; color: var(--text2); flex-shrink: 0; }
+  .btrack { flex: 1; height: 18px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+  .bfill { height: 100%; border-radius: 4px; transition: width .6s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; }
+  .bfill.nv { background: var(--red); } .bfill.wv { background: var(--green); }
+  .bpct { font-size: 10px; font-weight: 700; color: #fff; }
+
+  /* Golf */
+  .hole-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+  .hole-label { font-size: 10px; color: var(--text3); width: 46px; text-align: right; flex-shrink: 0; }
+  .shot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; transition: background .2s; }
+  .shot.pending { background: #e0e0e0; }
+  .shot.ok { background: var(--green); color: #fff; }
+  .shot.bad { background: var(--red); color: #fff; }
+  .shot.caught { background: #e36209; color: #fff; }
+  .shot.gate { width: 14px; height: 22px; border-radius: 3px; background: #dbeafe;
+    border: 1px dashed var(--blue); color: var(--blue); font-size: 8px; font-weight: 700; }
+  .hole-score { font-size: 10px; font-weight: 700; margin-left: 4px; min-width: 50px; }
+  .hs-ok { color: var(--green); } .hs-bad { color: var(--red); } .hs-catch { color: #e36209; }
+
+  /* Moat */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media(max-width:600px){ .two-col { grid-template-columns: 1fr; } }
+  .bet-card { border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+  .bet-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+  .bet-problem { margin-top: 8px; padding: 7px 9px; border-radius: 6px; font-size: 12px; line-height: 1.5; }
+  .moat-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 6px; background: var(--bg2); margin-bottom: 6px; }
+  .moat-num { font-size: 12px; font-weight: 700; color: var(--blue); width: 18px; flex-shrink: 0; }
+  .moat-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .moat-sub { font-size: 12px; color: var(--text2); }
+  .moat-why { font-size: 11px; color: var(--red); margin-top: 3px; font-style: italic; }
+  .partners-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+  .partner { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; text-align: center; min-width: 82px; }
+  .platform-box { border: 1.5px solid var(--blue); border-radius: var(--radius-lg); padding: 14px; position: relative; margin-bottom: 14px; }
+  .platform-lbl { position: absolute; top: -10px; left: 16px; background: var(--bg); padding: 0 6px;
+    font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .4px; }
+  .actions-core { background: var(--blue-bg); border-radius: var(--radius); padding: 10px; margin-bottom: 10px; text-align: center; }
+  .story-node { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px;
+    border-radius: var(--radius); border: 0.5px solid var(--border); margin-bottom: 8px; }
+  .story-node.hl { border-color: var(--blue); background: #f0f6ff; }
+  .story-icon { font-size: 20px; flex-shrink: 0; width: 26px; text-align: center; }
+  .punchline { background: var(--bg2); border-left: 3px solid var(--blue); padding: 12px 16px;
+    border-radius: 0 var(--radius) var(--radius) 0; font-size: 14px; line-height: 1.7; margin: 16px 0; }
+
+  /* CAM arch */
+  .arch-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  @media(max-width:600px){ .arch-two { grid-template-columns: 1fr; } }
+  .lane { border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 12px; }
+  .lane-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: 8px; padding-bottom: 5px; border-bottom: 0.5px solid var(--border); }
+  .anode { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; padding: 5px 6px;
+    border-radius: 5px; }
+  .anode-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .anode-title { font-size: 12px; font-weight: 600; }
+  .anode-sub { font-size: 11px; color: var(--text2); }
+  .gate-node { border: 0.5px solid; border-radius: 5px; padding: 6px 8px; margin-bottom: 6px; font-size: 11px; }
+  .gate-node .gn { font-weight: 700; margin-bottom: 2px; font-size: 12px; }
+  .arrow-down { text-align: center; font-size: 14px; color: var(--text3); margin: 2px 0; }
+  .finding { padding: 5px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 5px; border-left: 3px solid; }
+
+  /* Footer */
+  footer { margin-top: 48px; padding-top: 20px; border-top: 0.5px solid var(--border);
+    font-size: 12px; color: var(--text3); }
+  .cmp-section { display: none; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>The Finishing Problem</h1>
+  <div class="lede">Why verification gates — not better models — are GitHub's competitive moat in regulated industries. An interactive explainer for sales leaders and technical teams.</div>
+
+  <!-- TOP NAV -->
+  <div class="tabs">
+    <button class="tab active" onclick="showMain('golf',this)">⛳ The golf metaphor</button>
+    <button class="tab" onclick="showMain('pipeline',this)">🔧 CAM pipeline</button>
+    <button class="tab" onclick="showMain('moat',this)">🏰 Competitive moat</button>
+  </div>
+
+  <!-- ===== GOLF ===== -->
+  <div class="tabview on" id="mv-golf">
+    <div class="surface">
+      <h3>The caddie principle</h3>
+      <p>Every shot in golf has a small chance of going wrong. Play 18 holes alone and small errors compound into a disaster round. Play with a caddie who checks each decision <em>before you swing</em> and most errors get corrected before they cascade.</p>
+      <p style="margin-bottom:0"><strong style="color:var(--text)">That's the verification gate.</strong> Not a better golfer. A checkpoint that catches mistakes before they become the next hole's problem.</p>
+    </div>
+
+    <div class="mets">
+      <div class="met"><div class="met-l">Solo — no caddie</div><div class="met-v r" id="g-score-no">—</div><div class="met-sub" id="g-sub-no">errors compound</div></div>
+      <div class="met"><div class="met-l">With caddie (gates every 3)</div><div class="met-v g" id="g-score-yes">—</div><div class="met-sub" id="g-sub-yes">errors caught early</div></div>
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="ldot" style="background:var(--green)"></div>Good shot</div>
+      <div class="leg"><div class="ldot" style="background:var(--red)"></div>Bad shot — compounds</div>
+      <div class="leg"><div class="ldot" style="background:#e36209"></div>Caught by caddie</div>
+      <div class="leg"><div class="ldot" style="width:10px;height:14px;border-radius:2px;background:#dbeafe;border:1px dashed var(--blue)"></div>Caddie check</div>
+    </div>
+
+    <div class="status" id="g-status">Click "Play a round" to simulate</div>
+    <div class="btns">
+      <button class="pri" id="g-pbtn" onclick="playGolf()">⛳ Play a round</button>
+      <button class="plain" onclick="playGolf()">Play again</button>
+    </div>
+
+    <div class="two-col" id="g-courses">
+      <div class="card">
+        <h3 style="color:var(--red);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Solo — no caddie</h3>
+        <div id="g-holes-no"></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">With caddie (check every 3 holes)</h3>
+        <div id="g-holes-yes"></div>
+      </div>
+    </div>
+
+    <div class="surface" id="g-punchline" style="display:none">
+      <strong id="g-punch-head" style="display:block;font-size:14px;margin-bottom:4px"></strong>
+      <span id="g-punch-body" style="color:var(--text2);font-size:13px"></span>
+      <div style="margin-top:8px;font-size:12px;color:var(--text3)" id="g-punch-sub"></div>
+    </div>
+
+    <div class="cmp-section" id="g-cmp">
+      <h3 style="font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:8px">100-round comparison</h3>
+      <div class="bar-row"><span class="blbl">Without caddie</span><div class="btrack"><div class="bfill nv" id="g-bnv" style="width:0%"><span class="bpct" id="g-bnv-p"></span></div></div></div>
+      <div class="bar-row"><span class="blbl">With caddie</span><div class="btrack"><div class="bfill wv" id="g-bwv" style="width:0%"><span class="bpct" id="g-bwv-p"></span></div></div></div>
+    </div>
+  </div>
+
+  <!-- ===== CAM PIPELINE ===== -->
+  <div class="tabview" id="mv-pipeline">
+    <div class="surface">
+      <h3>cam-service: Implement fault escalation threshold (ASIL-B)</h3>
+      <p style="margin-bottom:6px">Scenario based on real <code>cam_fault.c</code>, <code>cam_config.h</code>, <code>cam_service.c</code> from the <a href="https://github.com/project-gearshift/critical-app-monitoring" target="_blank">project-gearshift/critical-app-monitoring</a> repo. Three violations intentionally introduced.</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--purple-bg);color:var(--purple-text)">V1: MISRA-C Rule 14.4 in cam_fault.c → Parasoft</span>
+        <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--teal-bg);color:var(--teal-text)">V2: MCDC coverage 75% &lt; 80% → coverage gate</span>
+        <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--amber-bg);color:var(--amber-text)">V3: REQ-047-D orphaned → UseBlocks traceability</span>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-bottom:12px">
+      <button class="tab active" onclick="showPipe('arch',this)">Architecture (shift-left)</button>
+      <button class="tab" onclick="showPipe('sim',this)">Simulate agent run</button>
+    </div>
+
+    <!-- Architecture sub-view -->
+    <div class="tabview on" id="pv-arch">
+      <div class="arch-two">
+        <div class="lane">
+          <div class="lane-head" style="color:var(--red)">Current — GM today</div>
+          <div class="anode"><div class="anode-dot" style="background:var(--blue)"></div><div><div class="anode-title">Developer writes code</div><div class="anode-sub">cam_fault.c, cam_config.h</div></div></div>
+          <div class="arrow-down">↓</div>
+          <div class="anode"><div class="anode-dot" style="background:#888"></div><div><div class="anode-title">Push to branch</div><div class="anode-sub">No local scan</div></div></div>
+          <div class="arrow-down">↓</div>
+          <div class="anode"><div class="anode-dot" style="background:var(--amber)"></div><div><div class="anode-title">Trigger AVD build</div><div class="anode-sub">Parasoft runs here — 30–90 min later</div></div></div>
+          <div class="arrow-down">↓</div>
+          <div class="anode"><div class="anode-dot" style="background:var(--red)"></div><div><div class="anode-title">XML/HTML report</div><div class="anode-sub">Manual parsing. Context long gone. SARIF not wired to GitHub.</div></div></div>
+          <div class="arrow-down">↓</div>
+          <div class="anode" style="opacity:.45"><div class="anode-dot" style="background:#ccc"></div><div><div class="anode-title">GitHub Security tab</div><div class="anode-sub">Not connected</div></div></div>
+        </div>
+        <div class="lane">
+          <div class="lane-head" style="color:var(--green)">Shift-left — with GitHub</div>
+          <div class="anode"><div class="anode-dot" style="background:var(--blue)"></div><div><div class="anode-title">Developer writes code</div><div class="anode-sub">cam_fault.c, cam_config.h</div></div></div>
+          <div class="arrow-down">↓</div>
+          <div class="gate-node" style="background:var(--purple-bg);border-color:var(--purple);color:var(--purple-text)">
+            <div class="gn">Gate 1 — IDE / pre-commit</div>
+            Parasoft MCP in Copilot Chat: inline violations + fix in seconds. Developer never leaves the IDE.
+          </div>
+          <div class="arrow-down">↓</div>
+          <div class="anode"><div class="anode-dot" style="background:#888"></div><div><div class="anode-title">Push clean code → open PR</div></div></div>
+          <div class="arrow-down">↓</div>
+          <div class="gate-node" style="background:var(--teal-bg);border-color:#1D9E75;color:var(--teal-text)">
+            <div class="gn">Gate 2 — GitHub Actions (PR)</div>
+            Parasoft CPP Test → SARIF → Security tab. PR blocked if violations or coverage &lt; 80%.
+          </div>
+          <div class="arrow-down">↓</div>
+          <div class="gate-node" style="background:var(--amber-bg);border-color:var(--amber);color:var(--amber-text)">
+            <div class="gn">Gate 3 — UseBlocks traceability</div>
+            All REQ-047 child reqs linked to tests. Orphaned reqs block merge.
+          </div>
+          <div class="arrow-down">↓</div>
+          <div class="anode"><div class="anode-dot" style="background:var(--green)"></div><div><div class="anode-title">PR unblocked → merge</div><div class="anode-sub">Full audit trail: SARIF + trace + coverage in GitHub</div></div></div>
+        </div>
+      </div>
+      <div class="mets">
+        <div class="met"><div class="met-l">Feedback loop — before</div><div class="met-v r">30–90m</div><div class="met-sub">after AVD build</div></div>
+        <div class="met"><div class="met-l">Feedback loop — after</div><div class="met-v g">&lt;60s</div><div class="met-sub">in Copilot Chat</div></div>
+        <div class="met"><div class="met-l">SARIF wired to GitHub</div><div class="met-v r">0%</div><div class="met-sub">GM today</div></div>
+        <div class="met"><div class="met-l">Coverage gate</div><div class="met-v n">none</div><div class="met-sub">CT not subscribed</div></div>
+      </div>
+    </div>
+
+    <!-- Simulate sub-view -->
+    <div class="tabview" id="pv-sim">
+      <div class="ctrl-row">
+        <label class="toggle"><div class="track on" id="p-vt" onclick="togglePV()"><div class="thumb"></div></div><span id="p-vt-lbl">Verification gates on</span></label>
+        <div class="ctrl-group"><span>Per-step accuracy</span><input type="range" id="p-acc" min="70" max="99" value="95" oninput="updatePMets()"><span class="val-badge" id="p-acc-out">95%</span></div>
+      </div>
+      <div class="mets" id="p-mets"></div>
+      <div class="legend">
+        <div class="leg"><div class="ldot" style="background:#d0d7de"></div>Pending</div>
+        <div class="leg"><div class="ldot" style="background:var(--green)"></div>Passed</div>
+        <div class="leg"><div class="ldot" style="background:var(--red)"></div>Silent failure</div>
+        <div class="leg"><div class="ldot" style="background:#e36209"></div>Caught by gate</div>
+      </div>
+      <div class="phase-rows" id="p-pipeline"></div>
+      <div class="status" id="p-status">Click simulate to run the agent</div>
+      <div class="btns">
+        <button class="pri" id="p-mbtn" onclick="pAnimate()">▶ Simulate agent run</button>
+        <button class="sec" id="p-rbtn" onclick="pRun100()">Run 100 deployments</button>
+      </div>
+      <div class="cmp-section" id="p-cmp">
+        <div class="bar-row"><span class="blbl">Without gates</span><div class="btrack"><div class="bfill nv" id="p-bnv" style="width:0%"><span class="bpct" id="p-bnv-p"></span></div></div></div>
+        <div class="bar-row"><span class="blbl">With gates</span><div class="btrack"><div class="bfill wv" id="p-bwv" style="width:0%"><span class="bpct" id="p-bwv-p"></span></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MOAT ===== -->
+  <div class="tabview" id="mv-moat">
+    <div class="tabs" style="margin-bottom:14px">
+      <button class="tab active" onclick="showMoat('bet',this)">The competing bets</button>
+      <button class="tab" onclick="showMoat('platform',this)">The platform moat</button>
+      <button class="tab" onclick="showMoat('story',this)">The full story</button>
+    </div>
+
+    <!-- Bets -->
+    <div class="tabview on" id="mm-bet">
+      <div class="two-col">
+        <div class="bet-card">
+          <div class="bet-head" style="color:var(--red)">Cursor · Windsurf · Claude Code</div>
+          <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">"We will build the perfect golfer."</p>
+          <p style="font-size:12px">Better model → fewer mistakes → verification not needed. The path to dominance is model quality and IDE experience.</p>
+          <div class="bet-problem" style="background:var(--red-bg);color:var(--red-text)">
+            In regulated industries, "fewer mistakes" isn't the bar. <strong>Zero undetected mistakes, with provenance</strong>, is the bar. ISO 26262 doesn't accept probability.
+          </div>
+        </div>
+        <div class="bet-card">
+          <div class="bet-head" style="color:var(--blue)">GitHub</div>
+          <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">"We will build the best caddie system."</p>
+          <p style="font-size:12px">Freedom of models — use any golfer you want. But every swing goes through a verification loop running on Actions, signed to GitHub's audit trail.</p>
+          <div class="bet-problem" style="background:var(--blue-bg);color:var(--blue-text)">
+            The caddie system improves regardless of which model is on top. Model wars are someone else's problem.
+          </div>
+        </div>
+      </div>
+      <div class="surface">
+        <strong>Why this matters now:</strong> The model quality gap is closing fast. But you cannot replicate 38 years of Parasoft MISRA certification, UseBlocks' ISO 26262 requirement tooling, or the Actions ecosystem of 25,000+ integrations with a better model. The moat isn't the golfer. It's the infrastructure the caddies run on.
+      </div>
+    </div>
+
+    <!-- Platform -->
+    <div class="tabview" id="mm-platform">
+      <div class="platform-box">
+        <div class="platform-lbl">GitHub Actions — the platform</div>
+        <div class="actions-core">
+          <div style="font-size:13px;font-weight:700;color:var(--blue-text);margin-bottom:3px">Actions compute + event system</div>
+          <div style="font-size:11px;color:#185fa5">Every push, PR, merge, release → programmable event. 240M+ developers. 25,000+ marketplace actions.</div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--text3);margin-bottom:8px">Verification partners run <em>on</em> Actions — not alongside it</div>
+        <div class="partners-row">
+          <div class="partner" style="background:var(--purple-bg);color:var(--purple-text)">Parasoft<div style="font-size:8px;margin-top:2px;opacity:.75">MISRA · CERT · AUTOSAR</div></div>
+          <div class="partner" style="background:var(--teal-bg);color:var(--teal-text)">UseBlocks<div style="font-size:8px;margin-top:2px;opacity:.75">ISO 26262 traceability</div></div>
+          <div class="partner" style="background:var(--amber-bg);color:var(--amber-text)">InfoMagnus<div style="font-size:8px;margin-top:2px;opacity:.75">SBOM · Sigstore</div></div>
+          <div class="partner" style="background:var(--green-bg);color:var(--green-text)">Arm runners<div style="font-size:8px;margin-top:2px;opacity:.75">Native silicon compute</div></div>
+          <div class="partner" style="background:var(--bg2);color:var(--text2)">KPIT<div style="font-size:8px;margin-top:2px;opacity:.75">AUTOSAR toolchain</div></div>
+          <div class="partner" style="background:var(--bg2);color:var(--text2)">VectorCAST<div style="font-size:8px;margin-top:2px;opacity:.75">MC/DC coverage</div></div>
+        </div>
+      </div>
+      <div class="moat-item"><div class="moat-num">1</div><div><div class="moat-title">Network density — the caddie marketplace</div><div class="moat-sub">25,000+ Actions. Every safety tool vendor already has a GitHub integration or is building one. Cursor has zero. Claude Code has zero.</div><div class="moat-why">They have no compute event infrastructure. Running Parasoft requires triggered compute, artifact storage, SARIF reporting — not just a chat interface.</div></div></div>
+      <div class="moat-item"><div class="moat-num">2</div><div><div class="moat-title">Causality — GitHub sees every commit, not snapshots</div><div class="moat-sub">GitHub holds the full graph: who wrote it, what requirement triggered it, which test passed it, which agent touched it.</div><div class="moat-why">You can't reconstruct causality after the fact. It has to be captured at commit time, in the platform where commits live.</div></div></div>
+      <div class="moat-item"><div class="moat-num">3</div><div><div class="moat-title">Audit trail — compliance as a byproduct</div><div class="moat-sub">SARIF to Security tab. SBOM signed with Sigstore. Requirements linked to commits. All in GitHub — the system of record auditors already ask for.</div><div class="moat-why">An IDE tool can't be a compliance system of record. Regulated buyers won't accept "trust the chat history."</div></div></div>
+      <div class="moat-item"><div class="moat-num">4</div><div><div class="moat-title">Model freedom — the caddie works with any golfer</div><div class="moat-sub">Copilot runs GPT-4o, Claude, Gemini, or a customer's fine-tuned model. Cursor is betting on one stack. If the model changes, their moat evaporates.</div><div class="moat-why">In regulated industries, customers can't be locked to one model provider for liability reasons. Freedom-of-models is a compliance feature.</div></div></div>
+    </div>
+
+    <!-- Story -->
+    <div class="tabview" id="mm-story">
+      <div class="story-node"><div class="story-icon">⛳</div><div><div class="moat-title">The bet our competitors are making</div><p style="font-size:12px;margin-bottom:0">Cursor, Windsurf, and Claude Code are racing to build the perfect golfer — a model so accurate it doesn't need verification. That's a reasonable bet for a startup building a code editor.</p></div></div>
+      <div class="story-node"><div class="story-icon">📐</div><div><div class="moat-title">Why it breaks in regulated software</div><p style="font-size:12px;margin-bottom:0">ISO 26262 doesn't accept "our model was 99.9% accurate." It requires documented evidence that every requirement was traced, every violation was caught, every artifact was signed. A perfect golfer who keeps no scorecard can't win a tournament with judges.</p></div></div>
+      <div class="story-node hl"><div class="story-icon">🏗️</div><div><div class="moat-title">What GitHub built that they didn't — Actions</div><p style="font-size:12px;margin-bottom:0">Actions is the event infrastructure that makes verification gates possible at scale. Every push, PR, and merge is a programmable event. Parasoft fires on every PR. UseBlocks validates every commit. InfoMagnus signs every artifact. Automatically. Without a human remembering to run it.</p></div></div>
+      <div class="story-node hl"><div class="story-icon">🤝</div><div><div class="moat-title">The partner ecosystem is the caddie corps</div><p style="font-size:12px;margin-bottom:0">Parasoft has 38 years of MISRA certification. UseBlocks owns ISO 26262 requirements tooling. They built for GitHub because GitHub has the platform — the compute, the events, the artifact storage, the security tab. Cursor can't offer them a home.</p></div></div>
+      <div class="story-node"><div class="story-icon">🔒</div><div><div class="moat-title">The causality moat</div><p style="font-size:12px;margin-bottom:0">GitHub holds the full history: which requirement drove this commit, which agent touched this file, which test verified this function. Competitors see the code. GitHub sees the causality chain behind it.</p></div></div>
+      <div class="story-node"><div class="story-icon">🆓</div><div><div class="moat-title">Freedom of models makes the moat model-proof</div><p style="font-size:12px;margin-bottom:0">Cursor is betting their moat on one model stack. When the next model leapfrogs it, their moat moves. GitHub's moat doesn't care who the golfer is — the caddie system works with any model.</p></div></div>
+      <div class="punchline">
+        <strong style="font-size:14px;display:block;margin-bottom:4px">The one sentence for a sales leader</strong>
+        "Cursor and Anthropic are racing to build a golfer who never misses. We built the only course where certified caddies — Parasoft, UseBlocks, InfoMagnus — run on every hole, automatically, and generate the scorecard that your auditors, your regulators, and your safety managers will actually accept."
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built by <a href="https://github.com/claynelson" target="_blank">Clay Nelson</a> · GitHub Industry Solutions · <a href="https://github.com/project-gearshift/critical-app-monitoring" target="_blank">project-gearshift/critical-app-monitoring</a>
+  </footer>
+</div>
+
+<script>
+const sl = ms => new Promise(r => setTimeout(r, ms));
+
+// ---- TAB NAV ----
+function showMain(id, btn){
+  document.querySelectorAll('#mv-golf,#mv-pipeline,#mv-moat').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tabs')[0].querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mv-'+id).classList.add('on');
+  btn.classList.add('active');
+}
+function showPipe(id, btn){
+  document.querySelectorAll('#pv-arch,#pv-sim').forEach(v=>v.classList.remove('on'));
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pv-'+id).classList.add('on');
+  btn.classList.add('active');
+  if(id==='sim'){ updatePMets(); renderPPipeline(); }
+}
+function showMoat(id, btn){
+  document.querySelectorAll('#mm-bet,#mm-platform,#mm-story').forEach(v=>v.classList.remove('on'));
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mm-'+id).classList.add('on');
+  btn.classList.add('active');
+}
+
+// ===== GOLF =====
+async function playGolf(){
+  document.getElementById('g-pbtn').disabled = true;
+  document.getElementById('g-punchline').style.display = 'none';
+  document.getElementById('g-cmp').style.display = 'none';
+  document.getElementById('g-status').textContent = 'Playing...';
+  const HOLES=18, ERR=0.18, COMP=1.4, GATE=3, CATCH=0.92;
+  const luck = Array.from({length:HOLES},()=>Math.random());
+  let noShots=[], noScore=36, yesShots=[], yesScore=36, em=1;
+  for(let h=0;h<HOLES;h++){
+    const bad = luck[h] < ERR*em;
+    noShots.push(bad?'bad':'ok');
+    if(bad){noScore+=2;em*=COMP;}else{em=Math.max(1,em*.8);}
+  }
+  em=1;
+  for(let h=0;h<HOLES;h++){
+    const bad=luck[h]<ERR*em, gate=(h+1)%GATE===0;
+    if(bad){const caught=gate&&Math.random()<CATCH;yesShots.push({s:caught?'caught':'bad',g:gate});if(!caught){yesScore+=2;em*=COMP;}else{em=Math.max(1,em*.8);}}
+    else{yesShots.push({s:'ok',g:gate});em=Math.max(1,em*.8);}
+  }
+  noScore=Math.min(noScore,120); yesScore=Math.min(yesScore,120);
+  const noEl=document.getElementById('g-holes-no'), yesEl=document.getElementById('g-holes-yes');
+  noEl.innerHTML=''; yesEl.innerHTML='';
+  for(let h=0;h<HOLES;h++){
+    const nr=document.createElement('div'); nr.className='hole-row';
+    nr.innerHTML=`<span class="hole-label">Hole ${h+1}</span>`;
+    const ns=document.createElement('div'); ns.className='shot pending'; nr.appendChild(ns);
+    const nl=document.createElement('span'); nl.className='hole-score'; nr.appendChild(nl);
+    noEl.appendChild(nr);
+    const yr=document.createElement('div'); yr.className='hole-row';
+    yr.innerHTML=`<span class="hole-label">Hole ${h+1}</span>`;
+    const ys=document.createElement('div'); ys.className='shot pending'; yr.appendChild(ys);
+    if(yesShots[h].g){const g=document.createElement('div');g.className='shot gate';g.textContent='✓';yr.appendChild(g);}
+    const yl=document.createElement('span'); yl.className='hole-score'; yr.appendChild(yl);
+    yesEl.appendChild(yr);
+  }
+  document.getElementById('g-score-no').textContent='—';
+  document.getElementById('g-score-yes').textContent='—';
+  let rn=36,ry=36;
+  for(let h=0;h<HOLES;h++){
+    await sl(80);
+    const nDiv=noEl.children[h].querySelector('.shot'), nLbl=noEl.children[h].querySelector('.hole-score');
+    nDiv.className='shot '+(noShots[h]==='bad'?'bad':'ok');
+    if(noShots[h]==='bad'){rn+=2;nLbl.textContent='+2 ⚠';nLbl.className='hole-score hs-bad';}
+    else{nLbl.textContent='par';nLbl.className='hole-score hs-ok';}
+    const yDiv=yesEl.children[h].querySelector('.shot'), yLbl=yesEl.children[h].querySelector('.hole-score');
+    yDiv.className='shot '+yesShots[h].s;
+    if(yesShots[h].s==='bad'){ry+=2;yLbl.textContent='+2 missed';yLbl.className='hole-score hs-bad';}
+    else if(yesShots[h].s==='caught'){yLbl.textContent='caught ✓';yLbl.className='hole-score hs-catch';}
+    else{yLbl.textContent='par';yLbl.className='hole-score hs-ok';}
+    document.getElementById('g-score-no').textContent=Math.min(rn+Math.round(36*(HOLES-h-1)/HOLES),120);
+    document.getElementById('g-score-yes').textContent=Math.min(ry+Math.round(36*(HOLES-h-1)/HOLES),120);
+  }
+  const lbl=s=>s<=72?'Par or better':s<=80?'Solid round':s<=90?'Bogey golf':s<=100?'Weekend hacker':'Rough day';
+  document.getElementById('g-score-no').textContent=noScore;
+  document.getElementById('g-sub-no').textContent=lbl(noScore);
+  document.getElementById('g-score-yes').textContent=yesScore;
+  document.getElementById('g-sub-yes').textContent=lbl(yesScore);
+  const diff=noScore-yesScore, caught=yesShots.filter(s=>s.s==='caught').length;
+  document.getElementById('g-status').textContent=`Round complete — ${yesShots.filter(s=>s.s==='bad'||s.s==='caught').length} bad shots, ${caught} caught by caddie.`;
+  const pl=document.getElementById('g-punchline'); pl.style.display='';
+  document.getElementById('g-punch-head').textContent=diff>0?`Caddie saved ${diff} strokes — same golfer, same course, same luck.`:`Even caddies have off days. Play again.`;
+  document.getElementById('g-punch-body').textContent=diff>0?`The caddie didn't make you a better golfer. It caught ${caught} bad decision${caught!==1?'s':''} before they cascaded into double bogeys.`:`The math favors the caddie — run again and the improvement usually shows.`;
+  document.getElementById('g-punch-sub').textContent=`In software: the agent isn't getting smarter. The verification gate catches errors at each step before they compound into a failed deployment.`;
+  document.getElementById('g-pbtn').disabled=false;
+}
+
+// ===== PIPELINE =====
+const P_PHASES=[
+  {n:'Requirements',t:'UseBlocks',bg:'#EEEDFE',tc:'#3C3489'},
+  {n:'Architecture',t:'Copilot',bg:'#F1EFE8',tc:'#444441'},
+  {n:'Implementation',t:'Copilot+MCP',bg:'#E6F1FB',tc:'#0C447C'},
+  {n:'Testing',t:'Parasoft',bg:'#E1F5EE',tc:'#085041'},
+  {n:'Traceability',t:'UseBlocks',bg:'#FAEEDA',tc:'#633806'},
+  {n:'Artifacts',t:'InfoMagnus',bg:'#EAF3DE',tc:'#27500A'}
+];
+const P_STEPS=[
+  {ph:0,n:'Fetch REQ-047'},{ph:0,n:'Parse child reqs'},{ph:0,n:'Map to files'},{ph:0,n:'Validate completeness'},
+  {ph:1,n:'Read cam_fault.h'},{ph:1,n:'Read cam_config.h'},{ph:1,n:'Read cam_service.c'},{ph:1,n:'Read test/'},
+  {ph:2,n:'cam_config.h: threshold'},{ph:2,n:'cam_fault.h: API'},{ph:2,n:'cam_fault.c: logic (V1)',viol:true},{ph:2,n:'cam_config.c: parse'},{ph:2,n:'cam_service.c: wire'},{ph:2,n:'MISRA comments'},
+  {ph:3,n:'Test: below limit'},{ph:3,n:'Test: at limit'},{ph:3,n:'Test: above limit'},{ph:3,n:'MCDC matrix (V2)',viol:true},{ph:3,n:'ctest + gcovr'},
+  {ph:4,n:'Tag to REQ-047'},{ph:4,n:'Trace matrix'},{ph:4,n:'Validate ASIL-B (V3)',viol:true},{ph:4,n:'Export artifact'},
+  {ph:5,n:'SBOM'},{ph:5,n:'Sign artifacts'},{ph:5,n:'Draft PR'},{ph:5,n:'Policy gate'}
+];
+const P_GATES=['UseBlocks','GitHub','Parasoft','Parasoft','UseBlocks','GitHub'];
+const P_DEMO_VIOLS=[10,17,21];
+let pVerify=true, pStates=P_STEPS.map(()=>'pending'), pGateStates=P_PHASES.map(()=>'pending'), pRunning=false;
+
+function togglePV(){
+  pVerify=!pVerify;
+  const t=document.getElementById('p-vt');
+  t.classList.toggle('on',pVerify);
+  document.getElementById('p-vt-lbl').textContent=pVerify?'Verification gates on':'Verification gates off';
+  updatePMets(); renderPPipeline();
+}
+function updatePMets(){
+  const acc=parseInt(document.getElementById('p-acc').value)/100;
+  document.getElementById('p-acc-out').textContent=Math.round(acc*100)+'%';
+  const n=P_STEPS.length, th=Math.pow(acc,n)*100;
+  const sizes=[4,4,6,5,4,4]; let pv=1;
+  for(const sz of sizes){const ps=Math.pow(acc,sz);pv*=ps+(1-ps)*0.97;}
+  document.getElementById('p-mets').innerHTML=`
+    <div class="met"><div class="met-l">Without gates</div><div class="met-v r">${th.toFixed(0)}%</div><div class="met-sub">safe deployments</div></div>
+    <div class="met"><div class="met-l">With gates</div><div class="met-v g">${(pv*100).toFixed(0)}%</div><div class="met-sub">safe deployments</div></div>
+    <div class="met"><div class="met-l">Lift</div><div class="met-v n">${(pv*100-th).toFixed(0)}pp</div><div class="met-sub">improvement</div></div>`;
+}
+function renderPPipeline(){
+  const c=document.getElementById('p-pipeline'); let html='';
+  P_PHASES.forEach((p,pi)=>{
+    const steps=P_STEPS.map((s,i)=>({...s,idx:i})).filter(s=>s.ph===pi);
+    const gs=pGateStates[pi];
+    const gStyle=gs==='pass'?`background:${p.bg};border-color:#888;color:${p.tc}`:gs==='fail'?'background:var(--red-bg);border-color:var(--red);color:var(--red-text)':'';
+    html+=`<div class="prow"><div class="pbadge" style="background:${p.bg};color:${p.tc}"><div class="pn">${p.n}</div><div class="pt">${p.t}</div></div><div class="steps-wrap">`;
+    steps.forEach(s=>{html+=`<div class="step ${pStates[s.idx]}" title="${s.n}">${s.idx+1}</div>`;});
+    html+=`</div><div class="gate-box ${gs}" style="${gStyle}"><div class="gt">${P_GATES[pi]}</div><div>${gs==='pass'?'✓ Gate passed':gs==='fail'?'✗ Blocked':'Gate '+pi}</div></div></div>`;
+  });
+  c.innerHTML=html;
+}
+async function pAnimate(){
+  if(pRunning)return; pRunning=true;
+  document.getElementById('p-mbtn').disabled=true; document.getElementById('p-rbtn').disabled=true;
+  document.getElementById('p-cmp').style.display='none';
+  pStates=P_STEPS.map(()=>'pending'); pGateStates=P_PHASES.map(()=>'pending'); renderPPipeline();
+  for(let ph=0;ph<P_PHASES.length;ph++){
+    const steps=P_STEPS.map((s,i)=>({...s,idx:i})).filter(s=>s.ph===ph);
+    let phErr=false;
+    for(const s of steps){
+      pStates[s.idx]='active'; renderPPipeline();
+      document.getElementById('p-status').textContent=`Step ${s.idx+1}/${P_STEPS.length}: ${s.n}`;
+      await sl(70);
+      const failed=P_DEMO_VIOLS.includes(s.idx);
+      if(!failed){pStates[s.idx]='ok';}
+      else{phErr=true; pStates[s.idx]=pVerify?'caught':'fail';}
+      renderPPipeline(); await sl(25);
+    }
+    await sl(100);
+    if(pVerify){
+      if(phErr&&Math.random()<0.97){
+        pGateStates[ph]='pass';
+        document.getElementById('p-status').textContent=`✓ ${P_GATES[ph]} gate: violation caught and blocked`;
+      }else if(phErr){
+        steps.forEach(s=>{if(pStates[s.idx]==='caught')pStates[s.idx]='fail';});
+        pGateStates[ph]='fail';
+        document.getElementById('p-status').textContent=`✗ ${P_GATES[ph]} gate missed violation — propagating`;
+      }else{pGateStates[ph]='pass';document.getElementById('p-status').textContent=`✓ ${P_GATES[ph]} gate: all checks passed`;}
+    }else{pGateStates[ph]=phErr?'fail':'pass';}
+    renderPPipeline(); await sl(180);
+  }
+  const fails=pStates.filter(s=>s==='fail').length;
+  document.getElementById('p-status').textContent=fails===0?'✓ All violations caught. ASIL-B compliance demonstrable. PR unblocked.':`✗ ${fails} violation(s) reached production. ASIL-B compliance NOT demonstrated.`;
+  document.getElementById('p-mbtn').textContent='Run again'; document.getElementById('p-mbtn').disabled=false; document.getElementById('p-rbtn').disabled=false; pRunning=false;
+}
+async function pRun100(){
+  if(pRunning)return; pRunning=true;
+  document.getElementById('p-status').textContent='Simulating 100 deployments...';
+  document.getElementById('p-mbtn').disabled=true; document.getElementById('p-rbtn').disabled=true;
+  const acc=parseInt(document.getElementById('p-acc').value)/100;
+  const sizes=[4,4,6,5,4,4]; let snv=0,swv=0;
+  for(let r=0;r<100;r++){
+    const fails=new Set(P_DEMO_VIOLS);
+    if(fails.size===0)snv++;
+    let ok=true; let idx=0;
+    for(const sz of sizes){let pf=false;for(let i=0;i<sz;i++){if(fails.has(idx++))pf=true;}if(pf&&Math.random()>=0.97){ok=false;break;}}
+    if(ok&&fails.size>0)swv++; else if(fails.size===0)swv++;
+  }
+  document.getElementById('p-cmp').style.display='block';
+  document.getElementById('p-bnv').style.width=snv+'%'; document.getElementById('p-bnv-p').textContent=snv+'%';
+  document.getElementById('p-bwv').style.width=swv+'%'; document.getElementById('p-bwv-p').textContent=swv+'%';
+  document.getElementById('p-status').textContent=`100 deployments: ${snv}% safe without gates vs ${swv}% with — ${swv-snv}pp improvement`;
+  document.getElementById('p-mbtn').disabled=false; document.getElementById('p-rbtn').disabled=false; pRunning=false;
+}
+updatePMets(); renderPPipeline();
+</script>
+</body>
+</html>
