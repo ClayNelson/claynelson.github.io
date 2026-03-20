@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Copilot as Control Plane — Architecture</title>
+<style>
+:root{--bg:#fff;--bg2:#f6f6f4;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--bd:rgba(0,0,0,0.1);--bd2:rgba(0,0,0,0.18);--blue:#0969da;--green:#1a7f37;--red:#cf222e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;font-size:14px;background:var(--bg);color:var(--text);line-height:1.6}
+.page{max-width:880px;margin:0 auto;padding:28px 20px 60px}
+nav{font-size:12px;color:var(--text3);margin-bottom:20px}
+nav a{color:var(--blue);text-decoration:none}
+nav a:hover{text-decoration:underline}
+h1{font-size:24px;font-weight:600;margin-bottom:6px}
+.lede{font-size:15px;color:var(--text2);margin-bottom:24px;padding-bottom:20px;border-bottom:.5px solid var(--bd)}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:20px;border:.5px solid var(--bd2);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text);transition:all .15s}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.view{display:none}.view.on{display:block}
+.vnote{font-size:13px;color:var(--text2);font-style:italic;margin-bottom:14px}
+.svg-card{border:.5px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:14px;overflow-x:auto}
+.key-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+@media(max-width:560px){.key-grid{grid-template-columns:1fr}}
+.key{padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.5}
+.key.blue{background:#E6F1FB;color:#0C447C}
+.key.purple{background:#EEEDFE;color:#3C3489}
+.key.teal{background:#E1F5EE;color:#085041}
+.key.amber{background:#FAEEDA;color:#633806}
+.key.green{background:#EAF3DE;color:#27500A}
+.pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.pill{width:28px;height:28px;border-radius:50%;border:.5px solid var(--bd2);cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .12s}
+.pill.done{background:#EAF3DE;color:#1a7f37;border-color:#1a7f37}
+.pill.curr{background:var(--blue);color:#fff;border-color:var(--blue)}
+.scard{background:var(--bg2);border-radius:12px;padding:16px;margin-bottom:12px;min-height:110px}
+.snum{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.stitle{font-size:17px;font-weight:600;margin-bottom:7px}
+.sdesc{font-size:13px;color:var(--text2);line-height:1.65}
+.sviol{margin-top:9px;padding:6px 10px;border-radius:5px;font-size:12px;background:#fff3cd;color:#7d5a00;border-left:3px solid #ffc107}
+.sgate{margin-top:9px;padding:7px 10px;border-radius:5px;font-size:12px;font-weight:600}
+.sgate.pass{background:#EAF3DE;color:#27500A}
+.sgate.fail{background:#FCEBEB;color:#791F1F}
+.snav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sctr{font-size:12px;color:var(--text3)}
+.btnp{padding:7px 18px;border-radius:8px;background:var(--blue);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:500}
+.btnp:disabled{background:#94b4d5;cursor:default}
+.btnn{padding:7px 16px;border-radius:8px;background:transparent;border:.5px solid var(--bd2);cursor:pointer;font-size:13px;color:var(--text)}
+.btnn:disabled{opacity:.4;cursor:default}
+.sw-wrap{overflow-x:auto;margin-bottom:4px}
+.sw-table{width:100%;border-collapse:collapse;min-width:580px}
+.sw-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:7px 8px;border-bottom:1.5px solid var(--bd2);color:var(--text2);text-align:center}
+.sw-table td{padding:5px 5px;border:.5px solid var(--bd);vertical-align:top}
+.sw-cell{padding:5px 7px;border-radius:4px;font-size:11px;line-height:1.4;min-height:30px}
+.c-dev{background:#F1EFE8;color:#2C2C2A}
+.c-gh{background:#E6F1FB;color:#0C447C}
+.c-ag{background:#E6F1FB;color:#0C447C;outline:1.5px solid #0969da;border-radius:4px}
+.c-mp{background:#EEEDFE;color:#3C3489}
+.c-mu{background:#E1F5EE;color:#085041}
+.c-mi{background:#FAEEDA;color:#633806}
+.c-art{background:#EAF3DE;color:#27500A}
+.off{color:var(--text3);font-size:10px}
+tr.cur td{background:#f0f6ff}
+footer{margin-top:48px;padding-top:18px;border-top:.5px solid var(--bd);font-size:12px;color:var(--text3)}
+footer a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="page">
+
+<nav><a href="finishing-problem.html">← The Finishing Problem</a></nav>
+<h1>Copilot as control plane</h1>
+<p class="lede">Architectural views of GitHub Copilot orchestrating a compliance-aware enhancement request — from GitHub Issue #47 to merged PR — with Parasoft, UseBlocks, and InfoMagnus running as verification gates on Actions.</p>
+
+<div class="tabs">
+  <button class="tab active" onclick="sw('structural',this)">Structural view</button>
+  <button class="tab" onclick="sw('behavioral',this)">Behavioral view</button>
+</div>
+
+<!-- ===== STRUCTURAL ===== -->
+<div class="view on" id="v-structural">
+<p class="vnote">What the system <em>is</em> — components, containment, and key relationships at rest.</p>
+
+<div class="svg-card">
+<svg width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- GitHub Platform container (dashed) -->
+<rect x="10" y="10" width="494" height="500" rx="14" fill="none" stroke="#0969da" stroke-width="1.5" stroke-dasharray="6 3"/>
+<text x="24" y="28" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#0969da" letter-spacing="0.5">GITHUB PLATFORM</text>
+
+<!-- Partner label -->
+<text x="597" y="22" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#5a5a56" text-anchor="middle" letter-spacing="0.4">PARTNER MCP</text>
+
+<!-- GitHub Issues -->
+<rect x="26" y="38" width="155" height="58" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+<text x="103" y="62" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#2C2C2A" text-anchor="middle" dominant-baseline="central">GitHub Issues</text>
+<text x="103" y="82" font-family="system-ui,sans-serif" font-size="10" fill="#5F5E5A" text-anchor="middle" dominant-baseline="central">Enhancement request #N</text>
+
+<!-- Copilot Agent — PROMINENT, center-top -->
+<rect x="210" y="28" width="222" height="78" rx="10" fill="#E6F1FB" stroke="#0969da" stroke-width="1.5"/>
+<text x="321" y="51" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#0C447C" text-anchor="middle" dominant-baseline="central">Copilot Agent</text>
+<text x="321" y="70" font-family="system-ui,sans-serif" font-size="11" fill="#185FA5" text-anchor="middle" dominant-baseline="central">Control plane</text>
+<text x="321" y="88" font-family="system-ui,sans-serif" font-size="10" fill="#378ADD" text-anchor="middle" dominant-baseline="central">reads · implements · calls tools · gates</text>
+
+<!-- Arrow Issue → Agent -->
+<line x1="181" y1="67" x2="208" y2="67" stroke="#888780" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- GitHub Actions -->
+<rect x="26" y="204" width="268" height="56" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.5"/>
+<text x="160" y="228" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#0C447C" text-anchor="middle" dominant-baseline="central">GitHub Actions</text>
+<text x="160" y="248" font-family="system-ui,sans-serif" font-size="10" fill="#185FA5" text-anchor="middle" dominant-baseline="central">Event-driven compute · triggers on every push and PR</text>
+
+<!-- Arrow Agent → Actions (dashed = controls) -->
+<line x1="275" y1="106" x2="200" y2="202" stroke="#0969da" stroke-width="1.5" stroke-dasharray="5 2" marker-end="url(#arr)"/>
+
+<!-- cam-service repo -->
+<rect x="26" y="296" width="176" height="112" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+<text x="114" y="317" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#2C2C2A" text-anchor="middle" dominant-baseline="central">cam-service</text>
+<text x="114" y="336" font-family="system-ui,sans-serif" font-size="10" fill="#888780" text-anchor="middle" dominant-baseline="central">cam_fault.c</text>
+<text x="114" y="352" font-family="system-ui,sans-serif" font-size="10" fill="#888780" text-anchor="middle" dominant-baseline="central">cam_config.h</text>
+<text x="114" y="368" font-family="system-ui,sans-serif" font-size="10" fill="#888780" text-anchor="middle" dominant-baseline="central">cam_service.c</text>
+<text x="114" y="384" font-family="system-ui,sans-serif" font-size="10" fill="#888780" text-anchor="middle" dominant-baseline="central">test/ · .github/</text>
+<text x="114" y="399" font-family="system-ui,sans-serif" font-size="9" fill="#B4B2A9" text-anchor="middle" dominant-baseline="central">ASIL-B safety-island code</text>
+
+<!-- Arrow Actions → cam-service -->
+<line x1="114" y1="260" x2="114" y2="294" stroke="#0969da" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Security Tab -->
+<rect x="220" y="296" width="130" height="52" rx="8" fill="#EAF3DE" stroke="#639922" stroke-width="0.5"/>
+<text x="285" y="318" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#27500A" text-anchor="middle" dominant-baseline="central">Security tab</text>
+<text x="285" y="337" font-family="system-ui,sans-serif" font-size="10" fill="#3B6D11" text-anchor="middle" dominant-baseline="central">SARIF · code scanning</text>
+
+<!-- Arrow Actions → Security Tab -->
+<line x1="224" y1="262" x2="257" y2="294" stroke="#1a7f37" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- PR + Audit Trail -->
+<rect x="220" y="362" width="130" height="52" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.5"/>
+<text x="285" y="384" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#0C447C" text-anchor="middle" dominant-baseline="central">PR + Audit Trail</text>
+<text x="285" y="402" font-family="system-ui,sans-serif" font-size="10" fill="#185FA5" text-anchor="middle" dominant-baseline="central">SBOM · trace · artifacts</text>
+
+<!-- Arrow Security Tab → PR -->
+<line x1="285" y1="348" x2="285" y2="360" stroke="#1a7f37" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Policy Gate -->
+<rect x="52" y="446" width="350" height="52" rx="10" fill="#EAF3DE" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="227" y="468" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#27500A" text-anchor="middle" dominant-baseline="central">Policy Gate → Merge</text>
+<text x="227" y="487" font-family="system-ui,sans-serif" font-size="10" fill="#3B6D11" text-anchor="middle" dominant-baseline="central">5 required status checks all green → PR approved</text>
+
+<!-- Arrows into Policy Gate -->
+<line x1="114" y1="408" x2="120" y2="444" stroke="#888780" stroke-width="1.5" marker-end="url(#arr)"/>
+<line x1="285" y1="414" x2="264" y2="444" stroke="#0969da" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ===== PARTNER MCP SERVICES (right column) ===== -->
+
+<!-- Parasoft MCP -->
+<rect x="520" y="28" width="150" height="50" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.5"/>
+<text x="595" y="50" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#3C3489" text-anchor="middle" dominant-baseline="central">Parasoft MCP</text>
+<text x="595" y="68" font-family="system-ui,sans-serif" font-size="10" fill="#534AB7" text-anchor="middle" dominant-baseline="central">MISRA · coverage · fixes</text>
+
+<!-- UseBlocks MCP -->
+<rect x="520" y="92" width="150" height="50" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/>
+<text x="595" y="114" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#085041" text-anchor="middle" dominant-baseline="central">UseBlocks MCP</text>
+<text x="595" y="132" font-family="system-ui,sans-serif" font-size="10" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">ISO 26262 · traceability</text>
+
+<!-- InfoMagnus MCP -->
+<rect x="520" y="156" width="150" height="50" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+<text x="595" y="178" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#633806" text-anchor="middle" dominant-baseline="central">InfoMagnus MCP</text>
+<text x="595" y="196" font-family="system-ui,sans-serif" font-size="10" fill="#854F0B" text-anchor="middle" dominant-baseline="central">SBOM · Sigstore signing</text>
+
+<!-- Agent → Parasoft (horizontal from right edge of Agent x=432) -->
+<line x1="432" y1="53" x2="518" y2="53" stroke="#7F77DD" stroke-width="1.5" marker-end="url(#arr)"/>
+<!-- Agent → UseBlocks (diagonal down) -->
+<line x1="432" y1="70" x2="518" y2="117" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#arr)"/>
+<!-- Agent → InfoMagnus (diagonal further down) -->
+<line x1="432" y1="86" x2="518" y2="181" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr)"/>
+
+</svg>
+</div>
+
+<div class="key-grid">
+  <div class="key blue"><strong>Copilot Agent</strong> — central orchestrator. Receives issues, calls MCP tools, reads and modifies code, responds to gate failures, assembles the PR audit trail.</div>
+  <div class="key purple"><strong>Parasoft MCP</strong> — MISRA/CERT static analysis on modified files only, MCDC branch coverage measurement, fix suggestions with rule documentation context.</div>
+  <div class="key teal"><strong>UseBlocks MCP</strong> — ISO 26262 requirement fetch (parent + children), bidirectional traceability linking, ASIL classification validation at every commit.</div>
+  <div class="key amber"><strong>InfoMagnus MCP</strong> — SPDX 2.3 SBOM generation across cam-service and libcam, Sigstore cosign signing of all compliance artifacts.</div>
+  <div class="key green"><strong>Policy Gate</strong> — GitHub branch protection: 5 required status checks (static, coverage, trace, SBOM, signing) must all be green before PR is unblocked.</div>
+</div>
+</div>
+
+<!-- ===== BEHAVIORAL ===== -->
+<div class="view" id="v-behavioral">
+<p class="vnote">What the system <em>does</em> — step by step as Copilot Agent processes Issue #47: "Implement configurable fault escalation threshold for REQ-047 (ASIL-B)."</p>
+<div class="pills" id="pills"></div>
+<div class="scard">
+  <div class="snum" id="snum"></div>
+  <div class="stitle" id="stitle"></div>
+  <div class="sdesc" id="sdesc"></div>
+  <div class="sviol" id="sviol" style="display:none"></div>
+  <div class="sgate" id="sgate" style="display:none"></div>
+</div>
+<div class="snav">
+  <button class="btnn" id="pbtn" onclick="prev()">← Previous</button>
+  <span class="sctr" id="sctr"></span>
+  <button class="btnp" id="nbtn" onclick="next()">Next →</button>
+</div>
+<div class="sw-wrap">
+  <table class="sw-table">
+    <thead>
+      <tr>
+        <th style="width:100px">Developer</th>
+        <th style="width:155px">GitHub Platform</th>
+        <th style="width:155px">Copilot Agent</th>
+        <th style="width:155px">Partner MCP Gates</th>
+        <th style="width:135px">Artifacts</th>
+      </tr>
+    </thead>
+    <tbody id="swb"></tbody>
+  </table>
+</div>
+</div>
+
+<footer>
+  Built by <a href="https://github.com/claynelson" target="_blank">Clay Nelson</a> · GitHub Industry Solutions ·
+  <a href="finishing-problem.html">The Finishing Problem</a> ·
+  <a href="https://github.com/project-gearshift/critical-app-monitoring" target="_blank">critical-app-monitoring</a>
+</footer>
+</div>
+
+<script>
+const S=[
+  {n:1,title:"Issue created",desc:"Developer opens GitHub Issue #47: 'Implement configurable fault escalation threshold for REQ-047 (ASIL-B).' Issue body includes the UseBlocks requirement ID, ASIL-B label, and cam_fault.c as the primary target file.",dev:"Opens Issue #47",gh:"Issue logged · Copilot notified",ag:"",mcp:"",art:"",mc:""},
+  {n:2,title:"Agent assigned to issue",desc:"Copilot Agent is assigned. It reads the full issue body, parses the requirement reference (REQ-047), ASIL-B label, and identifies cam_fault.c, cam_config.h, cam_service.c as target files from the issue context.",dev:"",gh:"Issue context delivered to Agent",ag:"Reads issue · parses context · maps files",mcp:"",art:"",mc:""},
+  {n:3,title:"Fetch requirements from UseBlocks",desc:"Agent calls UseBlocks MCP: GetRequirement('REQ-047'). Returns parent plus four child requirements: -A (timing bound), -B (escalation levels), -C (notification behavior), -D (fault reset). ASIL-B classification confirmed.",dev:"",gh:"",ag:"Calls UseBlocks MCP",mcp:"REQ-047 tree + ASIL-B confirmed",art:"",mc:"u"},
+  {n:4,title:"Read codebase",desc:"Agent reads cam_fault.h (callback signatures, fault ID enum, severity levels), cam_config.h (existing #define patterns, Kconfig bindings), cam_service.c (init sequence, fault subscriptions). Maps interface contracts before writing any code.",dev:"",gh:"cam-service: 3 files read",ag:"Maps interfaces · reads test/",mcp:"",art:"",mc:""},
+  {n:5,title:"Implement changes",desc:"Agent modifies cam_fault.c (escalation logic), cam_config.h (adds CAM_FAULT_ESCALATION_THRESHOLD_MS), cam_service.c (wires threshold in init). Pushes feature branch. GitHub Actions triggered automatically.",dev:"",gh:"Branch pushed · Actions triggered",ag:"Writes 3 files · pushes branch",mcp:"",art:"",mc:"",viol:"V1 introduced: MISRA-C Rule 14.4 — if(count) instead of if(count != 0U) in cam_fault.c:47"},
+  {n:6,title:"Actions dispatches compliance jobs",desc:"Workflow compliance.yml dispatches 3 parallel jobs: Parasoft CPP Test (MISRA + MCDC coverage), UseBlocks trace check, and InfoMagnus SBOM generation. Arm-hosted runner provides native silicon compilation.",dev:"",gh:"Actions: 3 parallel jobs dispatched",ag:"Monitors job queue",mcp:"Parasoft + UseBlocks + InfoMagnus start",art:"",mc:"m"},
+  {n:7,title:"Parasoft catches V1",desc:"Parasoft CPP Test SARIF output: 1 new violation in cam_fault.c line 47, MISRA-C Rule 14.4 (non-boolean in if-condition). Published to GitHub Security tab as a code scanning alert. PR gate: BLOCKED. Agent receives failure signal via Actions output.",dev:"",gh:"Security tab: SARIF alert · PR BLOCKED",ag:"Receives gate failure signal",mcp:"Parasoft: Rule 14.4 flagged → SARIF",art:"SARIF → Security tab",mc:"p",gate:"fail",gl:"V1: MISRA-C Rule 14.4 — gate BLOCKED"},
+  {n:8,title:"Agent applies fix",desc:"Agent calls Parasoft MCP: GetRuleDetails('MISRA-C:2012-14.4'). Receives rule documentation and fix example. Applies fix: changes if(count) to if(count != 0U) in cam_fault.c. Pushes amended commit. Actions re-triggered.",dev:"",gh:"Actions re-triggered",ag:"GetRuleDetails() · applies fix · re-pushes",mcp:"Parasoft MCP: rule doc + fix example",art:"",mc:"p"},
+  {n:9,title:"Coverage gate: MCDC check",desc:"MCDC branch coverage analysis: 75% on cam_fault.c threshold logic — below the ASIL-B 80% minimum. Agent calls GetUncoveredBranches(). Finds missing condition C4+negC3. Generates test, adds to suite. Re-run: 82%. Gate PASSED.",dev:"",gh:"Coverage: 75% → 82% · PASSED",ag:"Generates missing test case",mcp:"Parasoft: MCDC 82% meets 80% threshold",art:"coverage.xml",mc:"p",gate:"pass",gl:"Coverage 82% ≥ 80% ASIL-B threshold — PASSED"},
+  {n:10,title:"Traceability gate: UseBlocks check",desc:"UseBlocks verifies bidirectional requirement links. REQ-047-A, -B, -C each have test evidence. REQ-047-D (fault reset behavior) has none — gate BLOCKED. Agent creates test_cam_fault_reset(), links it to REQ-047-D via UseBlocks MCP. All 4 child requirements now traced. PASSED.",dev:"",gh:"Traceability gate resolves · PASSED",ag:"Adds reset test · links REQ-047-D",mcp:"UseBlocks: all 4 child reqs linked",art:"trace-matrix.html",mc:"u",gate:"pass",gl:"All 4 child requirements traced — PASSED"},
+  {n:11,title:"SBOM generation and artifact signing",desc:"InfoMagnus generates SPDX 2.3 SBOM covering cam-service and all libcam transitive dependencies. Sigstore cosign signs: SARIF + coverage.xml + sbom.spdx + commit digest. All artifacts pinned to the commit SHA.",dev:"",gh:"Artifacts stored · all signed",ag:"Monitors completion",mcp:"InfoMagnus: SPDX SBOM + Sigstore sign",art:"sbom.spdx · cosign sigs",mc:"i",gate:"pass",gl:"SBOM signed and stored — PASSED"},
+  {n:12,title:"All gates green — PR approved",desc:"All 5 required GitHub status checks green: static analysis, MCDC coverage, traceability, SBOM, Sigstore signing. Policy gate auto-unblocks PR #48. PR description links all artifacts. Full audit trail assembled. Ready for human code review and merge.",dev:"Reviews PR #48 · approves · merges",gh:"PR #48: 5/5 gates green · unblocked",ag:"Workflow complete · audit trail ready",mcp:"",art:"SARIF · coverage · trace · SBOM",mc:"",gate:"pass",gl:"5 of 5 status checks green → PR approved → merge ready"}
+];
+
+let cur=0,built=false;
+
+function sw(id,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('v-'+id).classList.add('on');
+  btn.classList.add('active');
+  if(id==='behavioral'&&!built){built=true;build();goTo(0);}
+}
+
+function build(){
+  document.getElementById('pills').innerHTML=S.map((_,i)=>`<div class="pill" id="pl-${i}" onclick="goTo(${i})">${i+1}</div>`).join('');
+  const mc={p:'c-mp',u:'c-mu',i:'c-mi',m:'c-mp','':''};
+  document.getElementById('swb').innerHTML=S.map((s,i)=>`<tr id="row-${i}">
+    <td><div class="sw-cell ${s.dev?'c-dev':'off'}">${s.dev||'—'}</div></td>
+    <td><div class="sw-cell ${s.gh?'c-gh':'off'}">${s.gh||'—'}</div></td>
+    <td><div class="sw-cell ${s.ag?'c-ag':'off'}">${s.ag||'—'}</div></td>
+    <td><div class="sw-cell ${s.mcp?(mc[s.mc]||'c-mp'):'off'}">${s.mcp||'—'}</div></td>
+    <td><div class="sw-cell ${s.art?'c-art':'off'}">${s.art||'—'}</div></td>
+  </tr>`).join('');
+}
+
+function goTo(i){
+  cur=i;
+  const s=S[i];
+  document.querySelectorAll('.pill').forEach((p,j)=>{p.className='pill';if(j<i)p.classList.add('done');else if(j===i)p.classList.add('curr');});
+  document.getElementById('snum').textContent=`Step ${s.n} of ${S.length}`;
+  document.getElementById('stitle').textContent=s.title;
+  document.getElementById('sdesc').textContent=s.desc;
+  const viol=document.getElementById('sviol');
+  if(s.viol){viol.style.display='';viol.textContent='Warning: '+s.viol;}else viol.style.display='none';
+  const gate=document.getElementById('sgate');
+  if(s.gate){gate.style.display='';gate.className='sgate '+s.gate;gate.textContent=(s.gate==='pass'?'✓ ':'✗ ')+s.gl;}else gate.style.display='none';
+  document.getElementById('sctr').textContent=`Step ${s.n} of ${S.length}`;
+  document.getElementById('pbtn').disabled=i===0;
+  document.getElementById('nbtn').disabled=i===S.length-1;
+  document.querySelectorAll('#swb tr').forEach((r,j)=>r.classList.toggle('cur',j===i));
+  document.getElementById('row-'+i)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function next(){if(cur<S.length-1)goTo(cur+1);}
+function prev(){if(cur>0)goTo(cur-1);}
+</script>
+</body>
+</html>
