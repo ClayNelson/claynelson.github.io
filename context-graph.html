@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Context Graph — Why agents need to know WHY</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f4f0;
+    --text: #1a1a18;
+    --text2: #5f5e5a;
+    --text3: #888780;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --purple50: #EEEDFE; --purple200: #AFA9EC; --purple600: #534AB7; --purple800: #3C3489;
+    --blue50: #E6F1FB; --blue200: #85B7EB; --blue600: #185FA5; --blue800: #0C447C;
+    --teal50: #E1F5EE; --teal200: #5DCAA5; --teal600: #0F6E56; --teal800: #085041;
+    --amber50: #FAEEDA; --amber200: #EF9F27; --amber600: #854F0B; --amber800: #633806;
+    --coral50: #FAECE7; --coral200: #F0997B; --coral600: #993C1D; --coral800: #712B13;
+    --gray50: #F1EFE8; --gray200: #B4B2A9; --gray600: #5F5E5A; --gray800: #444441;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252522;
+      --text: #e8e6de; --text2: #a8a69e; --text3: #6e6c65;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --purple50: #26215C; --purple200: #3C3489; --purple600: #AFA9EC; --purple800: #CECBF6;
+      --blue50: #042C53; --blue200: #0C447C; --blue600: #85B7EB; --blue800: #B5D4F4;
+      --teal50: #04342C; --teal200: #085041; --teal600: #5DCAA5; --teal800: #9FE1CB;
+      --amber50: #412402; --amber200: #633806; --amber600: #EF9F27; --amber800: #FAC775;
+      --coral50: #4A1B0C; --coral200: #712B13; --coral600: #F0997B; --coral800: #F5C4B3;
+      --gray50: #2C2C2A; --gray200: #444441; --gray600: #B4B2A9; --gray800: #D3D1C7;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+  h1 { font-size: 28px; font-weight: 500; line-height: 1.25; margin-bottom: 12px; }
+  .sub { font-size: 16px; color: var(--text2); margin-bottom: 36px; max-width: 580px; line-height: 1.65; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab {
+    padding: 7px 20px; font-size: 13px; font-family: inherit;
+    border-radius: 8px; border: 0.5px solid var(--border2);
+    background: transparent; color: var(--text2);
+    cursor: pointer; transition: all 0.18s;
+  }
+  .tab.on { background: var(--bg2); color: var(--text); border-color: var(--border2); }
+  .viz { background: var(--bg2); border-radius: 12px; padding: 24px 20px 20px; border: 0.5px solid var(--border); }
+  svg { display: block; width: 100%; }
+  @keyframes edgeDraw { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+  .e { stroke-dasharray: 200; stroke-dashoffset: 200; opacity: 0; }
+  .e.show { opacity: 1; animation: edgeDraw 0.65s ease forwards; }
+  .pni { transition: opacity 0.4s; }
+  .note {
+    margin-top: 16px; font-size: 14px; line-height: 1.65; color: var(--text2);
+    border-left: 2px solid var(--border2); padding: 10px 16px;
+    border-radius: 0 6px 6px 0; background: var(--bg);
+  }
+  .note strong { color: var(--text); font-weight: 500; }
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 48px 0; }
+  .section-label { font-size: 13px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+  p { font-size: 15px; color: var(--text2); line-height: 1.75; margin-bottom: 16px; }
+  .footer { margin-top: 56px; font-size: 12px; color: var(--text3); }
+  .footer a { color: var(--text3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">GitHub · Agent Infrastructure · 2025</div>
+  <h1>Nodes vs. edges: what agents lose without the context graph</h1>
+  <p class="sub">Most AI agents can read any asset in a codebase. The question is whether they can see what connects them — and why those connections exist.</p>
+
+  <div class="viz">
+    <div class="tabs">
+      <button class="tab" id="t1" onclick="go('off')">Without GitHub graph</button>
+      <button class="tab on" id="t2" onclick="go('on')">With GitHub context graph</button>
+    </div>
+
+    <svg viewBox="0 0 680 440">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <line id="e1" class="e" x1="340" y1="116" x2="340" y2="204" stroke="var(--purple600)" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line id="e2" class="e" x1="418" y1="192" x2="382" y2="208" stroke="var(--blue600)" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line id="e3" class="e" x1="382" y1="272" x2="418" y2="288" stroke="var(--teal600)" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line id="e4" class="e" x1="418" y1="340" x2="382" y2="356" stroke="var(--teal600)" stroke-width="1" marker-end="url(#ar)"/>
+      <line id="e5" class="e" x1="258" y1="288" x2="298" y2="272" stroke="var(--amber600)" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line id="e6" class="e" x1="258" y1="192" x2="298" y2="208" stroke="var(--gray600)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+      <!-- ISO req -->
+      <g class="pni" id="pn1">
+        <rect x="262" y="66" width="156" height="50" rx="8" fill="var(--purple50)" stroke="var(--purple600)" stroke-width="0.5"/>
+        <text x="340" y="86" text-anchor="middle" dominant-baseline="central" fill="var(--purple800)" font-size="14" font-weight="500" font-family="inherit">ISO 26262 Req</text>
+        <text x="340" y="104" text-anchor="middle" dominant-baseline="central" fill="var(--purple600)" font-size="12" font-family="inherit">§4.5 safety requirement</text>
+      </g>
+
+      <!-- ADR -->
+      <g class="pni" id="pn2">
+        <rect x="432" y="140" width="156" height="50" rx="8" fill="var(--blue50)" stroke="var(--blue600)" stroke-width="0.5"/>
+        <text x="510" y="160" text-anchor="middle" dominant-baseline="central" fill="var(--blue800)" font-size="14" font-weight="500" font-family="inherit">Arch. Decision</text>
+        <text x="510" y="178" text-anchor="middle" dominant-baseline="central" fill="var(--blue600)" font-size="12" font-family="inherit">Record ADR-014</text>
+      </g>
+
+      <!-- Central node — the code file -->
+      <rect x="262" y="208" width="156" height="50" rx="8" fill="var(--blue50)" stroke="var(--blue600)" stroke-width="1.2"/>
+      <text x="340" y="228" text-anchor="middle" dominant-baseline="central" fill="var(--blue800)" font-size="14" font-weight="500" font-family="inherit">safety_module.c</text>
+      <text x="340" y="246" text-anchor="middle" dominant-baseline="central" fill="var(--blue600)" font-size="12" font-family="inherit">Safety-critical asset</text>
+
+      <!-- Test case -->
+      <g class="pni" id="pn3">
+        <rect x="432" y="288" width="156" height="50" rx="8" fill="var(--teal50)" stroke="var(--teal600)" stroke-width="0.5"/>
+        <text x="510" y="308" text-anchor="middle" dominant-baseline="central" fill="var(--teal800)" font-size="14" font-weight="500" font-family="inherit">Test Case TC-042</text>
+        <text x="510" y="326" text-anchor="middle" dominant-baseline="central" fill="var(--teal600)" font-size="12" font-family="inherit">Integration test suite</text>
+      </g>
+
+      <!-- Compliance gate -->
+      <g class="pni" id="pn4">
+        <rect x="262" y="356" width="156" height="50" rx="8" fill="var(--coral50)" stroke="var(--coral600)" stroke-width="0.5"/>
+        <text x="340" y="376" text-anchor="middle" dominant-baseline="central" fill="var(--coral800)" font-size="14" font-weight="500" font-family="inherit">Compliance Gate</text>
+        <text x="340" y="394" text-anchor="middle" dominant-baseline="central" fill="var(--coral600)" font-size="12" font-family="inherit">v2.4 release gate</text>
+      </g>
+
+      <!-- Field issue -->
+      <g class="pni" id="pn5">
+        <rect x="92" y="288" width="156" height="50" rx="8" fill="var(--amber50)" stroke="var(--amber600)" stroke-width="0.5"/>
+        <text x="170" y="308" text-anchor="middle" dominant-baseline="central" fill="var(--amber800)" font-size="14" font-weight="500" font-family="inherit">Field Issue #1337</text>
+        <text x="170" y="326" text-anchor="middle" dominant-baseline="central" fill="var(--amber600)" font-size="12" font-family="inherit">Customer reported</text>
+      </g>
+
+      <!-- PR -->
+      <g class="pni" id="pn6">
+        <rect x="92" y="140" width="156" height="50" rx="8" fill="var(--gray50)" stroke="var(--gray600)" stroke-width="0.5"/>
+        <text x="170" y="160" text-anchor="middle" dominant-baseline="central" fill="var(--gray800)" font-size="14" font-weight="500" font-family="inherit">Pull Request #892</text>
+        <text x="170" y="178" text-anchor="middle" dominant-baseline="central" fill="var(--gray600)" font-size="12" font-family="inherit">November 2024</text>
+      </g>
+
+      <text id="slabel" x="340" y="428" text-anchor="middle" fill="var(--text3)" font-size="12" font-family="inherit">6 causal connections visible — agent sees WHY this code exists</text>
+    </svg>
+
+    <div id="n-on" class="note">The agent sees causality: <strong>WHY</strong> the code was written (ISO §4.5), <strong>WHAT</strong> constrains it (ADR-014), <strong>WHAT</strong> validates it (TC-042), <strong>WHAT</strong> gates it (compliance v2.4), and <strong>WHAT</strong> history prompted it (Issue #1337 → PR #892). When it touches this file, it understands the consequences before acting. <em>Systems reasoning.</em></div>
+    <div id="n-off" class="note" style="display:none">Six related assets. The agent can read every one of them in isolation. It understands the code's logic. But it cannot see why the redundant safety check exists, what requirement it satisfies, or that optimizing it away would fail a compliance gate traced to a customer-reported field failure. <em>Document analysis.</em></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section-label">The argument</div>
+  <p>Most tools in the software development lifecycle see <em>snapshots</em>. GitHub sees <em>causality</em>. Every commit carries a thread: who changed it, when, what issue it was responding to, what decision preceded it, what test it broke or fixed.</p>
+  <p>Layered over years of a software project, this becomes something remarkable — an organizational memory most companies don't even know they're building. Not just <em>what</em> the software does, but <em>why</em> it became what it is.</p>
+  <p>For a regulated industry — automotive, aerospace, medical devices — the question an auditor asks isn't just "did you run static analysis?" It's "can you prove that <em>this</em> version of <em>this</em> module was analyzed under <em>these</em> requirements, and that the result was a gating condition on <em>this</em> release?" An external agent cannot answer that question natively. The provenance chain is broken at every handoff.</p>
+  <p>The difference isn't capability. It's memory. And memory is what narrative requires.</p>
+
+  <div class="footer">
+    Clay Nelson · GitHub, Worldwide Industry Solutions ·
+    <a href="https://github.com/claynelson">github.com/claynelson</a>
+  </div>
+</div>
+
+<script>
+function go(mode) {
+  const edges = document.querySelectorAll('.e');
+  const pnodes = document.querySelectorAll('.pni');
+  document.getElementById('t1').classList.toggle('on', mode === 'off');
+  document.getElementById('t2').classList.toggle('on', mode === 'on');
+  document.getElementById('n-on').style.display = mode === 'on' ? '' : 'none';
+  document.getElementById('n-off').style.display = mode === 'off' ? '' : 'none';
+  document.getElementById('slabel').textContent = mode === 'on'
+    ? '6 causal connections visible — agent sees WHY this code exists'
+    : 'Agent sees: 6 isolated assets — connections unknown';
+  if (mode === 'on') {
+    pnodes.forEach(n => { n.style.opacity = '1'; });
+    edges.forEach((e, i) => {
+      e.classList.remove('show');
+      e.getBoundingClientRect();
+      setTimeout(() => e.classList.add('show'), 60 + i * 85);
+    });
+  } else {
+    pnodes.forEach(n => { n.style.opacity = '0.1'; });
+    edges.forEach(e => e.classList.remove('show'));
+  }
+}
+window.addEventListener('load', () => {
+  document.querySelectorAll('.e').forEach((e, i) => {
+    setTimeout(() => e.classList.add('show'), 500 + i * 90);
+  });
+});
+</script>
+</body>
+</html>
