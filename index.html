@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clay Nelson</title>
+<style>
+:root {
+  --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
+  --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
+    --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.7; }
+.container { max-width: 740px; margin: 0 auto; padding: 56px 24px 80px; }
+h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; }
+h2 { font-size: 21px; font-weight: 500; margin: 52px 0 18px; letter-spacing: -0.01em; }
+h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+p { margin-bottom: 16px; }
+em { font-style: italic; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.byline { color: var(--muted); font-size: 14px; margin: 6px 0 40px; }
+.caveat { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 32px 0; font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 0 8px 8px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin: 20px 0; }
+.card h3 { margin-bottom: 10px; }
+.card p:last-child { margin-bottom: 0; }
+.diagram-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 20px 20px; margin: 24px 0; overflow-x: auto; }
+.fig-label { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: block; }
+svg { display: block; width: 100%; }
+.t-h { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; font-weight: 500; fill: #2C2C2A; }
+.t-s { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #5F5E5A; }
+.z-p { fill: #EEEDFE; stroke: #7F77DD; stroke-width: 0.5; }
+.z-a { fill: #FAEEDA; stroke: #BA7517; stroke-width: 0.5; }
+.z-t { fill: #E1F5EE; stroke: #1D9E75; stroke-width: 0.5; }
+.z-g { fill: #F1EFE8; stroke: #B4B2A9; stroke-width: 0.5; }
+.z-r { fill: #FCEBEB; stroke: #E24B4A; stroke-width: 0.5; }
+.z-c { fill: #FAECE7; stroke: #D85A30; stroke-width: 0.5; }
+.arr-l { stroke: #888780; stroke-width: 1.5; fill: none; }
+.ldr { stroke: #D3D1C7; stroke-width: 0.5; stroke-dasharray: 4 3; fill: none; }
+.pill-links { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.pill-links a { padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--text); background: var(--surface); }
+.pill-links a:hover { border-color: var(--link); color: var(--link); text-decoration: none; }
+hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
+@media (prefers-color-scheme: dark) {
+  .t-h { fill: #E8E6DE; } .t-s { fill: #B4B2A9; }
+  .z-p { fill: #26215C; stroke: #AFA9EC; } .z-a { fill: #412402; stroke: #EF9F27; }
+  .z-t { fill: #04342C; stroke: #5DCAA5; } .z-g { fill: #2C2C2A; stroke: #5F5E5A; }
+  .z-r { fill: #501313; stroke: #F09595; } .z-c { fill: #4A1B0C; stroke: #F0997B; }
+  .arr-l { stroke: #888780; } .ldr { stroke: #444441; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Clay Nelson</h1>
+<p class="byline">Research, thinking, and experiments. Sandy Springs, GA &mdash; April 2026.</p>
+
+<div class="caveat">
+  Everything here is my own thinking and experimentation &mdash; not the views of any employer or client. These are working hypotheses published because the problems are real and the conversation is worth having.
+</div>
+
+<h2>Current research threads</h2>
+
+<div class="card">
+<h3>AI governance and the coordination gate problem</h3>
+<p>Where do oversight mechanisms belong in a multi-agent system? Most AI safety discussion focuses on capability constraints. I'm more interested in protocol design: how you structure the layer that coordinates agents without turning the human into the bottleneck. I've been developing a three-ring constitutional framework and testing it against empirical evidence from the Dochkina self-organizing agents paper (arXiv:2603.28990, March 2026), which found that self-organizing LLM agents outperform designed hierarchical structures &mdash; but only when the constitutional layer is intact.</p>
+<p style="margin-bottom:0">&rarr; <a href="https://medium.com/@claynelson/the-kirk-problem-why-ai-agents-need-human-override-and-humans-need-agents-5e042577780d">The Kirk Problem: Why AI Agents Need Human Override &mdash; And Humans Need Agents</a> &mdash; Medium, April 2026</p>
+</div>
+
+<div class="card">
+<h3>Governing intelligence across multi-agent development workflows</h3>
+<p>When you work across Claude, Claude Code, GitHub Copilot, and GitHub simultaneously, you experience a structural problem: reasoning degrades at each boundary crossing. The intent that generates a decision lives in conversation. By the time it reaches code, only acceptance criteria survive. I'm sketching an architecture &mdash; a protocol layer I'm calling <em>governing intelligence</em> &mdash; that preserves reasoning provenance across agent handoffs. The diagrams below are the working model.</p>
+<p style="margin-bottom:0">The core claim: <em>capability threshold determines autonomy threshold</em>. Ring 2, the protocol layer, is where that threshold gets encoded. In most systems right now, Ring 2 is absent. The human fills the gap. That is both the problem and the opportunity.</p>
+</div>
+
+<div class="card">
+<h3>Family as the original coordination design problem</h3>
+<p>I'm building <a href="https://haklo.app">Haklo</a>, a weekly meeting ritual app for families. The design challenge is structurally identical to the enterprise coordination problem: how do you give agents enough autonomy to operate effectively while maintaining coherent intent across time? Haklo's memoir flywheel &mdash; decision ancestry chains, values-aware coaching, narrative timeline &mdash; is the Ring 2 problem applied at household scale.</p>
+<p style="margin-bottom:0">The irony I keep returning to: I'm building a system to help families hold the thread of their own story together, while the development workflow for that very system loses the thread at every agent boundary.</p>
+</div>
+
+<hr>
+
+<h2>Working diagrams</h2>
+<p>Architecture sketches built in conversation with Claude &mdash; the kind of visual model I make when I need to see a structure before I can describe it in prose.</p>
+
+<div class="diagram-wrap">
+<span class="fig-label">Figure 1 &mdash; AI-assisted development system: three zones and the missing protocol layer</span>
+<svg viewBox="0 0 680 450" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arr1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="t-s" x="340" y="20" text-anchor="middle">AI-assisted development system</text>
+<rect class="z-p" x="40" y="32" width="148" height="316" rx="12"/>
+<text class="t-h" x="114" y="58" text-anchor="middle" dominant-baseline="central">Ideation</text>
+<text class="t-s" x="114" y="76" text-anchor="middle">reasoning layer</text>
+<rect class="z-g" x="57" y="90" width="114" height="36" rx="6"/>
+<text class="t-h" x="114" y="108" text-anchor="middle" dominant-baseline="central">Claude</text>
+<text class="t-s" x="114" y="150" text-anchor="middle">Generative</text>
+<text class="t-s" x="114" y="168" text-anchor="middle">Dialog-aware</text>
+<text class="t-s" x="114" y="196" text-anchor="middle">Outputs:</text>
+<text class="t-s" x="114" y="214" text-anchor="middle">intent + reasoning</text>
+<text class="t-s" x="114" y="232" text-anchor="middle">alternatives</text>
+<rect class="z-a" x="218" y="32" width="244" height="316" rx="12" stroke-dasharray="7 4"/>
+<text class="t-h" x="340" y="58" text-anchor="middle" dominant-baseline="central">Protocol layer</text>
+<text class="t-s" x="340" y="76" text-anchor="middle">currently absent</text>
+<rect class="z-g" x="232" y="92" width="216" height="34" rx="6"/>
+<text class="t-h" x="340" y="109" text-anchor="middle" dominant-baseline="central">Constitutional document</text>
+<rect class="z-g" x="232" y="138" width="216" height="34" rx="6"/>
+<text class="t-h" x="340" y="155" text-anchor="middle" dominant-baseline="central">Reasoning traces</text>
+<rect class="z-g" x="232" y="184" width="216" height="34" rx="6"/>
+<text class="t-h" x="340" y="201" text-anchor="middle" dominant-baseline="central">Capability thresholds</text>
+<rect class="z-g" x="232" y="230" width="216" height="34" rx="6"/>
+<text class="t-h" x="340" y="247" text-anchor="middle" dominant-baseline="central">Origin to issue links</text>
+<rect class="z-g" x="232" y="276" width="216" height="34" rx="6"/>
+<text class="t-h" x="340" y="293" text-anchor="middle" dominant-baseline="central">Handoff context</text>
+<rect class="z-t" x="492" y="32" width="148" height="316" rx="12"/>
+<text class="t-h" x="566" y="58" text-anchor="middle" dominant-baseline="central">Execution</text>
+<text class="t-s" x="566" y="76" text-anchor="middle">agent layer</text>
+<rect class="z-g" x="506" y="90" width="114" height="36" rx="6"/>
+<text class="t-h" x="563" y="108" text-anchor="middle" dominant-baseline="central">Claude Code</text>
+<text class="t-s" x="563" y="145" text-anchor="middle">codebase-aware</text>
+<rect class="z-g" x="506" y="160" width="114" height="36" rx="6"/>
+<text class="t-h" x="563" y="178" text-anchor="middle" dominant-baseline="central">Copilot</text>
+<text class="t-s" x="563" y="215" text-anchor="middle">fast executor</text>
+<line class="arr-l" x1="190" y1="192" x2="216" y2="192" marker-end="url(#arr1)"/>
+<line class="arr-l" x1="464" y1="192" x2="490" y2="192" marker-end="url(#arr1)"/>
+<rect class="z-g" x="40" y="382" width="600" height="42" rx="8"/>
+<text class="t-h" x="340" y="403" text-anchor="middle" dominant-baseline="central">GitHub artifact store</text>
+<line class="arr-l" x1="114" y1="350" x2="114" y2="380" marker-end="url(#arr1)"/>
+<line class="arr-l" x1="340" y1="350" x2="340" y2="380" marker-end="url(#arr1)"/>
+<line class="arr-l" x1="566" y1="350" x2="566" y2="380" marker-end="url(#arr1)"/>
+</svg>
+</div>
+
+<div class="diagram-wrap">
+<span class="fig-label">Figure 2 &mdash; Context degradation: what gets lost at each agent boundary</span>
+<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect class="z-p" x="60" y="52" width="160" height="78" rx="8"/>
+<text class="t-h" x="140" y="83" text-anchor="middle" dominant-baseline="central">Claude</text>
+<text class="t-s" x="140" y="107" text-anchor="middle" dominant-baseline="central">full reasoning intact</text>
+<text class="t-s" x="250" y="38" text-anchor="middle">reasoning lost</text>
+<line class="arr-l" x1="222" y1="91" x2="258" y2="91" marker-end="url(#arr2)"/>
+<rect class="z-a" x="260" y="52" width="160" height="78" rx="8"/>
+<text class="t-h" x="340" y="83" text-anchor="middle" dominant-baseline="central">GitHub issue</text>
+<text class="t-s" x="340" y="107" text-anchor="middle" dominant-baseline="central">what + criteria only</text>
+<text class="t-s" x="450" y="38" text-anchor="middle">philosophy assumed</text>
+<line class="arr-l" x1="422" y1="91" x2="458" y2="91" marker-end="url(#arr2)"/>
+<rect class="z-c" x="460" y="52" width="160" height="78" rx="8"/>
+<text class="t-h" x="540" y="83" text-anchor="middle" dominant-baseline="central">Code output</text>
+<text class="t-s" x="540" y="107" text-anchor="middle" dominant-baseline="central">reasoning absent</text>
+<rect class="z-r" x="60" y="158" width="560" height="42" rx="8"/>
+<text class="t-h" x="340" y="179" text-anchor="middle" dominant-baseline="central">Risk: technically correct, philosophically wrong</text>
+</svg>
+</div>
+
+<div class="diagram-wrap">
+<span class="fig-label">Figure 3 &mdash; Three-ring governance model applied to agentic workflow</span>
+<svg viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="t-s" x="340" y="22" text-anchor="middle">Three-ring governance model</text>
+<circle class="z-p" cx="220" cy="250" r="205" stroke-width="0.5"/>
+<circle class="z-a" cx="220" cy="250" r="145" stroke-width="1" stroke-dasharray="8 5"/>
+<circle class="z-t" cx="220" cy="250" r="82" stroke-width="0.5"/>
+<text class="t-s" x="220" y="76" text-anchor="middle">Ring 1</text>
+<text class="t-s" x="88" y="254" text-anchor="middle">Ring 2</text>
+<text class="t-h" x="220" y="254" text-anchor="middle" dominant-baseline="central">Ring 3</text>
+<rect class="z-p" x="468" y="58" width="172" height="88" rx="8"/>
+<text class="t-h" x="554" y="86" text-anchor="middle" dominant-baseline="central">Ring 1 - mission</text>
+<text class="t-s" x="554" y="108" text-anchor="middle">product philosophy</text>
+<text class="t-s" x="554" y="126" text-anchor="middle">constitutional constraints</text>
+<rect class="z-a" x="468" y="178" width="172" height="88" rx="8" stroke-dasharray="6 4"/>
+<text class="t-h" x="554" y="206" text-anchor="middle" dominant-baseline="central">Ring 2 - protocol</text>
+<text class="t-s" x="554" y="226" text-anchor="middle">currently the gap</text>
+<text class="t-s" x="554" y="246" text-anchor="middle">gates, traces, context</text>
+<rect class="z-t" x="468" y="310" width="172" height="88" rx="8"/>
+<text class="t-h" x="554" y="338" text-anchor="middle" dominant-baseline="central">Ring 3 - emergence</text>
+<text class="t-s" x="554" y="358" text-anchor="middle">Claude, Claude Code</text>
+<text class="t-s" x="554" y="376" text-anchor="middle">Copilot, autonomous</text>
+<line class="ldr" x1="354" y1="95" x2="466" y2="102" marker-end="url(#arr3)"/>
+<line class="ldr" x1="359" y1="222" x2="466" y2="222" marker-end="url(#arr3)"/>
+<line class="ldr" x1="280" y1="290" x2="466" y2="354" marker-end="url(#arr3)"/>
+</svg>
+</div>
+
+<hr>
+
+<h2>Intellectual throughline</h2>
+<p>The Kirk Problem essay, the Dochkina findings, Haklo's meeting architecture, and enterprise multi-team coordination are four expressions of one question: <em>in a system that includes both humans and autonomous agents, what determines which decisions require a gate?</em></p>
+<p>The three-ring model is my current answer. Ring 1 holds mission and values. Ring 2 holds protocol: approval gates, handoff mechanisms, capability thresholds, reasoning traces that let downstream agents understand why a decision was made. Ring 3 is where agents work autonomously within those constraints.</p>
+<p>The failure mode in almost every multi-agent system I've studied is that Ring 2 work gets pushed into Ring 3: emergence tries to fill what protocol should hold. This produces systems that are locally coherent and globally incoherent. The fix isn't more constraints. It's better Ring 2 design.</p>
+<p style="margin-bottom:0">The capability threshold is the autonomy threshold. That principle applies whether you're designing an AI governance framework, a family operating system, or a development workflow that coordinates three AI agents and a human founder.</p>
+
+<hr>
+
+<div class="pill-links">
+  <a href="https://medium.com/@claynelson">Medium</a>
+  <a href="https://github.com/ClayNelson">GitHub</a>
+  <a href="https://haklo.app">Haklo</a>
+  <a href="https://www.linkedin.com/in/claynelson">LinkedIn</a>
+</div>
+
+<footer>
+  <p>Personal research. Views my own. Last updated April 2026.</p>
+</footer>
+
+</div>
+</body>
+</html>
