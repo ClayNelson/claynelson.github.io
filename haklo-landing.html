@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haklo — The fire your family comes back to</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Design Tokens ──────────────────────────────────────────── */
+:root {
+  --ink:       #1c1a17;
+  --rice:      #f7f4ee;
+  --celadon:   #7a9e8e;
+  --stone:     #b8a898;
+  --persimmon: #b85c3a;
+  --mist:      #e8e4dc;
+  --warm-gray: #6b6560;
+  --rule:      #d4cfc6;
+  --ink-dark:  #0e0d0b;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
+}
+
+/* ─── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--rice);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; }
+
+/* ─── Utilities ──────────────────────────────────────────────── */
+.serif    { font-family: var(--serif); }
+.label    { font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--stone); font-weight: 400; }
+.rule     { height: 0.5px; background: var(--rule); border: none; }
+
+/* ─── Nav ────────────────────────────────────────────────────── */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 4rem;
+  border-bottom: 0.5px solid var(--rule);
+  position: sticky;
+  top: 0;
+  background: var(--rice);
+  z-index: 100;
+}
+.nav-word {
+  font-family: var(--serif);
+  font-size: 22px;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  font-weight: 400;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.25rem;
+}
+.nav-link {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--warm-gray);
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--ink); }
+.nav-btn {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border: 0.5px solid var(--ink);
+  border-radius: 2px;
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.nav-btn:hover { background: var(--ink); color: var(--rice); }
+
+/* ─── Hero ───────────────────────────────────────────────────── */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 5rem;
+  padding: 6rem 4rem 5rem;
+  align-items: center;
+  min-height: 600px;
+}
+.hero-kicker {
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--celadon);
+  margin-bottom: 1.5rem;
+}
+.hero-h1 {
+  font-family: var(--serif);
+  font-size: 58px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  margin-bottom: 1.75rem;
+  max-width: 520px;
+}
+.hero-h1 em {
+  font-style: italic;
+  color: var(--warm-gray);
+}
+.hero-sub {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--warm-gray);
+  max-width: 440px;
+  margin-bottom: 2.75rem;
+  font-weight: 300;
+}
+.cta-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.cta-primary {
+  padding: 12px 32px;
+  background: var(--persimmon);
+  color: var(--rice);
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: opacity 0.2s;
+}
+.cta-primary:hover { opacity: 0.88; }
+.cta-ghost {
+  padding: 12px 24px;
+  border: 0.5px solid var(--rule);
+  color: var(--warm-gray);
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: border-color 0.2s, color 0.2s;
+}
+.cta-ghost:hover { border-color: var(--stone); color: var(--ink); }
+
+/* ─── Phone frame ────────────────────────────────────────────── */
+.phone-wrap {
+  display: flex;
+  justify-content: flex-end;
+}
+.phone-frame {
+  background: var(--ink);
+  border-radius: 32px;
+  padding: 2.5px;
+  width: 260px;
+}
+.phone-inner {
+  background: var(--rice);
+  border-radius: 30px;
+  overflow: hidden;
+}
+.phone-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 20px 6px;
+  background: var(--rice);
+}
+.phone-status span {
+  font-size: 10px;
+  color: var(--stone);
+  font-family: var(--sans);
+}
+.app-screen { padding: 16px 18px 24px; }
+.app-date {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 4px;
+}
+.app-title {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+.app-meta {
+  font-size: 11px;
+  color: var(--stone);
+  margin-bottom: 14px;
+}
+.app-divider { height: 0.5px; background: var(--rule); margin: 10px 0; }
+.app-prompt {
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--warm-gray);
+  font-style: italic;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: var(--mist);
+  border-radius: 3px;
+}
+.app-member {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.app-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--celadon);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+.app-dot.away { background: var(--rule); opacity: 1; }
+.app-mname {
+  font-size: 12px;
+  font-family: var(--sans);
+  color: var(--warm-gray);
+}
+.app-mname.away { opacity: 0.45; }
+.app-mstatus {
+  font-size: 10px;
+  font-family: var(--sans);
+  color: var(--stone);
+  margin-left: auto;
+}
+.app-mstatus.present { color: var(--celadon); }
+.app-btn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 10px;
+  background: var(--ink);
+  color: var(--rice);
+  border-radius: 2px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  border: none;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+/* ─── Philosophy Band ────────────────────────────────────────── */
+.philosophy {
+  background: var(--ink-dark);
+  padding: 6rem 4rem;
+  text-align: center;
+}
+.phil-label {
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--celadon);
+  margin-bottom: 2.25rem;
+  opacity: 0.9;
+}
+.phil-quote {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.48;
+  color: var(--rice);
+  max-width: 640px;
+  margin: 0 auto 1.75rem;
+  letter-spacing: 0.01em;
+}
+.phil-attr {
+  font-size: 12px;
+  color: var(--stone);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+/* ─── Pillars ────────────────────────────────────────────────── */
+.pillars {
+  padding: 6rem 4rem;
+}
+.pillars .label { margin-bottom: 3.5rem; display: block; }
+.pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4rem;
+}
+.pillar-num {
+  font-family: var(--serif);
+  font-size: 44px;
+  font-weight: 300;
+  color: var(--rule);
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+.pillar-name {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--celadon);
+  margin-bottom: 0.85rem;
+}
+.pillar-body {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--warm-gray);
+  font-weight: 300;
+}
+
+/* ─── Demo Section ───────────────────────────────────────────── */
+.demo-section {
+  background: var(--mist);
+  padding: 6rem 4rem;
+}
+.demo-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  align-items: center;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.demo-label { margin-bottom: 1.25rem; display: block; }
+.demo-h2 {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+.demo-body {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--warm-gray);
+  font-weight: 300;
+}
+
+/* ─── Gathering Card ─────────────────────────────────────────── */
+.g-card {
+  background: var(--rice);
+  border: 0.5px solid var(--rule);
+  border-radius: 6px;
+  padding: 1.5rem 1.75rem;
+}
+.gc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+.gc-week {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 4px;
+}
+.gc-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.gc-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--celadon);
+  opacity: 0.85;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.gc-prompt {
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--warm-gray);
+  font-style: italic;
+  padding: 10px 14px;
+  background: var(--mist);
+  border-radius: 3px;
+  margin-bottom: 1rem;
+}
+.gc-rule { height: 0.5px; background: var(--rule); margin: 0.85rem 0; }
+.gc-members {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.gc-member {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 3px;
+  background: transparent;
+}
+.gc-member.present {
+  background: color-mix(in srgb, var(--celadon) 10%, transparent);
+}
+.gc-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-family: var(--sans);
+  color: var(--stone);
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.gc-avatar.p {
+  background: var(--celadon);
+  opacity: 0.75;
+  color: var(--rice);
+}
+.gc-mname {
+  font-size: 12px;
+  font-family: var(--sans);
+  color: var(--ink);
+  font-weight: 400;
+}
+.gc-mstatus {
+  font-size: 10px;
+  font-family: var(--sans);
+  color: var(--stone);
+}
+.gc-mstatus.p { color: var(--celadon); }
+.gc-footer {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 0.5px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.gc-count {
+  font-size: 11px;
+  color: var(--stone);
+  font-family: var(--sans);
+}
+.gc-open {
+  padding: 7px 18px;
+  background: var(--ink);
+  color: var(--rice);
+  border-radius: 2px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: none;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.gc-open:hover { opacity: 0.8; }
+
+/* ─── Pricing ────────────────────────────────────────────────── */
+.pricing {
+  padding: 6rem 4rem;
+}
+.pricing-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+.pricing-header .label { display: block; margin-bottom: 1.25rem; }
+.pricing-h2 {
+  font-family: var(--serif);
+  font-size: 38px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+.pricing-sub {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--warm-gray);
+  font-weight: 300;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.plan {
+  border: 0.5px solid var(--rule);
+  border-radius: 4px;
+  padding: 2.25rem 1.85rem;
+  display: flex;
+  flex-direction: column;
+}
+.plan.featured {
+  border-color: var(--celadon);
+  border-width: 1px;
+}
+.plan.coming {
+  opacity: 0.55;
+}
+.plan-badge {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--celadon);
+  margin-bottom: 1.1rem;
+  font-weight: 400;
+}
+.plan-badge.dim { color: var(--stone); }
+.plan-name {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+.plan-price {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+  line-height: 1.1;
+}
+.plan-price span {
+  font-size: 13px;
+  color: var(--stone);
+  font-family: var(--sans);
+  font-weight: 300;
+}
+.plan-tagline {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--warm-gray);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  font-weight: 300;
+}
+.plan-rule { height: 0.5px; background: var(--rule); margin-bottom: 1.35rem; }
+.plan-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 0.7rem;
+}
+.pf-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--celadon);
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+.pf-dot.dim { background: var(--rule); }
+.pf-text {
+  font-size: 13px;
+  color: var(--warm-gray);
+  line-height: 1.55;
+  font-weight: 300;
+}
+.plan-cta {
+  margin-top: auto;
+  padding-top: 1.5rem;
+}
+.plan-btn {
+  width: 100%;
+  padding: 11px;
+  border: 0.5px solid var(--ink);
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-weight: 400;
+  transition: background 0.2s, color 0.2s;
+}
+.plan-btn:hover { background: var(--ink); color: var(--rice); }
+.plan-btn.featured-btn {
+  background: var(--persimmon);
+  border-color: var(--persimmon);
+  color: var(--rice);
+}
+.plan-btn.featured-btn:hover { opacity: 0.88; background: var(--persimmon); }
+.plan-btn.notify {
+  border-color: var(--rule);
+  color: var(--stone);
+  cursor: default;
+}
+.coming-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--mist);
+  border-radius: 2px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 1.1rem;
+  font-weight: 400;
+}
+
+/* ─── Bottom CTA ─────────────────────────────────────────────── */
+.bottom-cta {
+  background: var(--ink-dark);
+  padding: 7rem 4rem;
+  text-align: center;
+}
+.bc-h {
+  font-family: var(--serif);
+  font-size: 42px;
+  font-weight: 300;
+  color: var(--rice);
+  margin-bottom: 1rem;
+  line-height: 1.25;
+}
+.bc-sub {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--stone);
+  margin-bottom: 2.75rem;
+  font-style: italic;
+  font-weight: 300;
+}
+.bc-btn {
+  display: inline-block;
+  padding: 14px 44px;
+  background: var(--persimmon);
+  color: var(--rice);
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-weight: 400;
+  transition: opacity 0.2s;
+}
+.bc-btn:hover { opacity: 0.88; }
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+footer {
+  padding: 2rem 4rem;
+  border-top: 0.5px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.ft-word {
+  font-family: var(--serif);
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  color: var(--warm-gray);
+  font-weight: 400;
+}
+.ft-links {
+  display: flex;
+  gap: 1.75rem;
+}
+.ft-link {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--stone);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.ft-link:hover { color: var(--warm-gray); }
+.ft-copy {
+  font-size: 11px;
+  color: var(--stone);
+  font-weight: 300;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { gap: 1.25rem; }
+  .nav-link { display: none; }
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 4rem 1.5rem;
+    gap: 3rem;
+  }
+  .phone-wrap { justify-content: center; }
+  .philosophy { padding: 4rem 1.5rem; }
+  .phil-quote { font-size: 24px; }
+  .pillars { padding: 4rem 1.5rem; }
+  .pillar-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .demo-section { padding: 4rem 1.5rem; }
+  .demo-inner { grid-template-columns: 1fr; gap: 3rem; }
+  .pricing { padding: 4rem 1.5rem; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
+  .bottom-cta { padding: 5rem 1.5rem; }
+  .bc-h { font-size: 32px; }
+  footer { padding: 1.5rem; flex-direction: column; align-items: flex-start; gap: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── Nav ──────────────────────────────────────────────────── -->
+<nav>
+  <span class="nav-word">haklo</span>
+  <div class="nav-links">
+    <a class="nav-link" href="#how">How it works</a>
+    <a class="nav-link" href="#gather">The gathering</a>
+    <a class="nav-link" href="#pricing">Membership</a>
+    <a class="nav-link" href="#">Sign in</a>
+    <button class="nav-btn">Begin →</button>
+  </div>
+</nav>
+
+<!-- ─── Hero ─────────────────────────────────────────────────── -->
+<section class="hero">
+  <div>
+    <p class="hero-kicker">A weekly gathering ritual</p>
+    <h1 class="hero-h1">The fire your family <em>comes back to.</em></h1>
+    <p class="hero-sub">Your family isn't disconnected. They're distracted. Haklo is the weekly ritual that returns everyone to the same room — wherever they are.</p>
+    <div class="cta-row">
+      <button class="cta-primary">Begin for free</button>
+      <button class="cta-ghost">See how it works</button>
+    </div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-frame">
+      <div class="phone-inner">
+        <div class="phone-status">
+          <span>9:41</span>
+          <span>●●●</span>
+        </div>
+        <div class="app-screen">
+          <p class="app-date">Sunday · April 6</p>
+          <p class="app-title">Mercer Gathering</p>
+          <p class="app-meta">Week 7 · 4 of 5 present</p>
+          <div class="app-divider"></div>
+          <p class="app-prompt">"What do you want the family to remember about this season?"</p>
+          <div class="app-member">
+            <div class="app-dot"></div>
+            <span class="app-mname">James</span>
+            <span class="app-mstatus present">present</span>
+          </div>
+          <div class="app-member">
+            <div class="app-dot"></div>
+            <span class="app-mname">Sarah</span>
+            <span class="app-mstatus present">present</span>
+          </div>
+          <div class="app-member">
+            <div class="app-dot"></div>
+            <span class="app-mname">Marcus</span>
+            <span class="app-mstatus present">present</span>
+          </div>
+          <div class="app-member">
+            <div class="app-dot"></div>
+            <span class="app-mname">Elena</span>
+            <span class="app-mstatus present">present</span>
+          </div>
+          <div class="app-member">
+            <div class="app-dot away"></div>
+            <span class="app-mname away">Theo</span>
+            <span class="app-mstatus">away this week</span>
+          </div>
+          <button class="app-btn">Begin the gathering</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Philosophy Band ───────────────────────────────────────── -->
+<section class="philosophy">
+  <p class="phil-label">The problem we're solving</p>
+  <p class="phil-quote">"Families don't drift apart because they stop loving each other. They drift apart because nothing holds the center."</p>
+  <p class="phil-attr">Haklo is the center.</p>
+</section>
+
+<!-- ─── Pillars ──────────────────────────────────────────────── -->
+<section class="pillars" id="how">
+  <span class="label">How it works</span>
+  <div class="pillar-grid">
+    <div>
+      <p class="pillar-num">01</p>
+      <p class="pillar-name">The Ritual</p>
+      <p class="pillar-body">Set a weekly gathering time. Every member receives a quiet prompt — a question worth sitting with. The gathering begins when someone arrives.</p>
+    </div>
+    <div>
+      <p class="pillar-num">02</p>
+      <p class="pillar-name">The Presence</p>
+      <p class="pillar-body">Present members check in. Away members are honored, not erased. A family of five with one traveling is still a family of five — the circle holds.</p>
+    </div>
+    <div>
+      <p class="pillar-num">03</p>
+      <p class="pillar-name">The Memory</p>
+      <p class="pillar-body">Decisions, reflections, and intentions are preserved — not as a log, but as a record of what this family chose and why. Something to return to.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Demo Section ─────────────────────────────────────────── -->
+<section class="demo-section" id="gather">
+  <div class="demo-inner">
+    <div>
+      <span class="demo-label label">The gathering card</span>
+      <h2 class="demo-h2">Every gathering has a shape. This is yours.</h2>
+      <p class="demo-body">The gathering card is the center of the Haklo experience. It holds the prompt, the members, the moment. It knows who is present and who is away — and it treats both with equal care.</p>
+    </div>
+    <div class="g-card">
+      <div class="gc-top">
+        <div>
+          <p class="gc-week">Week 7 · April 6</p>
+          <p class="gc-title">Mercer Family</p>
+        </div>
+        <div class="gc-indicator"></div>
+      </div>
+      <p class="gc-prompt">"What do you want the family to remember about this season?"</p>
+      <div class="gc-rule"></div>
+      <div class="gc-members">
+        <div class="gc-member present">
+          <div class="gc-avatar p">JM</div>
+          <div>
+            <div class="gc-mname">James</div>
+            <div class="gc-mstatus p">present</div>
+          </div>
+        </div>
+        <div class="gc-member present">
+          <div class="gc-avatar p">SM</div>
+          <div>
+            <div class="gc-mname">Sarah</div>
+            <div class="gc-mstatus p">present</div>
+          </div>
+        </div>
+        <div class="gc-member present">
+          <div class="gc-avatar p">MM</div>
+          <div>
+            <div class="gc-mname">Marcus</div>
+            <div class="gc-mstatus p">present</div>
+          </div>
+        </div>
+        <div class="gc-member present">
+          <div class="gc-avatar p">EM</div>
+          <div>
+            <div class="gc-mname">Elena</div>
+            <div class="gc-mstatus p">present</div>
+          </div>
+        </div>
+        <div class="gc-member" style="grid-column: 1/-1;">
+          <div class="gc-avatar">—</div>
+          <div>
+            <div class="gc-mname" style="opacity:0.4;">Theo</div>
+            <div class="gc-mstatus">away this week</div>
+          </div>
+        </div>
+      </div>
+      <div class="gc-footer">
+        <span class="gc-count">4 of 5 gathered</span>
+        <button class="gc-open">Open</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Pricing ───────────────────────────────────────────────── -->
+<section class="pricing" id="pricing">
+  <div class="pricing-header">
+    <span class="label">Membership</span>
+    <h2 class="pricing-h2">Begin where you are.</h2>
+    <p class="pricing-sub">Every family starts free. Grow into what you need.</p>
+  </div>
+  <div class="pricing-grid">
+
+    <div class="plan">
+      <p class="plan-badge">Free forever</p>
+      <p class="plan-name">Haklo</p>
+      <p class="plan-price">$0 <span>/ month</span></p>
+      <p class="plan-tagline">The ritual itself. Everything you need to begin.</p>
+      <div class="plan-rule"></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Weekly gathering ritual</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Up to 6 family members</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Present / away tracking</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Weekly prompts</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">4-week gathering history</span></div>
+      <div class="plan-cta">
+        <button class="plan-btn">Begin free</button>
+      </div>
+    </div>
+
+    <div class="plan featured">
+      <p class="plan-badge">Most chosen</p>
+      <p class="plan-name">Haklo Plus</p>
+      <p class="plan-price">$9.95 <span>/ month</span></p>
+      <p class="plan-tagline">For families who want the gathering to grow with them.</p>
+      <div class="plan-rule"></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Everything in Haklo</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">AI gathering coach</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Unlimited gathering history</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Decision records</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Seasonal themes &amp; prompts</span></div>
+      <div class="plan-feature"><div class="pf-dot"></div><span class="pf-text">Reflection summaries</span></div>
+      <div class="plan-cta">
+        <button class="plan-btn featured-btn">Begin Plus</button>
+      </div>
+    </div>
+
+    <div class="plan coming">
+      <div class="coming-pill">Coming soon</div>
+      <p class="plan-name">Haklo Culture</p>
+      <p class="plan-price" style="color:var(--stone);">— <span>/ month</span></p>
+      <p class="plan-tagline">For families building something that outlasts them.</p>
+      <div class="plan-rule"></div>
+      <div class="plan-feature"><div class="pf-dot dim"></div><span class="pf-text">Everything in Plus</span></div>
+      <div class="plan-feature"><div class="pf-dot dim"></div><span class="pf-text">Family values framework</span></div>
+      <div class="plan-feature"><div class="pf-dot dim"></div><span class="pf-text">Decisions as first-class records</span></div>
+      <div class="plan-feature"><div class="pf-dot dim"></div><span class="pf-text">Multigenerational archive</span></div>
+      <div class="plan-feature"><div class="pf-dot dim"></div><span class="pf-text">Family culture report</span></div>
+      <div class="plan-cta">
+        <button class="plan-btn notify">Notify me</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── Bottom CTA ────────────────────────────────────────────── -->
+<section class="bottom-cta">
+  <h2 class="bc-h">The table is set.<br>Who's gathering this Sunday?</h2>
+  <p class="bc-sub">Free to begin. No credit card. No streak to protect.</p>
+  <button class="bc-btn">Begin for free →</button>
+</section>
+
+<!-- ─── Footer ───────────────────────────────────────────────── -->
+<footer>
+  <span class="ft-word">haklo</span>
+  <div class="ft-links">
+    <a class="ft-link" href="#">Privacy</a>
+    <a class="ft-link" href="#">Terms</a>
+    <a class="ft-link" href="#">Contact</a>
+  </div>
+  <span class="ft-copy">© 2026 Haklo, LLC</span>
+</footer>
+
+</body>
+</html>
