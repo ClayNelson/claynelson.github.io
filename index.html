@@ -87,6 +87,12 @@ footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
 <p style="margin-bottom:0">The irony I keep returning to: I'm building a system to help families hold the thread of their own story together, while the development workflow for that very system loses the thread at every agent boundary.</p>
 </div>
 
+<div class="card">
+<h3>The economics of human-in-the-loop AI</h3>
+<p>LLM token costs grow quadratically with conversation length &mdash; every call re-sends the entire history, so input spend scales as N(N+1)/2 across turns. A single well-placed human question that redirects an agent at turn 8 doesn't just save one call; it collapses the entire compound cost of the wrong path. This is the compute-economics argument for Ring 2: good protocol design moves the human upstream, where their intervention is cheapest and the leverage is highest.</p>
+<p style="margin-bottom:0">&rarr; <a href="/token-cost-economics.html">Interactive model: adjust model pricing, conversation shape, and intervention timing to find your break-even point</a></p>
+</div>
+
 <hr>
 
 <h2>Working diagrams</h2>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Economics of Human-in-the-Loop AI — Clay Nelson</title>
+<style>
+:root {
+  --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
+  --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
+    --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.7; }
+.container { max-width: 740px; margin: 0 auto; padding: 56px 24px 80px; }
+h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; }
+h2 { font-size: 21px; font-weight: 500; margin: 52px 0 18px; letter-spacing: -0.01em; }
+h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+p { margin-bottom: 16px; }
+em { font-style: italic; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.byline { color: var(--muted); font-size: 14px; margin: 6px 0 40px; }
+.caveat { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 32px 0; font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 0 8px 8px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin: 20px 0; }
+.card p:last-child { margin-bottom: 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
+.back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
+.eq { font-family: 'SF Mono', 'Fira Mono', 'Consolas', monospace; font-size: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 20px 0; color: var(--text); line-height: 2; overflow-x: auto; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
+.slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.slider-label { font-size: 13px; color: var(--muted); width: 180px; flex-shrink: 0; }
+.slider-val { font-size: 13px; font-weight: 500; color: var(--text); width: 60px; text-align: right; flex-shrink: 0; }
+input[type=range] { flex: 1; accent-color: var(--link); }
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+.metric { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+.metric-label { font-size: 11px; color: var(--muted); margin: 0 0 4px; }
+.metric-value { font-size: 22px; font-weight: 500; color: var(--text); margin: 0; }
+.metric-sub { font-size: 11px; color: var(--subtle); margin: 2px 0 0; }
+.verdict { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 20px 0 0; font-size: 14px; color: var(--muted); background: var(--bg); border-radius: 0 8px 8px 0; }
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 560px) { .tool-grid { grid-template-columns: 1fr; } .metric-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<a href="/" class="back">&larr; Clay Nelson</a>
+
+<h1>The economics of human-in-the-loop AI</h1>
+<p class="byline">A working model for when a single human question is worth more than it costs. April 2026.</p>
+
+<p>There is a moment in most agentic AI sessions when a single well-placed question redirects the entire run. The question costs the human perhaps two minutes. It saves the system from completing a long, coherent, wrong path and then having to unwind it.</p>
+
+<p>The economics of this are non-obvious because the cost of compute in LLM systems does not grow linearly. It grows quadratically with conversation length. Every API call re-sends the entire conversation history as input tokens. Turn 20 costs roughly twenty times more in input than turn 1. The human who intervenes at turn 8 is not just saving 8 turns &mdash; they are collapsing an entire compound cost curve.</p>
+
+<div class="caveat">
+  This connects directly to the Ring 2 problem in multi-agent governance: the human is not a bottleneck when they intervene at the design level. They become a bottleneck only when the protocol layer is absent and they fill the gap by intervening at the execution level on every turn.
+</div>
+
+<h2>The equation</h2>
+
+<p>Total cost of an N-turn autonomous run:</p>
+
+<div class="eq">C_total = (N &times; T_out &times; P_out + [N &times; T_sys + N(N+1)/2 &times; T_turn] &times; P_in) / 1,000,000</div>
+
+<p>Where <em>N</em> = number of turns, <em>T_sys</em> = system prompt tokens, <em>T_turn</em> = average tokens added to context per turn, <em>T_out</em> = average output tokens per call, and <em>P_in / P_out</em> = price per million tokens for input and output respectively.</p>
+
+<p>The critical term is <em>N(N+1)/2</em> &mdash; the sum of an arithmetic series. Input cost grows triangularly. Double the turns and you roughly quadruple the input spend. Output is linear; input is not.</p>
+
+<p>Net value of a human intervention at turn <em>k</em> that corrects a wrong-path run:</p>
+
+<div class="eq">V = C_total(N) &minus; C_total(k) &minus; C_human<br>where C_human = (human_minutes / 60) &times; hourly_rate</div>
+
+<p>When V &gt; 0, the human's time is worth it on compute economics alone &mdash; before any quality adjustment for the value of arriving at the right answer.</p>
+
+<h2>Interactive model</h2>
+<p>Adjust the parameters to see where the break-even point lies for your context.</p>
+
+<div class="tool-wrap">
+  <div class="tool-grid">
+    <div>
+      <p class="section-label">Model pricing</p>
+      <div class="slider-row"><span class="slider-label">Input ($/M tokens)</span><input type="range" id="pIn" min="0.25" max="15" step="0.25" value="3"><span class="slider-val" id="pInV">$3.00</span></div>
+      <div class="slider-row"><span class="slider-label">Output ($/M tokens)</span><input type="range" id="pOut" min="1" max="75" step="1" value="15"><span class="slider-val" id="pOutV">$15.00</span></div>
+      <p class="section-label" style="margin-top:16px">Conversation shape</p>
+      <div class="slider-row"><span class="slider-label">System prompt (tokens)</span><input type="range" id="tSys" min="200" max="10000" step="100" value="2000"><span class="slider-val" id="tSysV">2,000</span></div>
+      <div class="slider-row"><span class="slider-label">Avg tokens/turn added</span><input type="range" id="tTurn" min="100" max="2000" step="50" value="700"><span class="slider-val" id="tTurnV">700</span></div>
+      <div class="slider-row"><span class="slider-label">Avg output/call</span><input type="range" id="tOut" min="100" max="2000" step="50" value="500"><span class="slider-val" id="tOutV">500</span></div>
+    </div>
+    <div>
+      <p class="section-label">Human intervention</p>
+      <div class="slider-row"><span class="slider-label">Total task turns (N)</span><input type="range" id="nTotal" min="5" max="80" step="1" value="30"><span class="slider-val" id="nTotalV">30</span></div>
+      <div class="slider-row"><span class="slider-label">Intervene at turn</span><input type="range" id="kIntervene" min="1" max="29" step="1" value="8"><span class="slider-val" id="kInterveneV">8</span></div>
+      <div class="slider-row"><span class="slider-label">Human time (min)</span><input type="range" id="hTime" min="0.5" max="30" step="0.5" value="2"><span class="slider-val" id="hTimeV">2 min</span></div>
+      <div class="slider-row"><span class="slider-label">Human rate ($/hr)</span><input type="range" id="hRate" min="25" max="500" step="25" value="150"><span class="slider-val" id="hRateV">$150</span></div>
+      <div class="metric-grid">
+        <div class="metric"><p class="metric-label">Full run cost</p><p class="metric-value" id="mFull">&mdash;</p><p class="metric-sub">no intervention</p></div>
+        <div class="metric"><p class="metric-label">With intervention</p><p class="metric-value" id="mWith">&mdash;</p><p class="metric-sub">to turn k + human time</p></div>
+        <div class="metric"><p class="metric-label">Compute saved</p><p class="metric-value" id="mSaved" style="color:#3B6D11">&mdash;</p><p class="metric-sub">tokens not burned</p></div>
+        <div class="metric"><p class="metric-label">Human cost</p><p class="metric-value" id="mHuman" style="color:#993C1D">&mdash;</p><p class="metric-sub">time &times; rate</p></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label" style="margin-top:20px">Cost per call &mdash; input compounds, output is linear</p>
+  <div style="position:relative;width:100%;height:200px"><canvas id="costChart"></canvas></div>
+  <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--muted)">
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#185FA5"></span>Input (quadratic)</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#0F6E56"></span>Output (linear)</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:#D85A30;border-radius:1px"></span>Intervention point</span>
+  </div>
+
+  <div class="verdict" id="verdictPanel"><span id="verdictText"></span></div>
+</div>
+
+<h2>What this means in practice</h2>
+
+<p>A one-question intervention that saves a 22-turn wrong-path run is worth roughly $0.40&ndash;$1.20 in compute for a mid-priced model &mdash; before factoring in the rework cost of arriving at the wrong answer and having to re-run. The economics favor early human direction strongly, especially as runs get longer.</p>
+
+<p>This is not an argument for constant interruption. The lever is specificity: a question asked at the <em>design</em> level (&ldquo;why are you using a hardcoded template when you already have a generation function?&rdquo;) costs one exchange and redirects the architecture. A correction at the execution level (&ldquo;change this variable name&rdquo;) costs the same tokens but saves nothing structural.</p>
+
+<p>The Ring 2 implication is this: if the protocol layer held the design intent clearly, the agent would have asked the question itself. Human intervention is the cost you pay when protocol is absent. Good Ring 2 design doesn't eliminate the human &mdash; it moves them upstream, where their time is worth the most and the quadratic curve hasn't had a chance to compound.</p>
+
+<hr>
+
+<p style="margin-bottom:0">&larr; <a href="/">Back to index</a></p>
+
+<footer><p>Personal research. Views my own. April 2026.</p></footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let chart = null;
+function fmt(n) {
+  if (n < 0.001) return '<$0.001';
+  if (n < 1) return '$' + n.toFixed(3);
+  return '$' + n.toFixed(2);
+}
+function calcTurn(i, tSys, tTurn, tOut, pIn, pOut) {
+  const ctx = tSys + i * tTurn;
+  return { ic: ctx * pIn / 1e6, oc: tOut * pOut / 1e6 };
+}
+function totalCost(n, tSys, tTurn, tOut, pIn, pOut) {
+  let s = 0;
+  for (let i = 1; i <= n; i++) { const c = calcTurn(i, tSys, tTurn, tOut, pIn, pOut); s += c.ic + c.oc; }
+  return s;
+}
+function update() {
+  const pIn = parseFloat(document.getElementById('pIn').value);
+  const pOut = parseFloat(document.getElementById('pOut').value);
+  const tSys = parseInt(document.getElementById('tSys').value);
+  const tTurn = parseInt(document.getElementById('tTurn').value);
+  const tOut = parseInt(document.getElementById('tOut').value);
+  const N = parseInt(document.getElementById('nTotal').value);
+  let K = parseInt(document.getElementById('kIntervene').value);
+  if (K >= N) { K = N - 1; document.getElementById('kIntervene').value = K; }
+  const hTime = parseFloat(document.getElementById('hTime').value);
+  const hRate = parseFloat(document.getElementById('hRate').value);
+  document.getElementById('pInV').textContent = '$' + pIn.toFixed(2);
+  document.getElementById('pOutV').textContent = '$' + pOut.toFixed(2);
+  document.getElementById('tSysV').textContent = tSys.toLocaleString();
+  document.getElementById('tTurnV').textContent = tTurn.toLocaleString();
+  document.getElementById('tOutV').textContent = tOut.toLocaleString();
+  document.getElementById('nTotalV').textContent = N;
+  document.getElementById('kInterveneV').textContent = K;
+  document.getElementById('hTimeV').textContent = hTime + ' min';
+  document.getElementById('hRateV').textContent = '$' + hRate;
+  document.getElementById('kIntervene').max = N - 1;
+  const labels = [], ics = [], ocs = [], ivLine = [];
+  for (let i = 1; i <= N; i++) {
+    labels.push('T' + i);
+    const c = calcTurn(i, tSys, tTurn, tOut, pIn, pOut);
+    ics.push(parseFloat((c.ic * 1000).toFixed(4)));
+    ocs.push(parseFloat((c.oc * 1000).toFixed(4)));
+    ivLine.push(null);
+  }
+  const maxY = Math.max(...ics, ...ocs);
+  ivLine[K - 1] = maxY * 1.15;
+  const full = totalCost(N, tSys, tTurn, tOut, pIn, pOut);
+  const partial = totalCost(K, tSys, tTurn, tOut, pIn, pOut);
+  const hCost = (hTime / 60) * hRate;
+  const saved = full - partial - hCost;
+  document.getElementById('mFull').textContent = fmt(full);
+  document.getElementById('mWith').textContent = fmt(partial + hCost);
+  document.getElementById('mSaved').textContent = fmt(Math.max(0, saved));
+  document.getElementById('mHuman').textContent = fmt(hCost);
+  const c1 = calcTurn(1, tSys, tTurn, tOut, pIn, pOut);
+  const cN = calcTurn(N, tSys, tTurn, tOut, pIn, pOut);
+  document.getElementById('verdictText').textContent = saved > 0
+    ? 'Intervening at turn ' + K + ' saves ' + fmt(saved) + ' net. The human\'s ' + hTime + ' min (= ' + fmt(hCost) + ') is worth it. Turn ' + N + ' alone costs ' + fmt(cN.ic + cN.oc) + ' vs turn 1 at ' + fmt(c1.ic + c1.oc) + ' — a ' + Math.round((cN.ic + cN.oc) / (c1.ic + c1.oc)) + '× difference.'
+    : 'At this rate the human\'s time (' + fmt(hCost) + ') exceeds the compute saved (' + fmt(full - partial) + '). The task is cheap enough to re-run, or intervene before turn ' + K + ' to tip the balance.';
+  if (chart) {
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = ics;
+    chart.data.datasets[1].data = ocs;
+    chart.data.datasets[2].data = ivLine;
+    chart.update('none');
+  } else {
+    chart = new Chart(document.getElementById('costChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Input', data: ics, backgroundColor: '#B5D4F4', borderColor: '#185FA5', borderWidth: 0.5, stack: 'a' },
+          { label: 'Output', data: ocs, backgroundColor: '#9FE1CB', borderColor: '#0F6E56', borderWidth: 0.5, stack: 'a' },
+          { label: 'Intervention', data: ivLine, type: 'bar', backgroundColor: 'rgba(216,90,48,0.15)', borderColor: '#D85A30', borderWidth: 1.5, stack: 'b', barThickness: 3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.datasetIndex === 2 ? null : ctx.dataset.label + ': $' + (ctx.raw / 1000).toFixed(5) } } },
+        scales: {
+          x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 15, font: { size: 10 }, color: '#888' }, grid: { display: false } },
+          y: { stacked: false, ticks: { font: { size: 10 }, color: '#888', callback: v => '$' + v.toFixed(1) + 'm' }, grid: { color: 'rgba(120,120,120,0.08)' } }
+        }
+      }
+    });
+  }
+}
+['pIn','pOut','tSys','tTurn','tOut','nTotal','kIntervene','hTime','hRate'].forEach(id => document.getElementById(id).addEventListener('input', update));
+update();
+</script>
+</body>
+</html>
