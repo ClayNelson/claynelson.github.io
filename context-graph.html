@@ -62,15 +62,22 @@
   .divider { border: none; border-top: 0.5px solid var(--border); margin: 48px 0; }
   .section-label { font-size: 13px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
   p { font-size: 15px; color: var(--text2); line-height: 1.75; margin-bottom: 16px; }
+  .prop-list { margin: 0 0 16px 0; padding: 0; list-style: none; }
+  .prop-list li { font-size: 15px; color: var(--text2); line-height: 1.75; padding: 6px 0 6px 20px; position: relative; border-bottom: 0.5px solid var(--border); }
+  .prop-list li:last-child { border-bottom: none; }
+  .prop-list li::before { content: "—"; position: absolute; left: 0; color: var(--text3); }
+  .prop-list li strong { color: var(--text); font-weight: 500; }
+  .callout { background: var(--bg2); border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; border: 0.5px solid var(--border); }
+  .callout p { margin-bottom: 0; font-size: 15px; }
   .footer { margin-top: 56px; font-size: 12px; color: var(--text3); }
   .footer a { color: var(--text3); }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="eyebrow">GitHub · Agent Infrastructure · 2025</div>
+  <div class="eyebrow">GitHub · Agent Infrastructure · 2026</div>
   <h1>Nodes vs. edges: what agents lose without the context graph</h1>
-  <p class="sub">Most AI agents can read any asset in a codebase. The question is whether they can see what connects them — and why those connections exist.</p>
+  <p class="sub">Any AI agent can read the assets in a codebase. The question is whether the evidence connecting them is stored somewhere — and whether that record can survive a regulatory audit.</p>
 
   <div class="viz">
     <div class="tabs">
@@ -139,20 +146,36 @@
         <text x="170" y="178" text-anchor="middle" dominant-baseline="central" fill="var(--gray600)" font-size="12" font-family="inherit">November 2024</text>
       </g>
 
-      <text id="slabel" x="340" y="428" text-anchor="middle" fill="var(--text3)" font-size="12" font-family="inherit">6 causal connections visible — agent sees WHY this code exists</text>
+      <text id="slabel" x="340" y="428" text-anchor="middle" fill="var(--text3)" font-size="12" font-family="inherit">6 causal connections stored — evidence chain is complete and auditable</text>
     </svg>
 
-    <div id="n-on" class="note">The agent sees causality: <strong>WHY</strong> the code was written (ISO §4.5), <strong>WHAT</strong> constrains it (ADR-014), <strong>WHAT</strong> validates it (TC-042), <strong>WHAT</strong> gates it (compliance v2.4), and <strong>WHAT</strong> history prompted it (Issue #1337 → PR #892). When it touches this file, it understands the consequences before acting. <em>Systems reasoning.</em></div>
-    <div id="n-off" class="note" style="display:none">Six related assets. The agent can read every one of them in isolation. It understands the code's logic. But it cannot see why the redundant safety check exists, what requirement it satisfies, or that optimizing it away would fail a compliance gate traced to a customer-reported field failure. <em>Document analysis.</em></div>
+    <div id="n-on" class="note">GitHub <strong>holds</strong> the evidence: <strong>WHY</strong> the code was written (ISO §4.5), <strong>WHAT</strong> constrains it (ADR-014), <strong>WHAT</strong> validates it (TC-042), <strong>WHAT</strong> gates it (compliance v2.4), and <strong>WHAT</strong> history prompted it (Issue #1337 → PR #892). An AI agent reads this graph — it does not replace it. The record is what survives an audit.</div>
+    <div id="n-off" class="note" style="display:none">Six related assets. Any agent can read every one of them in isolation. It can reason about the code's logic. But the connections between them — the requirement it satisfies, the field failure that prompted it, the compliance gate it feeds — are not stored anywhere. When an auditor asks for the evidence chain, there is nothing to produce. <em>Reasoning without a record.</em></div>
   </div>
 
   <hr class="divider">
 
   <div class="section-label">The argument</div>
-  <p>Most tools in the software development lifecycle see <em>snapshots</em>. GitHub sees <em>causality</em>. Every commit carries a thread: who changed it, when, what issue it was responding to, what decision preceded it, what test it broke or fixed.</p>
-  <p>Layered over years of a software project, this becomes something remarkable — an organizational memory most companies don't even know they're building. Not just <em>what</em> the software does, but <em>why</em> it became what it is.</p>
-  <p>For a regulated industry — automotive, aerospace, medical devices — the question an auditor asks isn't just "did you run static analysis?" It's "can you prove that <em>this</em> version of <em>this</em> module was analyzed under <em>these</em> requirements, and that the result was a gating condition on <em>this</em> release?" An external agent cannot answer that question natively. The provenance chain is broken at every handoff.</p>
-  <p>The difference isn't capability. It's memory. And memory is what narrative requires.</p>
+  <p>Most platforms in the software development lifecycle hold <em>snapshots</em>. GitHub holds <em>causality</em>. Every commit carries a thread: who changed it, when, what issue it was responding to, what decision preceded it, what test it broke or fixed.</p>
+
+  <p>Layered over years of a software project, this becomes something a regulated industry cannot afford to lose — an organizational memory that is <em>also</em> a legal record. Not just <em>what</em> the software does, but <em>why</em> it became what it is, with the timestamps and attribution to prove it.</p>
+
+  <p>The question an auditor asks under ISO 26262, DO-178C, or IEC 62304 is not "did you run static analysis?" It is: <em>can you produce the evidence that this version of this module was analyzed under these requirements, that the result was a gating condition on this release, and that no step in that chain was altered after the fact?</em></p>
+
+  <p>A legally defensible evidence chain has four properties an AI agent cannot supply on its own:</p>
+
+  <ul class="prop-list">
+    <li><strong>Immutability.</strong> Git's SHA-based commit graph is cryptographically tamper-evident. An agent's inference about what probably happened is not.</li>
+    <li><strong>Attribution.</strong> Every change must be traceable to a named, authorized human. Git carries this natively. A reconstructed graph assembled from inference does not.</li>
+    <li><strong>Timestamp integrity.</strong> The <em>when</em> must be verifiable. Commit timestamps are part of the hash chain. Anything assembled downstream is derived, not authoritative.</li>
+    <li><strong>Completeness of the causal chain.</strong> Requirement → Design Decision → Implementation → Test → Gate → Release. GitHub is the only single system where all six exist in one place, connected by native references.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Any agent can reason about your code. Only one system holds the evidence chain that makes that reasoning auditable.</p>
+  </div>
+
+  <p>The AI model is the reader. GitHub is the record. In regulated industries, that distinction is not architectural preference — it is the difference between passing an audit and failing one.</p>
 
   <div class="footer">
     Clay Nelson · GitHub, Worldwide Industry Solutions ·
@@ -169,8 +192,8 @@ function go(mode) {
   document.getElementById('n-on').style.display = mode === 'on' ? '' : 'none';
   document.getElementById('n-off').style.display = mode === 'off' ? '' : 'none';
   document.getElementById('slabel').textContent = mode === 'on'
-    ? '6 causal connections visible — agent sees WHY this code exists'
-    : 'Agent sees: 6 isolated assets — connections unknown';
+    ? '6 causal connections stored — evidence chain is complete and auditable'
+    : 'Agent sees: 6 isolated assets — no stored connections, no evidence chain';
   if (mode === 'on') {
     pnodes.forEach(n => { n.style.opacity = '1'; });
     edges.forEach((e, i) => {
