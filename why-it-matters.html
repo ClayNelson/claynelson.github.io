@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why it matters — the team scale problem</title>
+<style>
+  :root{
+    --bg:#FAF8F3;--surface:#FFFFFF;--text:#2C2C2A;--muted:#5F5E5A;
+    --subtle:#B4B2A9;--border:rgba(44,44,42,0.10);--link:#185FA5;
+    --green:#1a7f37;--green-bg:#eaf3de;--green-text:#27500a;
+    --blue:#0969da;--blue-bg:#e6f1fb;--blue-text:#0c447c;
+    --amber:#ba7517;--amber-bg:#faeeda;--amber-text:#633806;
+    --red:#cf222e;--red-bg:#fcebeb;--red-text:#791f1f;
+    --purple:#7f77dd;--purple-bg:#eeedfe;--purple-text:#3c3489;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{--bg:#1A1A18;--surface:#242422;--text:#E8E6DE;--muted:#B4B2A9;
+      --subtle:#5F5E5A;--border:rgba(255,255,255,0.08);--link:#85B7EB;
+      --green:#3fb950;--green-bg:#04342C;--green-text:#9FE1CB;
+      --blue:#79c0ff;--blue-bg:#042C53;--blue-text:#85B7EB;
+      --amber:#d29922;--amber-bg:#412402;--amber-text:#FAC775;
+      --red:#f85149;--red-bg:#501313;--red-text:#F09595;
+      --purple:#a5a0f0;--purple-bg:#26215C;--purple-text:#AFA9EC;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:16px;background:var(--bg);color:var(--text);line-height:1.75;}
+  .page{max-width:700px;margin:0 auto;padding:56px 24px 80px;}
+  h1{font-size:32px;font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:8px;}
+  h2{font-size:22px;font-weight:500;letter-spacing:-.01em;margin:52px 0 14px;}
+  h3{font-size:17px;font-weight:500;margin-bottom:8px;}
+  p{color:var(--muted);margin-bottom:14px;}
+  p strong{color:var(--text);font-weight:500;}
+  a{color:var(--link);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .lede{font-size:19px;color:var(--muted);margin-bottom:40px;line-height:1.6;}
+  hr{border:none;border-top:.5px solid var(--border);margin:48px 0;}
+  .callout{border-left:3px solid var(--blue);padding:14px 18px;
+    background:var(--blue-bg);border-radius:0 8px 8px 0;margin:24px 0;}
+  .callout p{color:var(--blue-text);margin:0;font-size:15px;line-height:1.65;}
+  .callout strong{color:var(--blue-text);}
+  .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;
+    font-weight:500;letter-spacing:.2px;margin-bottom:12px;}
+  .tag.start{background:var(--green-bg);color:var(--green-text);}
+  .tag.break{background:var(--red-bg);color:var(--red-text);}
+  .tag.fix{background:var(--blue-bg);color:var(--blue-text);}
+  .tag.watch{background:var(--amber-bg);color:var(--amber-text);}
+  .scenario{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
+  @media(max-width:560px){.scenario{grid-template-columns:1fr;}}
+  .sc{background:var(--surface);border:.5px solid var(--border);border-radius:12px;
+    padding:18px 20px;}
+  .sc.good{border-left:3px solid var(--green);}
+  .sc.bad{border-left:3px solid var(--red);}
+  .sc h3{font-size:14px;margin-bottom:6px;}
+  .sc h3.g{color:var(--green);}
+  .sc h3.r{color:var(--red);}
+  .sc p{font-size:14px;margin-bottom:0;}
+  .step-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:22px;}
+  .step-num{width:28px;height:28px;border-radius:50%;background:var(--blue-bg);
+    color:var(--blue-text);font-weight:500;font-size:13px;display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+  .step-body h3{font-size:15px;margin-bottom:4px;}
+  .step-body p{font-size:14px;margin-bottom:0;}
+  .half-life{margin:24px 0;}
+  .hl-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .hl-label{font-size:13px;color:var(--muted);width:160px;flex-shrink:0;}
+  .hl-track{flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden;}
+  .hl-fill{height:100%;border-radius:6px;}
+  .hl-note{font-size:11px;color:var(--subtle);margin-left:4px;min-width:80px;}
+  .players{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0;}
+  .player{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;
+    background:var(--surface);border:.5px solid var(--border);}
+  .player.solo{background:var(--green-bg);color:var(--green-text);border-color:var(--green);}
+  .player.conflict{background:var(--red-bg);color:var(--red-text);border-color:var(--red);}
+  .player.ok{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue);}
+  .three-things{counter-reset:things;margin:20px 0;}
+  .thing{display:flex;gap:14px;margin-bottom:20px;padding-bottom:20px;
+    border-bottom:.5px solid var(--border);}
+  .thing:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .thing-num{font-size:28px;font-weight:500;color:var(--border);flex-shrink:0;
+    width:36px;text-align:center;line-height:1;padding-top:2px;}
+  .thing-body h3{font-size:15px;margin-bottom:4px;}
+  .thing-body p{font-size:14px;margin-bottom:0;}
+  .nav-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:28px 0;}
+  @media(max-width:480px){.nav-cards{grid-template-columns:1fr;}}
+  .nav-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;
+    padding:16px 18px;text-decoration:none;display:block;transition:border-color .15s;}
+  .nav-card:hover{border-color:var(--link);text-decoration:none;}
+  .nav-card-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+    color:var(--subtle);margin-bottom:6px;}
+  .nav-card h3{font-size:14px;color:var(--link);margin-bottom:4px;}
+  .nav-card p{font-size:13px;margin-bottom:0;}
+  footer{margin-top:48px;padding-top:20px;border-top:.5px solid var(--border);
+    font-size:12px;color:var(--subtle);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<p style="font-size:13px;color:var(--subtle);margin-bottom:16px">
+  <a href="/">claynelson.github.io</a> &rsaquo; why it matters
+</p>
+
+<h1>Why the best AI tool for one developer breaks at five</h1>
+<p class="lede">A plain-language explainer for anyone selling or building GitHub in the era of AI coding agents. No math required &mdash; yet.</p>
+
+<hr style="margin-top:0">
+
+<h2>Start with a golf caddie</h2>
+
+<p>Imagine a scratch golfer with an exceptional caddie. The caddie has watched every round. They know the golfer reads uphill putts with a slight pull. They know not to suggest the 7-iron on the 14th when there's any wind from the south. They carry the entire philosophy of that golfer's game in their head.</p>
+
+<p>That golfer, with that caddie, is exceptional. They win rounds they have no business winning &mdash; because the caddie isn't just carrying clubs. The caddie is carrying <strong>strategic memory</strong>.</p>
+
+<p>This is what Claude Code does for a solo developer today. It isn't just writing code. It's holding the design philosophy, the sequencing decisions, the reasons why things are structured the way they are &mdash; all in a single coherent context. The developer doesn't have to re-explain themselves at every step. The intent travels with the work.</p>
+
+<div class="callout">
+  <p><strong>The caddie insight:</strong> The value isn't the clubs. It's the continuous memory of intent across the whole round.</p>
+</div>
+
+<h2>Now add four more golfers</h2>
+
+<p>Same golf course. Now there are five golfers, each with their own private caddie. The caddies have never spoken to each other. Each one knows their own golfer's game deeply &mdash; but has no idea what the other four are doing.</p>
+
+<p>They all tee off at the same time. Two of them choose the same line down the 4th fairway. Three caddies independently decide their golfer should play aggressively toward the same pin. Nobody is wrong about their own golfer &mdash; but the course is chaos.</p>
+
+<p>This is a five-developer team where every developer is running an AI agent with no shared context. Each agent is excellent at serving its own developer. Together, they are competing for the same parts of the codebase with no awareness of each other.</p>
+
+<div class="scenario">
+  <div class="sc good">
+    <h3 class="g">Solo developer + Claude Code</h3>
+    <p>One caddie. Knows every decision you've made. Holds your philosophy. Nothing is lost between sessions.</p>
+  </div>
+  <div class="sc bad">
+    <h3 class="r">5 developers, 5 private agents</h3>
+    <p>Five caddies, none talking. Each excellent alone. Together: 15 agents competing for the same files, no shared memory of why anything was built the way it was.</p>
+  </div>
+</div>
+
+<h2>Three things go wrong</h2>
+
+<div class="three-things">
+  <div class="thing">
+    <div class="thing-num">1</div>
+    <div class="thing-body">
+      <h3>The coordination edges multiply faster than you expect</h3>
+      <p>With two developers, there's one edge between them to manage. With five, there are ten. But here's the new part: each developer running three AI agents isn't one person anymore &mdash; they're a small team. At five developers with three agents each, you have 105 potential conflict edges. Most of those are <strong>invisible</strong>. No agent knows what another is doing.</p>
+    </div>
+  </div>
+  <div class="thing">
+    <div class="thing-num">2</div>
+    <div class="thing-body">
+      <h3>Some files are like the 18th green &mdash; everyone ends up there</h3>
+      <p>In any codebase, a small number of files are touched by almost every feature: configuration files, routing tables, database schema, the app's main entry point. These are <strong>hub files</strong>. When five developers run agents in parallel, each agent working on its own feature will independently try to update these files. A recent benchmark found that Git's merge algorithm creates false conflicts on nearly half of these cases &mdash; not because the changes actually conflict, but because Git reads lines of text, not intent.</p>
+    </div>
+  </div>
+  <div class="thing">
+    <div class="thing-num">3</div>
+    <div class="thing-body">
+      <h3>The philosophy disappears when the conversation ends</h3>
+      <p>When the caddie goes home, the strategic memory goes with them. Every Claude Code session, every conversation with an AI agent &mdash; when it closes, the reasoning behind the decisions made in that session is gone. At solo scale, the developer is the keeper of that memory. At five-person scale, <strong>no one is</strong>. Two weeks later, nobody can explain why a key architectural decision was made the way it was &mdash; because the only record lived in a chat window that closed.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<h2>What GitHub provides that a private caddie can't</h2>
+
+<p>Think about what makes a golf tournament work. It isn't five exceptional caddies. It's the course itself: the tee sheets that sequence who plays when, the scorecards that create a shared record, the rules that every player and caddie operates under. The course is the <strong>coordination infrastructure</strong>.</p>
+
+<p>GitHub is that infrastructure for software development. Pull requests aren't just code review &mdash; they're the contract between parallel workstreams. Issues aren't just task tracking &mdash; they're durable records of why decisions were made, recoverable months later when a new agent needs to understand the context. The branch rules aren't bureaucracy &mdash; they're the tee sheet that prevents two agents from teeing off on the same hole.</p>
+
+<p>When agents live <strong>inside</strong> GitHub, through Copilot, they share this infrastructure natively. When agents live <strong>outside</strong> GitHub, like Claude Code running externally, they are brilliant private caddies operating on a course with no tee sheet, no shared scorecards, and no rules about who plays when.</p>
+
+<div class="callout">
+  <p><strong>The question isn't which agent is smarter.</strong> It's whether your agents have shared context, or whether they're 15 brilliant caddies who've never spoken operating on the same course at the same time.</p>
+</div>
+
+<h2>How long does the reasoning survive?</h2>
+
+<p>Here's a simple way to see the gap. An architectural decision gets made. How findable is the <em>reasoning behind that decision</em> two months from now?</p>
+
+<div class="half-life">
+  <div class="hl-row">
+    <span class="hl-label">External chat session</span>
+    <div class="hl-track"><div class="hl-fill" style="background:var(--red);width:4%"></div></div>
+    <span class="hl-note">gone at session end</span>
+  </div>
+  <div class="hl-row">
+    <span class="hl-label">PR description</span>
+    <div class="hl-track"><div class="hl-fill" style="background:var(--amber);width:36%"></div></div>
+    <span class="hl-note">fades as codebase grows</span>
+  </div>
+  <div class="hl-row">
+    <span class="hl-label">GitHub Issues + PR link</span>
+    <div class="hl-track"><div class="hl-fill" style="background:var(--green);width:88%"></div></div>
+    <span class="hl-note">still findable months later</span>
+  </div>
+  <div class="hl-row">
+    <span class="hl-label">Entire Checkpoints *</span>
+    <div class="hl-track"><div class="hl-fill" style="background:var(--blue);width:96%"></div></div>
+    <span class="hl-note">captured at every commit</span>
+  </div>
+</div>
+<p style="font-size:12px;color:var(--subtle);margin-top:-8px">* <a href="https://entire.io" style="color:var(--subtle)">Entire</a> is a new startup from the former GitHub CEO that captures agent reasoning alongside code. Worth watching &mdash; it's building into this exact gap.</p>
+
+<p>When five developers run external agents, the team's collective reasoning about the codebase is stored almost entirely in individual chat histories that nobody can search. When they work through GitHub, that reasoning accumulates in Issues and PRs &mdash; findable, searchable, and available to the next agent that picks up the work.</p>
+
+<hr>
+
+<h2>The one thing to remember in a conversation</h2>
+
+<p>You'll meet developers who love Claude Code. They should &mdash; it's exceptional. The solo-developer experience with an external AI agent is genuinely better than Copilot on many dimensions. Don't argue that point.</p>
+
+<p>The conversation to have instead:</p>
+
+<div class="callout" style="border-left-color:var(--purple);background:var(--purple-bg)">
+  <p style="color:var(--purple-text)">“Your developers are already using AI agents. I'm not here to take that away. The question is whether those agents have a shared understanding of what the codebase is doing &mdash; or whether they're brilliant caddies who've never talked, operating on a course with no rules. GitHub is the course. The PR is the tee sheet. And right now, a lot of teams are about to find out the hard way that the course matters more than the caddie.”</p>
+</div>
+
+<p>The customer at five or more developers has probably already felt this problem. They may have called it something else: merge conflicts that didn't make sense, architectural decisions that got reversed because nobody remembered why they were made, agents generating technically correct code that missed the point. When you name the pattern, they recognize it.</p>
+
+<hr>
+
+<h2>Ready to go deeper?</h2>
+
+<p style="color:var(--muted);margin-bottom:20px">The pages below show the actual math and let you run simulations. Useful if you want to demonstrate the problem live in a conversation &mdash; the sprint conflict simulation in particular makes the abstract very concrete in about 30 seconds.</p>
+
+<div class="nav-cards">
+  <a class="nav-card" href="/team-scale-math.html">
+    <div class="nav-card-label">Interactive model</div>
+    <h3>The team scale math</h3>
+    <p>Drag a slider from 1 to 5 developers and watch the unmanaged conflict edges multiply. Run a sprint simulation to see hub files light up red.</p>
+  </a>
+  <a class="nav-card" href="/token-cost-economics.html">
+    <div class="nav-card-label">Interactive model</div>
+    <h3>Token cost economics</h3>
+    <p>Why early human intervention in an agent workflow is worth 10x more than the same correction made later. The compound cost argument for keeping humans in the loop.</p>
+  </a>
+</div>
+
+<div class="nav-cards" style="grid-template-columns:1fr">
+  <a class="nav-card" href="https://github.com/ClayNelson/agent-patterns" target="_blank">
+    <div class="nav-card-label">Research repository</div>
+    <h3>Agent patterns &mdash; ClayNelson/agent-patterns</h3>
+    <p>The source research behind this page: framework docs, experimental cases, and a watchlist of startups (Entire, Atomic) building into this space.</p>
+  </a>
+</div>
+
+<footer>
+  Built by <a href="https://github.com/claynelson">Clay Nelson</a> &middot;
+  Part of the <a href="https://github.com/ClayNelson/agent-patterns">agent-patterns</a> research project &middot;
+  <a href="/">Back to index</a>
+</footer>
+
+</div>
+</body>
+</html>
