@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Team Scale Problem — Why GitHub Wins at N>3</title>
+<style>
+  :root {
+    --bg:#ffffff;--bg2:#f6f6f4;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;
+    --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);
+    --blue:#0969da;--blue-bg:#e6f1fb;--blue-text:#0c447c;
+    --green:#1a7f37;--green-bg:#eaf3de;--green-text:#27500a;
+    --red:#cf222e;--red-bg:#fcebeb;--red-text:#791f1f;
+    --amber:#ba7517;--amber-bg:#faeeda;--amber-text:#633806;
+    --purple:#7f77dd;--purple-bg:#eeedfe;--purple-text:#3c3489;
+    --radius:8px;--radius-lg:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:14px;background:var(--bg);color:var(--text);line-height:1.6;}
+  .page{max-width:880px;margin:0 auto;padding:32px 20px 64px;}
+  h1{font-size:26px;font-weight:600;margin-bottom:6px;}
+  h2{font-size:18px;font-weight:600;margin:32px 0 10px;}
+  h3{font-size:15px;font-weight:600;margin-bottom:6px;}
+  p{color:var(--text2);margin-bottom:10px;}
+  .lede{font-size:16px;color:var(--text2);margin-bottom:28px;border-bottom:.5px solid var(--border);padding-bottom:20px;}
+  .card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;}
+  .surface{background:var(--bg2);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:12px;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{padding:6px 14px;border-radius:20px;border:.5px solid var(--border2);cursor:pointer;
+    font-size:13px;font-weight:500;background:transparent;color:var(--text);transition:all .15s;}
+  .tab:hover{background:var(--bg2);}
+  .tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .tabview{display:none;}.tabview.on{display:block;}
+  .ctrl-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:14px;}
+  .ctrl-group{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2);}
+  input[type=range]{accent-color:var(--blue);width:110px;}
+  .val-badge{font-size:12px;font-weight:700;color:var(--blue);min-width:26px;}
+  .mets{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  .met{flex:1;min-width:88px;padding:10px;border-radius:var(--radius);border:.5px solid var(--border);text-align:center;}
+  .met-l{font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--text3);margin-bottom:3px;}
+  .met-v{font-size:24px;font-weight:700;line-height:1;}
+  .met-v.g{color:var(--green);}.met-v.r{color:var(--red);}.met-v.b{color:var(--blue);}.met-v.a{color:var(--amber);}
+  .met-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  button.pri{padding:7px 18px;border-radius:var(--radius);background:var(--blue);color:#fff;
+    border:none;cursor:pointer;font-size:13px;font-weight:500;}
+  button.pri:disabled{background:#94b4d5;cursor:default;}
+  button.plain{padding:6px 14px;border-radius:var(--radius);background:transparent;
+    border:.5px solid var(--border2);cursor:pointer;font-size:13px;color:var(--text);}
+  .status{font-size:11px;color:var(--text3);min-height:16px;margin-bottom:8px;}
+  canvas{display:block;border-radius:var(--radius-lg);border:.5px solid var(--border);background:var(--bg2);width:100%;}
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .blbl{font-size:11px;width:160px;text-align:right;color:var(--text2);flex-shrink:0;}
+  .btrack{flex:1;height:20px;background:var(--bg2);border-radius:4px;overflow:hidden;}
+  .bfill{height:100%;border-radius:4px;transition:width .7s ease;display:flex;align-items:center;padding:0 6px;}
+  .bval{font-size:10px;font-weight:700;color:#fff;}
+  .sprint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;margin:10px 0;}
+  .sf{border:.5px solid var(--border);border-radius:var(--radius);padding:7px 8px;font-size:10px;transition:all .3s;}
+  .sf.ok{background:var(--green-bg);border-color:var(--green);color:var(--green-text);}
+  .sf.conflict{background:var(--red-bg);border-color:var(--red);color:var(--red-text);}
+  .sf.hub{border-style:dashed;}
+  .sf .fn{font-weight:700;margin-bottom:2px;}
+  .sf .ft{font-size:9px;opacity:.75;}
+  .hl-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+  .hl-label{font-size:11px;color:var(--text2);width:130px;flex-shrink:0;padding-top:4px;}
+  .hl-bar-wrap{flex:1;}
+  .hl-bar{height:14px;border-radius:3px;margin-bottom:3px;transition:width 1s ease;}
+  .hl-tick{font-size:9px;color:var(--text3);}
+  .source{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;
+    background:var(--bg2);border:.5px solid var(--border);font-size:10px;color:var(--text3);
+    margin:2px;cursor:help;text-decoration:none;}
+  .source:hover{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue);}
+  .sources{margin:8px 0 0;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  @media(max-width:580px){.two-col{grid-template-columns:1fr;}}
+  .punchline{background:var(--bg2);border-left:3px solid var(--blue);padding:12px 16px;
+    border-radius:0 var(--radius) var(--radius) 0;font-size:14px;line-height:1.7;margin:16px 0;}
+  table.compact{width:100%;border-collapse:collapse;font-size:12px;}
+  table.compact th{text-align:left;padding:5px 8px;background:var(--bg2);
+    border-bottom:.5px solid var(--border);font-weight:600;color:var(--text2);}
+  table.compact td{padding:5px 8px;border-bottom:.5px solid var(--border);}
+  table.compact tr.hl td{font-weight:700;background:#fffbf0;}
+  table.compact tr.warn td{background:var(--red-bg);color:var(--red-text);}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0;}
+  .leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+  .ldot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  footer{margin-top:48px;padding-top:20px;border-top:.5px solid var(--border);font-size:12px;color:var(--text3);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>The Team Scale Problem</h1>
+<div class="lede">Why Claude Code external dominates solo — and why that advantage inverts at N≥3 developers. Built from empirical research, not talking points.</div>
+
+<div class="tabs" id="main-tabs">
+  <button class="tab active" onclick="show('mult',this)">⚖️ The multiplier</button>
+  <button class="tab" onclick="show('conflict',this)">🧨 Conflict surface</button>
+  <button class="tab" onclick="show('coord',this)">🎯 The coordination layer</button>
+</div>
+
+<!-- TAB 1 -->
+<div class="tabview on" id="tv-mult">
+  <div class="surface">
+    <h3>Brooks' Law — now compressed to hours</h3>
+    <p>Fred Brooks (1975): "Adding manpower to a late software project makes it later." Communication overhead scales as <strong>N(N−1)/2</strong> — not linearly. AI agents don't repeal this. They accelerate it. Coordination costs that once appeared over months now appear over hours.</p>
+    <p style="margin-bottom:0">The new variable: each developer running AI agents is no longer one contributor — they're a small team. The coordination math that used to apply between <em>developers</em> now applies between <em>agents</em>.</p>
+    <div class="sources">
+      <a class="source" href="https://www.augmentcode.com/blog/the-end-of-linear-work" target="_blank">📄 Augment Code — "The End of Linear Work" (2026)</a>
+      <a class="source" href="https://arxiv.org/abs/2601.15195" target="_blank">📄 Ehsani et al., arXiv 2601.15195 (Jan 2026) — 33k agent PRs</a>
+      <a class="source" href="https://dl.acm.org/doi/10.1145/3772429.3772439" target="_blank">📄 DAI 2025 — Multi-agent orchestration: sharp phase transitions</a>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-group">Developers<input type="range" id="sl-devs" min="1" max="10" value="1" oninput="updateMult()"><span class="val-badge" id="out-devs">1</span></div>
+    <div class="ctrl-group">Agents / dev<input type="range" id="sl-agents" min="1" max="5" value="1" oninput="updateMult()"><span class="val-badge" id="out-agents">1</span></div>
+  </div>
+  <div class="mets" id="mult-mets"></div>
+  <canvas id="net-canvas" height="240"></canvas>
+  <div class="legend" style="margin-top:8px">
+    <div class="leg"><div class="ldot" style="background:var(--blue)"></div>Developer</div>
+    <div class="leg"><div class="ldot" style="background:var(--green);width:8px;height:8px"></div>Agent</div>
+    <div class="leg"><svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="4,2"/></svg>Cross-dev conflict edge</div>
+    <div class="leg"><svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="#0969da" stroke-width="1" opacity=".4"/></svg>Same-dev (you manage)</div>
+  </div>
+  <h2 style="margin-top:20px">The lookup table</h2>
+  <p>Cross-developer conflict edges = the coordination problem GitHub's PR layer has to absorb. Note how they multiply vs. Brooks' baseline as agent count increases.</p>
+  <table class="compact" id="mult-table"></table>
+  <div class="punchline" id="mult-punch" style="margin-top:16px"></div>
+</div>
+
+<!-- TAB 2 -->
+<div class="tabview" id="tv-conflict">
+  <div class="surface">
+    <h3>Git's 48% false conflict rate — empirically measured</h3>
+    <p>A 2026 benchmark of 31 merge scenarios found Git's line-based merge algorithm produced false conflicts on <strong>48% of cases</strong> where two branches made independent, non-conflicting changes to the same file. Git sees flat text lines — not functions, classes, or intent.</p>
+    <p>The worst files are <strong>hub files</strong> — config registries, routing tables, schema files. Every feature touches them. Conflict probability on these approaches 1.0 as team + agent count grows.</p>
+    <div class="sources">
+      <a class="source" href="https://thenote.app/post/en/gits-line-based-merge-is-broken-for-the-ai-agent-era-1xm5pmgiey" target="_blank">📄 Git's Line-Based Merge is Broken (Feb 2026)</a>
+      <a class="source" href="https://arxiv.org/abs/2601.15195" target="_blank">📄 Ehsani et al. — not-merged PRs touch more files (Jan 2026)</a>
+      <a class="source" href="https://arxiv.org/abs/2602.00164" target="_blank">📄 Alam et al. — 35% of AI fix PRs unmerged (Jan 2026)</a>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-group">Developers<input type="range" id="cf-devs" min="1" max="8" value="2" oninput="updateConflict()"><span class="val-badge" id="cf-out-devs">2</span></div>
+    <div class="ctrl-group">Agents / dev<input type="range" id="cf-agents" min="1" max="5" value="1" oninput="updateConflict()"><span class="val-badge" id="cf-out-agents">1</span></div>
+    <div class="ctrl-group">Hub files<input type="range" id="cf-hubs" min="2" max="12" value="5" oninput="updateConflict()"><span class="val-badge" id="cf-out-hubs">5</span></div>
+  </div>
+  <div class="mets" id="cf-mets"></div>
+  <div class="btns">
+    <button class="pri" id="cf-btn" onclick="runSprintSim()">▶ Simulate a sprint</button>
+    <button class="plain" onclick="runSprintSim()">Run again</button>
+  </div>
+  <div class="status" id="cf-status">Adjust sliders then click to simulate</div>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:10px">Hub files (every feature touches these)</h3>
+      <div class="sprint-grid" id="cf-hub-grid"></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:10px">Regular files (bounded exposure)</h3>
+      <div class="sprint-grid" id="cf-reg-grid"></div>
+    </div>
+  </div>
+  <div class="surface" id="cf-outcome" style="display:none">
+    <strong id="cf-outcome-head" style="display:block;font-size:14px;margin-bottom:4px"></strong>
+    <span id="cf-outcome-body" style="font-size:13px;color:var(--text2)"></span>
+  </div>
+  <h2 style="margin-top:20px">What the empirical data says about AI PRs that fail</h2>
+  <p>From large-scale studies of agent-authored pull requests on GitHub (2025–2026):</p>
+  <div style="margin-bottom:6px">
+    <div class="bar-row"><span class="blbl">Bug-fix task PRs merged</span><div class="btrack"><div class="bfill" style="background:var(--amber);width:0" id="bfill-bug"><span class="bval">—</span></div></div></div>
+    <div class="bar-row"><span class="blbl">Docs / CI task PRs merged</span><div class="btrack"><div class="bfill" style="background:var(--green);width:0" id="bfill-doc"><span class="bval">—</span></div></div></div>
+    <div class="bar-row"><span class="blbl">Claude Code PRs merged (solo)</span><div class="btrack"><div class="bfill" style="background:var(--blue);width:0" id="bfill-cc"><span class="bval">—</span></div></div></div>
+    <div class="bar-row"><span class="blbl">Merged PRs requiring human edit</span><div class="btrack"><div class="bfill" style="background:var(--purple);width:0" id="bfill-he"><span class="bval">—</span></div></div></div>
+  </div>
+  <p style="font-size:11px;color:var(--text3)">The "human edit required" bar is the coordination tax — the work that happens <em>after</em> the agent finishes because context was lost, files overlapped, or project norms weren't captured anywhere findable. At team scale, this multiplies by N.</p>
+  <div class="sources">
+    <a class="source" href="https://arxiv.org/abs/2509.14745" target="_blank">📄 Kashiwa et al., arXiv 2509.14745 — 567 Claude Code PRs (Sep 2025)</a>
+    <a class="source" href="https://arxiv.org/abs/2602.00164" target="_blank">📄 Alam et al., arXiv 2602.00164 — fix PR failure catalog (Jan 2026)</a>
+  </div>
+</div>
+
+<!-- TAB 3 -->
+<div class="tabview" id="tv-coord">
+  <div class="surface">
+    <h3>The bottleneck is shifting</h3>
+    <p>Harvey.ai (2026): <em>"Our engineers are now so productive that they are harder to coordinate. The bottlenecks are shifting away from implementation and toward review, prioritization, coordination, and operating design. That is what the new leverage looks like."</em></p>
+    <p style="margin-bottom:0">The answer isn't a faster agent. It's a coordination layer — a place where agents have shared context, decisions are durable, and the PR is the contract between parallel workstreams.</p>
+    <div class="sources">
+      <a class="source" href="https://www.harvey.ai/blog/autonomous-agents-legal-is-next" target="_blank">📄 Harvey.ai — "Autonomous Agents" (Apr 2026)</a>
+      <a class="source" href="https://arxiv.org/html/2602.01011v2" target="_blank">📄 "Multi-Agent Teams Hold Experts Back" (Feb 2026) — coordination costs dilute expertise</a>
+    </div>
+  </div>
+
+  <h2>Decision half-life: how long is reasoning findable?</h2>
+  <p>AI-assisted development generates reasoning fast. The critical question is how long that reasoning is <em>findable</em> after a decision is made. Drag the slider forward in time.</p>
+  <div class="ctrl-row">
+    <div class="ctrl-group">Weeks since decision<input type="range" id="hl-weeks" min="0" max="12" value="0" oninput="updateHL()"><span class="val-badge" id="hl-out">0</span></div>
+  </div>
+  <div id="hl-rows">
+    <div class="hl-row">
+      <span class="hl-label">External chat session<br><span style="font-size:9px;opacity:.6">Claude Code / Cursor</span></span>
+      <div class="hl-bar-wrap"><div class="hl-bar" id="hlb-chat" style="background:var(--red);width:100%"></div><span class="hl-tick" id="hlt-chat"></span></div>
+    </div>
+    <div class="hl-row">
+      <span class="hl-label">PR description<br><span style="font-size:9px;opacity:.6">git blame</span></span>
+      <div class="hl-bar-wrap"><div class="hl-bar" id="hlb-pr" style="background:var(--amber);width:100%"></div><span class="hl-tick" id="hlt-pr"></span></div>
+    </div>
+    <div class="hl-row">
+      <span class="hl-label">GitHub Issues<br><span style="font-size:9px;opacity:.6">linked to PR + commit</span></span>
+      <div class="hl-bar-wrap"><div class="hl-bar" id="hlb-issue" style="background:var(--green);width:100%"></div><span class="hl-tick" id="hlt-issue"></span></div>
+    </div>
+    <div class="hl-row">
+      <span class="hl-label">Entire Checkpoints<br><span style="font-size:9px;opacity:.6">agent reasoning at commit</span></span>
+      <div class="hl-bar-wrap"><div class="hl-bar" id="hlb-entire" style="background:var(--blue);width:100%"></div><span class="hl-tick" id="hlt-entire"></span></div>
+    </div>
+  </div>
+
+  <h2 style="margin-top:24px">Coordination layer comparison</h2>
+  <table class="compact" style="margin-bottom:14px">
+    <thead><tr><th>Dimension</th><th>External (Claude Code)</th><th>Inside GitHub (Copilot)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Context scope</strong></td><td>Per-session, per-developer</td><td>Shared repo — Issues, PRs, branch state</td></tr>
+      <tr><td><strong>Agent-to-agent awareness</strong></td><td style="color:var(--red)">None — blind to other agents</td><td style="color:var(--green)">PR is the negotiation interface</td></tr>
+      <tr><td><strong>Command Intent survival</strong></td><td style="color:var(--red)">Dies when context window closes</td><td style="color:var(--green)">Lives in Issues — survives handoff</td></tr>
+      <tr><td><strong>Conflict arbitration</strong></td><td style="color:var(--amber)">Manual — developer resolves post-hoc</td><td style="color:var(--green)">PR blocks merge until resolved</td></tr>
+      <tr><td><strong>Audit / governance</strong></td><td style="color:var(--red)">None by default</td><td style="color:var(--green)">Policy enforcement, access controls</td></tr>
+      <tr class="hl"><td><strong>Solo developer</strong></td><td style="color:var(--green)">✓ Wins — Command Intent preserved</td><td>Adequate</td></tr>
+      <tr class="warn"><td><strong>5+ developers</strong></td><td style="color:var(--red)">✗ 90+ uncoordinated cross-dev edges</td><td style="color:var(--green)">✓ PR is the coordination primitive</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The inflection zone</h2>
+  <div class="mets">
+    <div class="met"><div class="met-l">Edges at N=1, 3 agents</div><div class="met-v b">3</div><div class="met-sub">you manage all — no cross-dev</div></div>
+    <div class="met"><div class="met-l">Edges at N=3, 3 agents</div><div class="met-v a">36</div><div class="met-sub">18 cross-dev — needs structure</div></div>
+    <div class="met"><div class="met-l">Edges at N=5, 3 agents</div><div class="met-v r">105</div><div class="met-sub">90 cross-dev — informal breaks</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--text3)">Practical ceiling observed: 5–7 concurrent agents before review bottleneck and conflict overhead consume the productivity gain — regardless of agent quality or model. The constraint is coordination, not capability.</p>
+
+  <div class="punchline">
+    <strong style="font-size:14px;display:block;margin-bottom:5px">The one sentence</strong>
+    Your developers are already running 3–5 agents each. The question isn't whether they're using AI — it's whether those agents have a shared understanding of what the codebase is doing, or whether they're 15 blind workers competing for the same hub files. GitHub is the only platform where agents have shared context and where the decisions they make are durable enough to govern the next decision.
+  </div>
+
+  <h2>Proposed experiments</h2>
+  <div class="surface">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="border-left:3px solid var(--blue);padding-left:10px">
+        <strong style="font-size:12px">False conflict rate at N=1 vs N=5</strong>
+        <p style="margin:0;font-size:12px">Run identical task decomposition on a real codebase with 1 dev vs 5 devs each with Claude Code. Count actual Git conflicts per sprint. Baseline against the empirical 48% false-conflict rate.</p>
+      </div>
+      <div style="border-left:3px solid var(--green);padding-left:10px">
+        <strong style="font-size:12px">Command Intent survival test</strong>
+        <p style="margin:0;font-size:12px">Two weeks after a sprint, ask each developer to explain the rationale for an architectural decision made via an agent session. Measure how many are findable in the Issue record vs. only the developer's memory.</p>
+      </div>
+      <div style="border-left:3px solid var(--amber);padding-left:10px">
+        <strong style="font-size:12px">Hub file collision frequency</strong>
+        <p style="margin:0;font-size:12px">Identify the top 5 most-touched files in any active repo. Instrument git log to count concurrent modification rate as AI agent usage increases vs. the N(N−1)/2 × agents² formula.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="surface" style="margin-top:8px">
+    <h3 style="margin-bottom:6px">Signals to watch in the market</h3>
+    <p style="margin-bottom:6px"><strong>Entire (Thomas Dohmke)</strong> — $60M seed, building a Git-compatible semantic DB + agent reasoning layer. First product: Checkpoints captures agent reasoning at every commit. This is a portable, open-source answer to the Command Intent survival problem — built by the person who ran GitHub. <a href="https://entire.io" target="_blank" class="source">entire.io →</a></p>
+    <p style="margin-bottom:0"><strong>Atomic (Lee Faus)</strong> — former GitHub + GitLab Field CTO building agent-native primitives. Newsletter: Be Atomic. Product TBD but practitioner credibility is real. <a href="https://atomic.dev" target="_blank" class="source">atomic.dev →</a></p>
+  </div>
+</div>
+
+<footer>
+  Built by <a href="https://github.com/claynelson" target="_blank">Clay Nelson</a> · Part of the <a href="https://github.com/ClayNelson/agent-patterns" target="_blank">agent-patterns</a> research project ·
+  See also: <a href="finishing-problem.html">The Finishing Problem</a> · <a href="token-cost-economics.html">Token Cost Economics</a>
+</footer>
+</div>
+
+<script>
+function show(id,btn){
+  ['mult','conflict','coord'].forEach(t=>document.getElementById('tv-'+t).classList.remove('on'));
+  document.querySelectorAll('#main-tabs .tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tv-'+id).classList.add('on');
+  btn.classList.add('active');
+  if(id==='conflict')setTimeout(()=>animateBars(),100);
+  if(id==='coord')setTimeout(()=>updateHL(),100);
+}
+
+function crossDevEdges(nd,na){
+  const total=nd*na;
+  const same=nd*(na*(na-1)/2);
+  return total*(total-1)/2-same;
+}
+
+function updateMult(){
+  const nd=+document.getElementById('sl-devs').value;
+  const na=+document.getElementById('sl-agents').value;
+  document.getElementById('out-devs').textContent=nd;
+  document.getElementById('out-agents').textContent=na;
+  const ea=nd*na,te=ea*(ea-1)/2,se=nd*(na*(na-1)/2),ce=te-se,de=nd*(nd-1)/2;
+  document.getElementById('mult-mets').innerHTML=`
+    <div class="met"><div class="met-l">Effective agents</div><div class="met-v b">${ea}</div><div class="met-sub">${nd}×${na}</div></div>
+    <div class="met"><div class="met-l">Total edge pairs</div><div class="met-v ${te>50?'r':'a'}">${te}</div><div class="met-sub">all agent pairs</div></div>
+    <div class="met"><div class="met-l">Cross-dev edges</div><div class="met-v ${ce>20?'r':ce>5?'a':'g'}">${ce}</div><div class="met-sub">unmanaged conflict surface</div></div>
+    <div class="met"><div class="met-l">Brooks baseline</div><div class="met-v ${de>6?'a':'g'}">${de}</div><div class="met-sub">dev-to-dev (no AI)</div></div>`;
+  drawNet(nd,na);
+  buildTable(nd,na);
+  document.getElementById('mult-punch').innerHTML=nd===1
+    ?`Solo: you orchestrate all ${ea} agent${ea>1?'s':''}. Zero cross-developer coordination overhead. Command Intent is fully yours to hold. This is the Claude Code sweet spot.`
+    :ce<=10?`At ${nd} devs × ${na} agents: ${ce} cross-dev edges. Still manageable with branch discipline — but watch hub file collisions.`
+    :`At ${nd} devs × ${na} agents: <strong>${ce} unmanaged cross-dev conflict edges</strong> vs. ${de} in Brooks' baseline. This is where informal Slack coordination fails and the PR layer becomes structurally necessary.`;
+}
+
+function drawNet(nd,na){
+  const canvas=document.getElementById('net-canvas');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.offsetWidth||600,H=240;
+  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H/2,R=Math.min(cx,cy)-42;
+  const devPos=Array.from({length:nd},(_,d)=>({
+    x:cx+R*Math.cos(2*Math.PI*d/nd-Math.PI/2),
+    y:cy+R*Math.sin(2*Math.PI*d/nd-Math.PI/2)
+  }));
+  const agentPos=[];
+  for(let d=0;d<nd;d++){
+    const {x:dvx,y:dvy}=devPos[d];
+    if(na===1){agentPos.push({x:dvx,y:dvy,d});continue;}
+    const inx=cx-dvx,iny=cy-dvy,len=Math.sqrt(inx*inx+iny*iny)||1;
+    for(let a=0;a<na;a++){
+      const angle=2*Math.PI*a/na+Math.atan2(iny/len,inx/len);
+      agentPos.push({x:dvx+22*Math.cos(angle),y:dvy+22*Math.sin(angle),d});
+    }
+  }
+  for(let i=0;i<agentPos.length;i++)for(let j=i+1;j<agentPos.length;j++){
+    if(agentPos[i].d!==agentPos[j].d){
+      ctx.beginPath();ctx.moveTo(agentPos[i].x,agentPos[i].y);ctx.lineTo(agentPos[j].x,agentPos[j].y);
+      ctx.strokeStyle='rgba(207,34,46,0.18)';ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+    }
+  }
+  for(let i=0;i<agentPos.length;i++)for(let j=i+1;j<agentPos.length;j++){
+    if(agentPos[i].d===agentPos[j].d){
+      ctx.beginPath();ctx.moveTo(agentPos[i].x,agentPos[i].y);ctx.lineTo(agentPos[j].x,agentPos[j].y);
+      ctx.strokeStyle='rgba(9,105,218,0.3)';ctx.lineWidth=1;ctx.stroke();
+    }
+  }
+  agentPos.forEach(ap=>{ctx.beginPath();ctx.arc(ap.x,ap.y,na>1?6:11,0,Math.PI*2);ctx.fillStyle='#1a7f37';ctx.fill();});
+  if(na>1)devPos.forEach(({x,y},d)=>{
+    ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fillStyle='#0969da';ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 9px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('D'+(d+1),x,y);
+  });
+  ctx.fillStyle='rgba(154,154,148,0.7)';ctx.font='11px system-ui';ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText(`${nd} dev × ${na} agent = ${nd*na} total · ${crossDevEdges(nd,na)} cross-dev edges`,8,8);
+}
+
+function buildTable(selNd,selNa){
+  const na=selNa;
+  let html='<thead><tr><th>Devs (N)</th><th>Dev edges (Brooks)</th><th>Effective agents</th><th>Cross-dev edges</th><th>Agent multiplier</th></tr></thead><tbody>';
+  [1,2,3,5,8,10].forEach(nd=>{
+    const de=nd*(nd-1)/2,ea=nd*na,ce=crossDevEdges(nd,na);
+    const mult=de===0?'—':(ce/Math.max(1,de)).toFixed(1)+'×';
+    const cls=nd===selNd?'hl':ce>50?'warn':'';
+    html+=`<tr class="${cls}"><td>${nd}</td><td>${de}</td><td>${ea}</td><td>${ce}</td><td>${mult}</td></tr>`;
+  });
+  document.getElementById('mult-table').innerHTML=html+'</tbody>';
+}
+
+const HN=['router.ts','config.json','schema.sql','app.tsx','constants.ts','api-client.ts','db-init.ts','auth.ts','types.ts','index.ts','middleware.ts','env.ts'];
+const RN=['UserCard.tsx','invoice.service.ts','pdf-export.ts','search.hook.ts','notifications.ts','audit-log.ts','payments.tsx','reports.ts','team-settings.ts','onboarding.tsx'];
+
+function updateConflict(){
+  const nd=+document.getElementById('cf-devs').value,na=+document.getElementById('cf-agents').value,nh=+document.getElementById('cf-hubs').value;
+  document.getElementById('cf-out-devs').textContent=nd;
+  document.getElementById('cf-out-agents').textContent=na;
+  document.getElementById('cf-out-hubs').textContent=nh;
+  const ce=crossDevEdges(nd,na);
+  const p_cross=ce>0?1-Math.pow(1-0.9*0.9,ce):0;
+  const p_hub=Math.min(0.48*p_cross,0.96);
+  const exp_c=nh*p_hub;
+  const p_clean=Math.pow(1-p_hub,nh);
+  document.getElementById('cf-mets').innerHTML=`
+    <div class="met"><div class="met-l">Cross-dev agent edges</div><div class="met-v ${ce>20?'r':ce>5?'a':'g'}">${ce}</div><div class="met-sub">conflict surface</div></div>
+    <div class="met"><div class="met-l">P(conflict per hub)</div><div class="met-v ${p_hub>0.5?'r':p_hub>0.2?'a':'g'}">${(p_hub*100).toFixed(0)}%</div><div class="met-sub">per sprint</div></div>
+    <div class="met"><div class="met-l">Expected conflicts</div><div class="met-v ${exp_c>2?'r':exp_c>0.5?'a':'g'}">${exp_c.toFixed(1)}</div><div class="met-sub">hub files / sprint</div></div>
+    <div class="met"><div class="met-l">P(clean sprint)</div><div class="met-v ${p_clean<0.3?'r':p_clean<0.7?'a':'g'}">${(p_clean*100).toFixed(0)}%</div><div class="met-sub">no conflicts</div></div>`;
+}
+
+async function runSprintSim(){
+  document.getElementById('cf-btn').disabled=true;
+  document.getElementById('cf-status').textContent='Running sprint...';
+  document.getElementById('cf-outcome').style.display='none';
+  const nd=+document.getElementById('cf-devs').value,na=+document.getElementById('cf-agents').value,nh=+document.getElementById('cf-hubs').value;
+  const hg=document.getElementById('cf-hub-grid'),rg=document.getElementById('cf-reg-grid');
+  hg.innerHTML='';rg.innerHTML='';
+  const hubEls=[],regEls=[];
+  for(let i=0;i<nh;i++){
+    const el=document.createElement('div');el.className='sf hub';
+    el.innerHTML=`<div class="fn">${HN[i%HN.length]}</div><div class="ft">hub</div>`;
+    hg.appendChild(el);hubEls.push(el);
+  }
+  const nr=Math.min(6,nd*na);
+  for(let i=0;i<nr;i++){
+    const el=document.createElement('div');el.className='sf';
+    el.innerHTML=`<div class="fn">${RN[i%RN.length]}</div><div class="ft">feature</div>`;
+    rg.appendChild(el);regEls.push(el);
+  }
+  await new Promise(r=>setTimeout(r,200));
+  let conflicts=0;
+  for(let i=0;i<hubEls.length;i++){
+    await new Promise(r=>setTimeout(r,80));
+    const dt=[];
+    for(let d=0;d<nd;d++)if(Array.from({length:na},()=>Math.random()<0.88).some(Boolean))dt.push(d);
+    const c=dt.length>=2&&Math.random()<0.48;
+    hubEls[i].className='sf hub '+(c?'conflict':'ok');
+    hubEls[i].querySelector('.ft').textContent=c?`conflict: ${dt.length} devs`:`ok: ${dt.length} dev${dt.length!==1?'s':''}`;
+    if(c)conflicts++;
+  }
+  for(let i=0;i<regEls.length;i++){
+    await new Promise(r=>setTimeout(r,50));
+    const c=nd>=2&&Math.random()<0.08;
+    regEls[i].className='sf '+(c?'conflict':'ok');
+    regEls[i].querySelector('.ft').textContent=c?'conflict':'ok';
+    if(c)conflicts++;
+  }
+  document.getElementById('cf-status').textContent=`Sprint complete — ${conflicts} conflict${conflicts!==1?'s':''} detected.`;
+  const out=document.getElementById('cf-outcome');out.style.display='';
+  const h=document.getElementById('cf-outcome-head'),b=document.getElementById('cf-outcome-body');
+  h.style.color=conflicts===0?'var(--green)':'var(--red)';
+  h.textContent=conflicts===0?'✓ Clean sprint — no merge conflicts.':`✗ ${conflicts} conflict${conflicts!==1?'s':''} this sprint — manual resolution required.`;
+  b.textContent=conflicts===0
+    ?`With ${nd} dev${nd!==1?'s':''} and ${na} agent${na!==1?'s':''} each, the hub files stayed clean. Run again — at these numbers it won't hold every sprint.`
+    :`Each conflict requires a developer to context-switch, understand what two agents independently intended, and reconcile. This is where agent productivity gains leak out. The PR gate is the only thing that can catch this systematically.`;
+  document.getElementById('cf-btn').disabled=false;
+  updateConflict();
+}
+
+function animateBars(){
+  [{id:'bfill-bug',v:38,l:'38%',c:'var(--amber)'},{id:'bfill-doc',v:71,l:'71%',c:'var(--green)'},{id:'bfill-cc',v:83.8,l:'83.8%',c:'var(--blue)'},{id:'bfill-he',v:45.1,l:'45.1%',c:'var(--purple)'}]
+  .forEach(b=>{const el=document.getElementById(b.id);if(el){el.style.width='0';el.style.background=b.c;el.querySelector('span').textContent='';}});
+  setTimeout(()=>{
+    [{id:'bfill-bug',v:38,l:'38%'},{id:'bfill-doc',v:71,l:'71%'},{id:'bfill-cc',v:83.8,l:'83.8%'},{id:'bfill-he',v:45.1,l:'45.1%'}]
+    .forEach(b=>{const el=document.getElementById(b.id);if(el){el.style.width=b.v+'%';el.querySelector('span').textContent=b.l;}});
+  },100);
+}
+
+function updateHL(){
+  const w=+document.getElementById('hl-weeks').value;
+  document.getElementById('hl-out').textContent=w;
+  const decay=(v,rate)=>Math.max(2,100-w*rate);
+  [{id:'hlb-chat',val:decay(100,90),tick:w===0?'100% — session just happened':w<1?'Fading fast — context window not saved':`~${Math.round(decay(100,90))}% — likely gone after session ends`},
+   {id:'hlb-pr',val:decay(100,8),tick:w===0?'100%':w<=4?`~${Math.round(decay(100,8))}% — findable in PR description`:`~${Math.round(decay(100,8))}% — degrading as context grows stale`},
+   {id:'hlb-issue',val:decay(100,1.5),tick:w===0?'100%':`~${Math.round(decay(100,1.5))}% — linked Issues stay findable months later`},
+   {id:'hlb-entire',val:decay(100,0.5),tick:w===0?'100%':`~${Math.round(decay(100,0.5))}% — agent reasoning captured at every commit`}
+  ].forEach(b=>{
+    const el=document.getElementById(b.id),tl=document.getElementById(b.id.replace('hlb','hlt'));
+    if(el)el.style.width=b.val+'%';
+    if(tl)tl.textContent=b.tick;
+  });
+}
+
+updateMult();updateConflict();updateHL();
+window.addEventListener('resize',()=>{const nd=+document.getElementById('sl-devs').value,na=+document.getElementById('sl-agents').value;drawNet(nd,na);});
+</script>
+</body>
+</html>
