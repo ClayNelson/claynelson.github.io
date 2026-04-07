@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pick the right fight — GitHub seller guide</title>
+<style>
+:root{
+  --bg:#FAF8F3;--surface:#fff;--text:#2C2C2A;--muted:#5F5E5A;--subtle:#B4B2A9;
+  --border:rgba(44,44,42,0.10);--border2:rgba(44,44,42,0.18);
+  --link:#185FA5;
+  --green:#1a7f37;--green-bg:#eaf3de;--green-b:#97c459;--green-text:#27500a;
+  --red:#cf222e;--red-bg:#fcebeb;--red-b:#e24b4a;--red-text:#791f1f;
+  --blue:#185fa5;--blue-bg:#e6f1fb;--blue-b:#378add;--blue-text:#0c447c;
+  --amber:#ba7517;--amber-bg:#faeeda;--amber-b:#ef9f27;--amber-text:#633806;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1A1A18;--surface:#242422;--text:#E8E6DE;--muted:#B4B2A9;--subtle:#5F5E5A;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.16);
+    --green:#3fb950;--green-bg:#04342C;--green-b:#5DCAA5;--green-text:#9FE1CB;
+    --red:#f85149;--red-bg:#501313;--red-b:#F09595;--red-text:#F7C1C1;
+    --blue:#79c0ff;--blue-bg:#042C53;--blue-b:#85B7EB;--blue-text:#B5D4F4;
+    --amber:#d29922;--amber-bg:#412402;--amber-b:#FAC775;--amber-text:#FAC775;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  background:var(--bg);color:var(--text);font-size:16px;line-height:1.65;}
+.page{max-width:720px;margin:0 auto;padding:48px 24px 80px;}
+.breadcrumb{font-size:12px;color:var(--subtle);margin-bottom:32px;}
+.breadcrumb a{color:var(--subtle);text-decoration:none;}
+.breadcrumb a:hover{color:var(--link);}
+
+.headline{font-size:36px;font-weight:600;letter-spacing:-.025em;line-height:1.1;
+  margin-bottom:12px;}
+.sub{font-size:18px;color:var(--muted);line-height:1.5;margin-bottom:40px;
+  max-width:560px;}
+
+hr{border:none;border-top:.5px solid var(--border);margin:40px 0;}
+
+.fight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0;}
+@media(max-width:540px){.fight-grid{grid-template-columns:1fr;}}
+.fight-card{border-radius:12px;padding:20px 22px;border:.5px solid var(--border);}
+.fight-card.lose{background:var(--red-bg);border-color:var(--red-b);}
+.fight-card.win{background:var(--green-bg);border-color:var(--green-b);}
+.fight-label{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;
+  margin-bottom:10px;}
+.fight-card.lose .fight-label{color:var(--red-text);}
+.fight-card.win .fight-label{color:var(--green-text);}
+.fight-item{font-size:14px;display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;
+  line-height:1.45;}
+.fight-card.lose .fight-item{color:var(--red-text);}
+.fight-card.win .fight-item{color:var(--green-text);}
+.fight-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.fight-card.lose .fight-dot{background:var(--red);}
+.fight-card.win .fight-dot{background:var(--green);}
+
+.section-label{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--subtle);margin-bottom:16px;}
+
+.three-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0;}
+@media(max-width:480px){.three-nums{grid-template-columns:1fr;}
+  .three-nums .num-card{display:flex;gap:14px;align-items:center;}}
+.num-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;
+  padding:16px 18px;}
+.num-big{font-size:36px;font-weight:600;line-height:1;letter-spacing:-.02em;margin-bottom:4px;}
+.num-card:nth-child(1) .num-big{color:var(--blue);}
+.num-card:nth-child(2) .num-big{color:var(--amber);}
+.num-card:nth-child(3) .num-big{color:var(--red);}
+.num-label{font-size:13px;color:var(--muted);line-height:1.4;}
+
+.callout{border-left:3px solid var(--blue-b);background:var(--blue-bg);
+  padding:16px 20px;border-radius:0 8px 8px 0;margin:24px 0;
+  font-size:15px;color:var(--blue-text);line-height:1.6;}
+.callout strong{color:var(--blue-text);font-weight:600;}
+
+.script-block{background:var(--surface);border:.5px solid var(--border2);
+  border-radius:12px;padding:20px 22px;margin:20px 0;}
+.script-block .script-label{font-size:11px;font-weight:600;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--subtle);margin-bottom:12px;}
+.script-line{font-size:15px;color:var(--text);line-height:1.65;font-style:italic;
+  border-left:2px solid var(--border2);padding-left:14px;margin-bottom:10px;}
+.script-line:last-child{margin-bottom:0;}
+
+.q-block{background:var(--amber-bg);border:.5px solid var(--amber-b);
+  border-radius:12px;padding:18px 22px;margin:20px 0;}
+.q-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--amber-text);margin-bottom:8px;}
+.q-text{font-size:17px;font-weight:500;color:var(--amber-text);line-height:1.5;}
+.q-follow{margin-top:10px;font-size:13px;color:var(--amber-text);opacity:.8;
+  line-height:1.5;}
+
+.objection{border-top:.5px solid var(--border);padding:14px 0;}
+.objection:last-child{border-bottom:.5px solid var(--border);}
+.obj-q{font-size:14px;font-weight:500;color:var(--muted);margin-bottom:6px;}
+.obj-a{font-size:14px;color:var(--muted);line-height:1.55;}
+.obj-a strong{color:var(--text);font-weight:500;}
+
+.proof-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;}
+@media(max-width:480px){.proof-cards{grid-template-columns:1fr;}}
+.proof-card{background:var(--surface);border:.5px solid var(--border);
+  border-radius:10px;padding:14px 16px;text-decoration:none;display:block;
+  transition:border-color .15s;}
+.proof-card:hover{border-color:var(--link);}
+.proof-card-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--subtle);margin-bottom:5px;}
+.proof-card h3{font-size:14px;color:var(--link);margin-bottom:4px;font-weight:500;}
+.proof-card p{font-size:12px;color:var(--muted);margin:0;line-height:1.4;}
+
+footer{margin-top:48px;padding-top:20px;border-top:.5px solid var(--border);
+  font-size:12px;color:var(--subtle);}
+footer a{color:var(--subtle);text-decoration:none;}
+footer a:hover{color:var(--link);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<p class="breadcrumb"><a href="/">claynelson.github.io</a> &rsaquo; pick the right fight</p>
+
+<h1 class="headline">Pick the right fight.</h1>
+<p class="sub">Most GitHub sales conversations happen on the wrong battlefield. Here’s how to move to the one where the outcome is structural, not a coin flip.</p>
+
+<div class="section-label">The two conversations</div>
+
+<div class="fight-grid">
+  <div class="fight-card lose">
+    <div class="fight-label">The conversation you lose</div>
+    <div class="fight-item"><div class="fight-dot"></div><span>Which AI writes better code?</span></div>
+    <div class="fight-item"><div class="fight-dot"></div><span>Feature comparison vs. Claude Code / Cursor</span></div>
+    <div class="fight-item"><div class="fight-dot"></div><span>Price per seat</span></div>
+    <div class="fight-item"><div class="fight-dot"></div><span>Benchmark scores</span></div>
+  </div>
+  <div class="fight-card win">
+    <div class="fight-label">The conversation you win</div>
+    <div class="fight-item"><div class="fight-dot"></div><span>How do your agents coordinate with each other?</span></div>
+    <div class="fight-item"><div class="fight-dot"></div><span>Where does the reasoning behind a decision live after the session ends?</span></div>
+    <div class="fight-item"><div class="fight-dot"></div><span>What happens when two agents touch the same file?</span></div>
+    <div class="fight-item"><div class="fight-dot"></div><span>Who arbits when agents conflict?</span></div>
+  </div>
+</div>
+
+<p style="font-size:14px;color:var(--muted);margin-top:-4px">The left column changes every 6 months as models improve. The right column is structural — it doesn’t change when a new model drops.</p>
+
+<hr>
+
+<div class="section-label">Three numbers. Memorize them.</div>
+
+<div class="three-nums">
+  <div class="num-card">
+    <div class="num-big">N(N−1)/2</div>
+    <div class="num-label">Coordination edges between developers. At 5 people: 10 edges. At 5 people running 3 agents each: 105 unmanaged edges.</div>
+  </div>
+  <div class="num-card">
+    <div class="num-big">48%</div>
+    <div class="num-label">Of AI-agent merge scenarios produce false conflicts in Git’s line-based algorithm. Not real conflicts — just Git not understanding code structure.</div>
+  </div>
+  <div class="num-card">
+    <div class="num-big">~0</div>
+    <div class="num-label">Weeks before external agent reasoning disappears. The intent behind a decision lives in a chat window. When it closes, it’s gone.</div>
+  </div>
+</div>
+
+<p style="font-size:13px;color:var(--muted)">You don’t need to lead with these. They’re your foundation when the customer pushes back.</p>
+
+<hr>
+
+<div class="section-label">The one question that changes everything</div>
+
+<div class="q-block">
+  <div class="q-label">Ask this early</div>
+  <div class="q-text">“How many people on your team are running AI agents independently right now?”</div>
+  <div class="q-follow">If the answer is more than two, the coordination problem already exists. They may not have named it yet. Your job is to name it.</div>
+</div>
+
+<p style="font-size:14px;color:var(--muted)">The follow-up: <em>“When two of those agents touch the same file in the same week, what happens?”</em> Most teams will pause. That pause is the opening.</p>
+
+<hr>
+
+<div class="section-label">What to say</div>
+
+<div class="script-block">
+  <div class="script-label">The two-sentence version</div>
+  <div class="script-line">“Your developers are already using AI agents. The question is whether those agents share a common understanding of the codebase — or whether they’re brilliant assistants operating in isolation, competing for the same files with no memory of why anything was built the way it was.”</div>
+</div>
+
+<div class="script-block">
+  <div class="script-label">If they say “we love Claude Code, why would we switch?”</div>
+  <div class="script-line">“You shouldn’t switch for one developer. Claude Code is exceptional for a solo engineer — full context, coherent philosophy, everything in one conversation. The question is what happens when you add developers three, four, and five, each running their own agents. That’s not a tool problem. That’s a coordination problem. And coordination is exactly what GitHub is built for.”</div>
+</div>
+
+<div class="script-block">
+  <div class="script-label">If they say “we’ll figure out the coordination ourselves”</div>
+  <div class="script-line">“You can. The workaround is branch discipline, manual worktrees, team agreements about who touches what. Teams do it. But every one of those agreements lives in Slack or someone’s head. The moment you hire engineer six, or two agents touch your config file on the same day, the informal system cracks. GitHub is the formal system.”</div>
+</div>
+
+<hr>
+
+<div class="section-label">Common objections</div>
+
+<div class="objection">
+  <div class="obj-q">“But Claude Code has better context than Copilot.”</div>
+  <div class="obj-a">True for one developer. <strong>Context that lives in one developer’s session doesn’t help the other four.</strong> GitHub Issues and PRs are shared context. That’s not a model capability — it’s platform architecture.</div>
+</div>
+<div class="objection">
+  <div class="obj-q">“We’re a small team, this doesn’t apply yet.”</div>
+  <div class="obj-a">The inflection hits at 3–5 developers. <strong>If you’re growing, you’re 6 months from feeling this.</strong> The teams that set up the coordination layer before they need it are the ones that don’t lose a sprint to merge debt.</div>
+</div>
+<div class="objection">
+  <div class="obj-q">“Git handles merge conflicts fine.”</div>
+  <div class="obj-a">Git handles human-speed conflicts reasonably well. <strong>At AI-agent speed — multi-file commits, parallel worktrees, hub files touched by every feature — Git’s line-based merge algorithm creates false conflicts on nearly half of cases.</strong> That’s not a merge conflict. That’s lost sprint time.</div>
+</div>
+<div class="objection">
+  <div class="obj-q">“The former GitHub CEO just started a company that does this too.”</div>
+  <div class="obj-a">Yes — Entire, Thomas Dohmke’s new company, is building a semantic reasoning layer and raised $60M at $300M valuation doing it. <strong>That validates the problem, not the competitor.</strong> GitHub has the installed base, the PR primitive, and the Issues record that Entire is trying to recreate from scratch.</div>
+</div>
+
+<hr>
+
+<div class="section-label">Show don’t tell — live proof</div>
+
+<p style="font-size:14px;color:var(--muted);margin-bottom:16px">When a customer wants to see the math, don’t explain it — run the simulation. The sprint conflict demo takes 30 seconds and the hub files lighting up red does the work better than any slide.</p>
+
+<div class="proof-cards">
+  <a class="proof-card" href="/team-scale-math.html">
+    <div class="proof-card-eyebrow">Live simulation</div>
+    <h3>The team scale math</h3>
+    <p>Set team size and agents per developer. Run a sprint. Watch hub files conflict in real time. Use the conflict tab in a customer conversation.</p>
+  </a>
+  <a class="proof-card" href="/why-it-matters.html">
+    <div class="proof-card-eyebrow">Plain language explainer</div>
+    <h3>Why it matters</h3>
+    <p>The golf caddie analogy. Share this with a champion who needs to explain the problem internally before a buying conversation.</p>
+  </a>
+  <a class="proof-card" href="/token-cost-economics.html">
+    <div class="proof-card-eyebrow">Economic model</div>
+    <h3>Token cost economics</h3>
+    <p>Why early human intervention in an agent loop is worth 10x more than a correction made later. The CFO version of the argument.</p>
+  </a>
+  <a class="proof-card" href="https://github.com/ClayNelson/agent-patterns" target="_blank">
+    <div class="proof-card-eyebrow">Research source</div>
+    <h3>Agent patterns repo</h3>
+    <p>The empirical foundation: experiment cases, framework docs, competitive watchlist. For the customer who wants to see the data.</p>
+  </a>
+</div>
+
+<footer>
+  <a href="/">claynelson.github.io</a> &middot; Part of the <a href="https://github.com/ClayNelson/agent-patterns">agent-patterns</a> research project &middot;
+  <a href="/why-it-matters.html">Why it matters</a> &middot;
+  <a href="/team-scale-math.html">The math</a>
+</footer>
+
+</div>
+</body>
+</html>
