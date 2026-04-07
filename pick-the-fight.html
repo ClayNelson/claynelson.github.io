@@ -32,16 +32,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .breadcrumb a{color:var(--subtle);text-decoration:none;}
 .breadcrumb a:hover{color:var(--link);}
 .headline{font-size:36px;font-weight:600;letter-spacing:-.025em;line-height:1.1;margin-bottom:12px;}
-.sub{font-size:18px;color:var(--muted);line-height:1.5;margin-bottom:40px;max-width:560px;}
+.sub{font-size:18px;color:var(--muted);line-height:1.5;margin-bottom:40px;max-width:580px;}
 hr{border:none;border-top:.5px solid var(--border);margin:40px 0;}
 .fight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0;}
 @media(max-width:540px){.fight-grid{grid-template-columns:1fr;}}
 .fight-card{border-radius:12px;padding:20px 22px;border:.5px solid var(--border);}
 .fight-card.lose{background:var(--red-bg);border-color:var(--red-b);}
 .fight-card.win{background:var(--green-bg);border-color:var(--green-b);}
-.fight-label{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px;}
-.fight-card.lose .fight-label{color:var(--red-text);}
-.fight-card.win .fight-label{color:var(--green-text);}
+.fight-label{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px;}
+.fight-sublabel{font-size:11px;margin-bottom:12px;opacity:.75;}
+.fight-card.lose .fight-label,.fight-card.lose .fight-sublabel{color:var(--red-text);}
+.fight-card.win .fight-label,.fight-card.win .fight-sublabel{color:var(--green-text);}
 .fight-item{font-size:14px;display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;line-height:1.45;}
 .fight-card.lose .fight-item{color:var(--red-text);}
 .fight-card.win .fight-item{color:var(--green-text);}
@@ -98,27 +99,29 @@ footer a:hover{color:var(--link);}
 <p class="breadcrumb"><a href="/">claynelson.github.io</a> &rsaquo; pick the right fight</p>
 
 <h1 class="headline">Pick the right fight.</h1>
-<p class="sub">Most GitHub sales conversations happen on the wrong battlefield. Here's how to move to the one where the outcome is structural, not a coin flip.</p>
+<p class="sub">Most GitHub sales conversations happen on the wrong battlefield. Here&rsquo;s how to shift to ground where GitHub has a structural, lasting advantage &mdash; instead of fighting a never-ending coin-flip battle on model performance.</p>
 
 <div class="section-label">The two conversations</div>
 
 <div class="fight-grid">
   <div class="fight-card lose">
     <div class="fight-label">The conversation you lose</div>
+    <div class="fight-sublabel">Ephemeral &mdash; resets every 6 months</div>
     <div class="fight-item"><div class="fight-dot"></div><span>Which AI writes better code?</span></div>
     <div class="fight-item"><div class="fight-dot"></div><span>Feature comparison vs. Claude Code / Cursor</span></div>
     <div class="fight-item"><div class="fight-dot"></div><span>Price per seat</span></div>
-    <div class="fight-item"><div class="fight-dot"></div><span>Benchmark scores</span></div>
+    <div class="fight-item"><div class="fight-dot"></div><span>Latest benchmark scores</span></div>
   </div>
   <div class="fight-card win">
     <div class="fight-label">The conversation you win</div>
+    <div class="fight-sublabel">Structural &mdash; gets harder as AI adoption grows</div>
     <div class="fight-item"><div class="fight-dot"></div><span>How do your agents coordinate with each other?</span></div>
     <div class="fight-item"><div class="fight-dot"></div><span>Where does the reasoning behind a decision live after the session ends?</span></div>
     <div class="fight-item"><div class="fight-dot"></div><span>What happens when two agents touch the same file?</span></div>
     <div class="fight-item"><div class="fight-dot"></div><span>Who arbits when agents conflict?</span></div>
   </div>
 </div>
-<p style="font-size:14px;color:var(--muted);margin-top:-4px">The left column changes every 6 months as models improve. The right column is structural &mdash; it doesn&rsquo;t change when a new model drops.</p>
+<p style="font-size:14px;color:var(--muted);margin-top:-4px">The left side flips with every new model release. The right side is about platform architecture and team-scale reality &mdash; it only gets harder as AI adoption grows.</p>
 
 <hr>
 
@@ -128,7 +131,7 @@ footer a:hover{color:var(--link);}
 <div class="three-nums">
   <a class="num-card linked" href="/connections-primer.html">
     <div class="num-big">105</div>
-    <div class="num-label">Potential collisions when 5 developers each run 3 AI agents &mdash; all invisible, with no awareness of each other.</div>
+    <div class="num-label">Potential invisible collisions in a team of just 5 developers each running 3 AI agents &mdash; none of which know what the others are doing.</div>
     <table class="mini-table">
       <tr><td>2 developers</td><td>1 pair</td></tr>
       <tr><td>5 developers</td><td>10 pairs</td></tr>
@@ -138,11 +141,11 @@ footer a:hover{color:var(--link);}
   </a>
   <div class="num-card">
     <div class="num-big">48%</div>
-    <div class="num-label">Of AI-agent code merges create a false conflict in Git &mdash; not because the changes clash, but because Git reads lines of text, not intent. Each one costs a developer 30&ndash;90 minutes of manual untangling.</div>
+    <div class="num-label">Of AI-agent code merges create a false conflict in Git &mdash; not because the changes actually clash, but because Git compares lines of text, not intent. The work is compatible. The tool doesn&rsquo;t know that. Each one costs 30&ndash;90 minutes of manual untangling.</div>
   </div>
   <div class="num-card">
     <div class="num-big">~0</div>
-    <div class="num-label">Weeks before the reasoning behind a decision disappears when using an external AI tool. The &ldquo;why&rdquo; lives in a chat window. When it closes, it&rsquo;s gone &mdash; for everyone on the team.</div>
+    <div class="num-label">Weeks before the &ldquo;why&rdquo; behind an architectural decision disappears when it&rsquo;s trapped in an external AI chat. Two weeks later, even the developer who made the decision often can&rsquo;t reconstruct it.</div>
   </div>
 </div>
 
@@ -156,7 +159,8 @@ footer a:hover{color:var(--link);}
   <div class="q-follow">If the answer is more than two, the coordination problem already exists. They may not have named it yet. Your job is to name it.</div>
 </div>
 
-<p style="font-size:14px;color:var(--muted)">The follow-up: <em>&ldquo;When two of those agents touch the same file in the same week, what happens?&rdquo;</em> Most teams pause here. That pause is the opening.</p>
+<p style="font-size:14px;color:var(--muted)">Follow up with: <em>&ldquo;When two of those agents touch the same file in the same week, what happens?&rdquo;</em></p>
+<p style="font-size:14px;color:var(--muted);margin-top:6px">Most teams pause. That pause? That&rsquo;s your opening.</p>
 
 <hr>
 
@@ -164,17 +168,19 @@ footer a:hover{color:var(--link);}
 
 <div class="script-block">
   <div class="script-label">The two-sentence version</div>
-  <div class="script-line">&ldquo;Your developers are already using AI agents. The question is whether those agents share a common understanding of the codebase &mdash; or whether they&rsquo;re brilliant assistants operating in isolation, competing for the same files with no memory of why anything was built the way it was.&rdquo;</div>
+  <div class="script-line">&ldquo;Your developers are already using AI agents. The real question is whether those agents share a common understanding of the codebase &mdash; or whether they&rsquo;re operating as brilliant but isolated assistants, colliding on files with no memory of why the code was built the way it was.&rdquo;</div>
 </div>
 
 <div class="script-block">
-  <div class="script-label">If they say &ldquo;we love Claude Code, why would we switch?&rdquo;</div>
-  <div class="script-line">&ldquo;You shouldn&rsquo;t switch for one developer. Claude Code is exceptional for a solo engineer &mdash; full context, coherent philosophy, everything in one conversation. The question is what happens when you add developers three, four, and five, each running their own agents. That&rsquo;s not a tool problem. That&rsquo;s a coordination problem. And coordination is exactly what GitHub is built for.&rdquo;</div>
+  <div class="script-label">If they say &ldquo;we love Claude Code &mdash; why would we switch?&rdquo;</div>
+  <div class="script-line">&ldquo;You shouldn&rsquo;t switch for one developer. Claude Code is exceptional for a solo engineer &mdash; rich context, coherent philosophy, everything in one conversation.</div>
+  <div class="script-line">The issue arises when you add developers three, four, and five, each running their own agents. That&rsquo;s no longer a model or tool problem. That&rsquo;s a coordination problem. And coordination at scale is exactly what GitHub was built to solve.&rdquo;</div>
 </div>
 
 <div class="script-block">
   <div class="script-label">If they say &ldquo;we&rsquo;ll figure out the coordination ourselves&rdquo;</div>
-  <div class="script-line">&ldquo;You can. The workaround is branch discipline, manual agreements about who touches what, team rules about shared files. Teams do it. But every one of those agreements lives in Slack or someone&rsquo;s head. The moment you hire engineer six, or two agents hit your config file on the same day, the informal system cracks. GitHub is the formal system.&rdquo;</div>
+  <div class="script-line">&ldquo;You absolutely can &mdash; many teams do it with branch discipline, Slack agreements, and tribal knowledge.</div>
+  <div class="script-line">But those informal systems start cracking the moment you add engineer six or when two agents hit the same config file on the same day. GitHub gives you the formal system &mdash; shared Issues, PRs, and merge arbitration &mdash; that survives growth and turnover.&rdquo;</div>
 </div>
 
 <hr>
@@ -183,32 +189,32 @@ footer a:hover{color:var(--link);}
 
 <div class="objection">
   <div class="obj-q">&ldquo;But Claude Code has better context than Copilot.&rdquo;</div>
-  <div class="obj-a">True for one developer. <strong>Context that lives in one developer&rsquo;s session doesn&rsquo;t help the other four.</strong> GitHub Issues and PRs are shared context that every agent can reference. That&rsquo;s not a model capability &mdash; it&rsquo;s platform architecture.</div>
+  <div class="obj-a">True for one developer in one session. <strong>That context doesn&rsquo;t help the other four.</strong> GitHub Issues and PRs create shared context that every agent on the team can reference. That&rsquo;s platform architecture, not model capability.</div>
 </div>
 <div class="objection">
-  <div class="obj-q">&ldquo;We&rsquo;re a small team, this doesn&rsquo;t apply yet.&rdquo;</div>
-  <div class="obj-a">The problem hits at 3&ndash;5 developers. <strong>If you&rsquo;re growing, you&rsquo;re 6 months from feeling this.</strong> The teams that build the coordination layer before they need it are the ones that don&rsquo;t lose a sprint to untangling conflicting changes.</div>
+  <div class="obj-q">&ldquo;We&rsquo;re a small team &mdash; this doesn&rsquo;t apply yet.&rdquo;</div>
+  <div class="obj-a">The pain typically surfaces at 3&ndash;5 developers. <strong>If you&rsquo;re growing, you&rsquo;re probably 6 months away.</strong> Teams that put a coordination layer in place before they need it avoid losing entire sprints to conflicting agent changes.</div>
 </div>
 <div class="objection">
   <div class="obj-q">&ldquo;Git handles merge conflicts fine.&rdquo;</div>
-  <div class="obj-a">Git handles human-speed conflicts reasonably well. <strong>AI agents work on multiple files simultaneously, in parallel, at high frequency.</strong> Git&rsquo;s merge system was designed before that existed &mdash; it creates unnecessary conflicts on nearly half of AI-agent code merges. That&rsquo;s not a merge conflict. That&rsquo;s lost sprint time.</div>
+  <div class="obj-a">Git handles human-paced work reasonably well. <strong>AI agents are different: multiple files, parallel execution, high frequency.</strong> Git&rsquo;s merge logic wasn&rsquo;t built for that world &mdash; it produces unnecessary conflicts on nearly half of AI-generated merges. That&rsquo;s not just a merge issue. That&rsquo;s lost velocity.</div>
 </div>
 <div class="objection">
   <div class="obj-q">&ldquo;The former GitHub CEO just started a company that does this too.&rdquo;</div>
-  <div class="obj-a">Yes &mdash; Entire, Thomas Dohmke&rsquo;s new company, raised $60M at $300M valuation building better coordination tooling for AI agents. <strong>That validates the problem, not the competitor.</strong> GitHub has the installed base, the pull request workflow, and the Issues record that Entire is trying to build from scratch.</div>
+  <div class="obj-a">Yes &mdash; Thomas Dohmke&rsquo;s new company Entire raised $60M at a $300M valuation to tackle exactly this problem. <strong>That validates how real and urgent it is.</strong> GitHub has the massive installed base, mature PR workflow, and persistent Issues record that Entire is still trying to build from scratch.</div>
 </div>
 
 <hr>
 
 <div class="section-label">Show don&rsquo;t tell &mdash; live proof</div>
 
-<p style="font-size:14px;color:var(--muted);margin-bottom:16px">When a customer wants to see the evidence, don&rsquo;t explain it &mdash; run the simulation. The sprint conflict demo takes 30 seconds and the hub files lighting up red does more than any slide.</p>
+<p style="font-size:14px;color:var(--muted);margin-bottom:16px">When a customer wants to see evidence, don&rsquo;t explain it &mdash; run the simulation. The sprint conflict demo takes 30 seconds. The hub files lighting up red does more than any slide.</p>
 
 <div class="proof-cards">
   <a class="proof-card" href="/team-scale-math.html">
     <div class="proof-card-eyebrow">Live simulation</div>
     <h3>The team scale math</h3>
-    <p>Set team size and agents per developer. Run a sprint. Watch the shared files conflict in real time. Use the conflict tab live in a customer conversation.</p>
+    <p>Set team size and agents per developer. Run a sprint. Watch shared files conflict in real time. Use the conflict tab live in a customer conversation.</p>
   </a>
   <a class="proof-card" href="/why-it-matters.html">
     <div class="proof-card-eyebrow">Plain language explainer</div>
