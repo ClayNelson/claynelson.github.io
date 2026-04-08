@@ -41,12 +41,6 @@
     background:var(--blue-bg);border-radius:0 8px 8px 0;margin:24px 0;}
   .callout p{color:var(--blue-text);margin:0;font-size:15px;line-height:1.65;}
   .callout strong{color:var(--blue-text);}
-  .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;
-    font-weight:500;letter-spacing:.2px;margin-bottom:12px;}
-  .tag.start{background:var(--green-bg);color:var(--green-text);}
-  .tag.break{background:var(--red-bg);color:var(--red-text);}
-  .tag.fix{background:var(--blue-bg);color:var(--blue-text);}
-  .tag.watch{background:var(--amber-bg);color:var(--amber-text);}
   .scenario{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
   @media(max-width:560px){.scenario{grid-template-columns:1fr;}}
   .sc{background:var(--surface);border:.5px solid var(--border);border-radius:12px;
@@ -57,24 +51,12 @@
   .sc h3.g{color:var(--green);}
   .sc h3.r{color:var(--red);}
   .sc p{font-size:14px;margin-bottom:0;}
-  .step-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:22px;}
-  .step-num{width:28px;height:28px;border-radius:50%;background:var(--blue-bg);
-    color:var(--blue-text);font-weight:500;font-size:13px;display:flex;
-    align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
-  .step-body h3{font-size:15px;margin-bottom:4px;}
-  .step-body p{font-size:14px;margin-bottom:0;}
   .half-life{margin:24px 0;}
   .hl-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
   .hl-label{font-size:13px;color:var(--muted);width:200px;flex-shrink:0;}
   .hl-track{flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden;}
   .hl-fill{height:100%;border-radius:6px;}
   .hl-note{font-size:11px;color:var(--subtle);margin-left:4px;min-width:120px;}
-  .players{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0;}
-  .player{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;
-    background:var(--surface);border:.5px solid var(--border);}
-  .player.solo{background:var(--green-bg);color:var(--green-text);border-color:var(--green);}
-  .player.conflict{background:var(--red-bg);color:var(--red-text);border-color:var(--red);}
-  .player.ok{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue);}
   .three-things{counter-reset:things;margin:20px 0;}
   .thing{display:flex;gap:14px;margin-bottom:20px;padding-bottom:20px;
     border-bottom:.5px solid var(--border);}
@@ -103,6 +85,12 @@
   .win-cell ul{list-style:none;padding:0;}
   .win-cell ul li{font-size:13px;color:var(--muted);padding:4px 0;border-bottom:.5px solid var(--border);}
   .win-cell ul li:last-child{border-bottom:none;}
+  .glossary{margin:28px 0;}
+  .glossary dl{display:grid;row-gap:0;}
+  .glossary dt{font-size:14px;font-weight:600;color:var(--text);padding:14px 0 4px;
+    border-top:.5px solid var(--border);}
+  .glossary dd{font-size:14px;color:var(--muted);margin:0 0 14px 0;line-height:1.65;}
+  .glossary dd em{color:var(--text);font-style:normal;font-weight:500;}
   footer{margin-top:48px;padding-top:20px;border-top:.5px solid var(--border);
     font-size:12px;color:var(--subtle);}
 </style>
@@ -157,7 +145,7 @@
     <div class="thing-num">1</div>
     <div class="thing-body">
       <h3>The coordination edges multiply faster than you expect</h3>
-      <p>With two developers, there's one edge between them to manage. With five, there are ten. But here's the new part: each developer running three AI agents isn't one person anymore &mdash; they're a small team. At five developers with three agents each, you have 105 potential conflict edges. Most of those are <strong>invisible</strong>. No agent knows what another is doing.</p>
+      <p>With two developers, there's one <strong>edge</strong> &mdash; one connection that needs to be managed &mdash; between them. With five, there are ten. But here's the new part: each developer running three AI agents isn't one person anymore &mdash; they're a small team. At five developers with three agents each, you have 105 potential conflict edges. Most of those are <strong>invisible</strong>. No agent knows what another is doing. <em>(Not sure what an edge is? See the glossary below.)</em></p>
     </div>
   </div>
   <div class="thing">
@@ -202,7 +190,7 @@
   <p style="color:var(--amber-text)"><strong>ISO 26262, DO-178C, and IEC 62443</strong> all require demonstrable traceability between intent and implementation. When the reasoning behind a safety-critical decision lives only in a closed chat window, it never existed from a compliance standpoint. Tool qualification in regulated environments doesn't mean qualifying the AI model &mdash; it means qualifying the <em>process around</em> the model. GitHub provides that process. External agents don't.</p>
 </div>
 
-<p>This is why automotive, aerospace, and industrial teams aren't asking "which agent is smartest?" They're asking "which agent can I put in front of an auditor?" That question requires a system that holds causality &mdash; not just one that generates capable output.</p>
+<p>This is why automotive, aerospace, and industrial teams aren't asking &ldquo;which agent is smartest?&rdquo; They're asking &ldquo;which agent can I put in front of an auditor?&rdquo; That question requires a system that holds causality &mdash; not just one that generates capable output.</p>
 
 <h2>How long does the reasoning survive?</h2>
 
@@ -238,7 +226,7 @@
 
 <h2>Where GitHub wins the agent conversation</h2>
 
-<p>The field question is almost never "is Copilot smarter than Claude Code?" Developers who love Claude Code should &mdash; it's exceptional for solo work. Don't argue that point.</p>
+<p>The field question is almost never &ldquo;is Copilot smarter than Claude Code?&rdquo; Developers who love Claude Code should &mdash; it's exceptional for solo work. Don't argue that point.</p>
 
 <p>The question to raise instead is about coordination. GitHub is the only platform where agents operate <em>inside</em> the development infrastructure rather than alongside it.</p>
 
@@ -270,21 +258,21 @@
     <div class="thing-num">1</div>
     <div class="thing-body">
       <h3>Lead with the coordination problem, not the agent comparison</h3>
-      <p>"Your developers are already using AI agents. The question isn't which one is smarter &mdash; it's whether they share a model of the codebase. Right now, most teams have five brilliant caddies who've never spoken. GitHub is the course that makes coordination possible."</p>
+      <p>&ldquo;Your developers are already using AI agents. The question isn't which one is smarter &mdash; it's whether they share a model of the codebase. Right now, most teams have five brilliant caddies who've never spoken. GitHub is the course that makes coordination possible.&rdquo;</p>
     </div>
   </div>
   <div class="thing">
     <div class="thing-num">2</div>
     <div class="thing-body">
       <h3>Ask about the merge chaos &mdash; they've already felt it</h3>
-      <p>Customers who've run multiple agents in parallel don't need convincing about the problem. They need a name for it. "Have you seen hub file conflicts that didn't make sense? Architectural decisions that got reversed because nobody remembered why they were made?" When you name the pattern, they recognize it immediately.</p>
+      <p>Customers who've run multiple agents in parallel don't need convincing about the problem. They need a name for it. &ldquo;Have you seen hub file conflicts that didn't make sense? Architectural decisions that got reversed because nobody remembered why they were made?&rdquo; When you name the pattern, they recognize it immediately.</p>
     </div>
   </div>
   <div class="thing">
     <div class="thing-num">3</div>
     <div class="thing-body">
       <h3>For regulated industries: compliance is the forcing function</h3>
-      <p>In automotive, aerospace, and industrial accounts, close with the audit question: "Can you show an auditor the reasoning chain from requirement to commit?" External agents can't answer that. GitHub Agentic Workflows &mdash; inside the pull request, tied to the issue, linked to the branch &mdash; can. That's not a feature comparison. That's a qualification conversation.</p>
+      <p>In automotive, aerospace, and industrial accounts, close with the audit question: &ldquo;Can you show an auditor the reasoning chain from requirement to commit?&rdquo; External agents can't answer that. GitHub Agentic Workflows &mdash; inside the pull request, tied to the issue, linked to the branch &mdash; can. That's not a feature comparison. That's a qualification conversation.</p>
     </div>
   </div>
 </div>
@@ -298,7 +286,46 @@
 <p>GitHub is the only platform that holds what agents need to share: not just the code, but the <em>why</em> behind it &mdash; the attributed, timestamped, immutable causal chain that makes parallel agent work coherent instead of chaotic.</p>
 
 <div class="callout" style="border-left-color:var(--purple);background:var(--purple-bg)">
-  <p style="color:var(--purple-text)">"Your developers are already using AI agents. I'm not here to take that away. The question is whether those agents have a shared understanding of what the codebase is doing &mdash; or whether they're brilliant caddies who've never talked, operating on a course with no rules. GitHub is the course. The PR is the tee sheet. And right now, a lot of teams are about to find out the hard way that the course matters more than the caddie."</p>
+  <p style="color:var(--purple-text)">&ldquo;Your developers are already using AI agents. I'm not here to take that away. The question is whether those agents have a shared understanding of what the codebase is doing &mdash; or whether they're brilliant caddies who've never talked, operating on a course with no rules. GitHub is the course. The PR is the tee sheet. And right now, a lot of teams are about to find out the hard way that the course matters more than the caddie.&rdquo;</p>
+</div>
+
+<hr>
+
+<h2>Glossary</h2>
+<p>A few terms that come up in this piece &mdash; explained without assuming a software background.</p>
+
+<div class="glossary">
+  <dl>
+    <dt>Agent / AI agent</dt>
+    <dd>A piece of software that uses an AI model to take sequences of actions on its own &mdash; writing code, running tests, making decisions &mdash; rather than just answering a single question. Think of it as the difference between asking someone a question and hiring them to complete a project. Claude Code and GitHub Copilot are both examples of AI agents.</dd>
+
+    <dt>Coordination edge</dt>
+    <dd>A <em>connection point</em> between two people (or agents) that requires communication or coordination. If you and a colleague are both editing the same document, there is one edge between you to manage. Add a third person, and now there are three edges (A&#8596;B, B&#8596;C, A&#8596;C). The key insight: edges grow much faster than the number of participants. Five people have ten edges; fifteen agents have 105. Each invisible edge is a potential conflict waiting to happen.</dd>
+
+    <dt>Hub file</dt>
+    <dd>A file in a codebase that nearly every new feature has to touch &mdash; like a shared configuration file, a database schema, or the app's main entry point. Hub files are bottlenecks: when multiple agents work in parallel, they all converge on the same hub files independently, creating conflicts even when the underlying changes do not actually interfere with each other.</dd>
+
+    <dt>Context / shared context</dt>
+    <dd>The accumulated knowledge an AI holds during a working session &mdash; the decisions made, the reasons behind them, the design philosophy of the project. When a chat session closes, that context disappears. <em>Shared context</em> means multiple agents or developers all working from the same understanding, rather than each holding their own private version of the story.</dd>
+
+    <dt>Causality (vs. a snapshot)</dt>
+    <dd>A <em>snapshot</em> tells you what the code looks like right now. <em>Causality</em> tells you the full chain of why it became that way &mdash; who made a decision, when, based on what reasoning, in response to which requirement. Git shows you snapshots. GitHub &mdash; through issues, pull requests, and linked agent workflows &mdash; preserves causality. For regulated industries, causality is what an auditor actually needs.</dd>
+
+    <dt>Merge conflict</dt>
+    <dd>What happens when two people (or agents) make changes to the same part of a file and the system cannot automatically figure out which version to keep. Git, the underlying version control system, resolves conflicts by comparing lines of text &mdash; it has no understanding of <em>intent</em>. This means it often flags conflicts that are not real problems, and occasionally misses conflicts that are.</dd>
+
+    <dt>Pull request (PR)</dt>
+    <dd>A formal proposal to add a set of changes to a shared codebase. In this context, pull requests matter not just as a code review mechanism, but as a durable record: the discussion, the linked issue, the reasoning &mdash; all of it lives on the pull request and remains searchable long after the work is done.</dd>
+
+    <dt>The Finishing Problem</dt>
+    <dd>A mathematical observation about compound error rates in multi-step agent workflows. If each step in a 50-step process succeeds 95% of the time &mdash; which sounds excellent &mdash; the probability that all 50 steps succeed is roughly 8%. No single agent fails catastrophically; the system just quietly does not finish. The problem gets worse as teams run more agents in parallel with no shared model of what &ldquo;done&rdquo; means. <a href="/finishing-problem.html">Run the simulation &#8594;</a></dd>
+
+    <dt>Tool qualification</dt>
+    <dd>A requirement in regulated industries (automotive, aerospace, medical devices) that any software tool used in a safety-critical development process must be proven to behave predictably and traceably. The key insight for AI: you do not qualify the AI model itself &mdash; you qualify the <em>process around it</em>. That process requires documented, auditable workflows, which is exactly what GitHub provides and external chat-based agents do not.</dd>
+
+    <dt>GitHub Agentic Workflows</dt>
+    <dd>A capability launched in February 2026 that allows multi-step agent tasks to run inside GitHub &mdash; triggered by issues, pull requests, or other events &mdash; with the agent's reasoning and actions tied directly to the GitHub event graph. Unlike external agents that operate in isolated chat sessions, Agentic Workflows leave an attributed, searchable trail of what the agent did and why.</dd>
+  </dl>
 </div>
 
 <hr>
