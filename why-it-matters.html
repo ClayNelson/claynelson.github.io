@@ -65,10 +65,10 @@
   .step-body p{font-size:14px;margin-bottom:0;}
   .half-life{margin:24px 0;}
   .hl-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .hl-label{font-size:13px;color:var(--muted);width:160px;flex-shrink:0;}
+  .hl-label{font-size:13px;color:var(--muted);width:200px;flex-shrink:0;}
   .hl-track{flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden;}
   .hl-fill{height:100%;border-radius:6px;}
-  .hl-note{font-size:11px;color:var(--subtle);margin-left:4px;min-width:80px;}
+  .hl-note{font-size:11px;color:var(--subtle);margin-left:4px;min-width:120px;}
   .players{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0;}
   .player{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;
     background:var(--surface);border:.5px solid var(--border);}
@@ -92,6 +92,17 @@
     color:var(--subtle);margin-bottom:6px;}
   .nav-card h3{font-size:14px;color:var(--link);margin-bottom:4px;}
   .nav-card p{font-size:13px;margin-bottom:0;}
+  .win-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
+  @media(max-width:560px){.win-row{grid-template-columns:1fr;}}
+  .win-cell{background:var(--surface);border:.5px solid var(--border);border-radius:10px;padding:16px 18px;}
+  .win-cell.gh{border-left:3px solid var(--green);}
+  .win-cell.ext{border-left:3px solid var(--red);}
+  .win-cell-label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
+  .win-cell-label.gh{color:var(--green);}
+  .win-cell-label.ext{color:var(--red);}
+  .win-cell ul{list-style:none;padding:0;}
+  .win-cell ul li{font-size:13px;color:var(--muted);padding:4px 0;border-bottom:.5px solid var(--border);}
+  .win-cell ul li:last-child{border-bottom:none;}
   footer{margin-top:48px;padding-top:20px;border-top:.5px solid var(--border);
     font-size:12px;color:var(--subtle);}
 </style>
@@ -104,7 +115,7 @@
 </p>
 
 <h1>Why the best AI tool for one developer breaks at five</h1>
-<p class="lede">A plain-language explainer for anyone selling or building GitHub in the era of AI coding agents. No math required &mdash; yet.</p>
+<p class="lede">A plain-language explainer &mdash; and field guide &mdash; for anyone selling or building with GitHub in the era of AI coding agents.</p>
 
 <hr style="margin-top:0">
 
@@ -165,9 +176,13 @@
   </div>
 </div>
 
+<div class="callout" style="border-left-color:var(--red);background:var(--red-bg)">
+  <p style="color:var(--red-text)"><strong>The Finishing Problem:</strong> When five agents each complete individual steps at 95% accuracy, a 50-step workflow succeeds roughly 8% of the time &mdash; and no single agent reports a failure. The math doesn't care how smart each agent is. It cares whether they share a model of what <em>done</em> looks like. <a href="/finishing-problem.html" style="color:var(--red-text);text-decoration:underline">Run the simulation &rarr;</a></p>
+</div>
+
 <hr>
 
-<h2>What GitHub provides that a private caddie can't</h2>
+<h2>What GitHub provides that a private caddie can&rsquo;t</h2>
 
 <p>Think about what makes a golf tournament work. It isn't five exceptional caddies. It's the course itself: the tee sheets that sequence who plays when, the scorecards that create a shared record, the rules that every player and caddie operates under. The course is the <strong>coordination infrastructure</strong>.</p>
 
@@ -176,12 +191,22 @@
 <p>When agents live <strong>inside</strong> GitHub, through Copilot, they share this infrastructure natively. When agents live <strong>outside</strong> GitHub, like Claude Code running externally, they are brilliant private caddies operating on a course with no tee sheet, no shared scorecards, and no rules about who plays when.</p>
 
 <div class="callout">
-  <p><strong>The question isn't which agent is smarter.</strong> It's whether your agents have shared context, or whether they're 15 brilliant caddies who've never spoken operating on the same course at the same time.</p>
+  <p><strong>External agents hold snapshots. GitHub holds causality.</strong> Snapshots tell you what the code is. Causality tells you why it became that way &mdash; the attributed, timestamped, immutable chain from intent to commit. That's the coordination layer no external agent can replicate, because it lives in the platform, not the conversation.</p>
 </div>
+
+<h2>Where this becomes a compliance problem</h2>
+
+<p>In consumer software, the philosophy-disappears problem is a productivity concern. In regulated industries, it's an audit failure.</p>
+
+<div class="callout" style="border-left-color:var(--amber);background:var(--amber-bg)">
+  <p style="color:var(--amber-text)"><strong>ISO 26262, DO-178C, and IEC 62443</strong> all require demonstrable traceability between intent and implementation. When the reasoning behind a safety-critical decision lives only in a closed chat window, it never existed from a compliance standpoint. Tool qualification in regulated environments doesn't mean qualifying the AI model &mdash; it means qualifying the <em>process around</em> the model. GitHub provides that process. External agents don't.</p>
+</div>
+
+<p>This is why automotive, aerospace, and industrial teams aren't asking "which agent is smartest?" They're asking "which agent can I put in front of an auditor?" That question requires a system that holds causality &mdash; not just one that generates capable output.</p>
 
 <h2>How long does the reasoning survive?</h2>
 
-<p>Here's a simple way to see the gap. An architectural decision gets made. How findable is the <em>reasoning behind that decision</em> two months from now?</p>
+<p>An architectural decision gets made. How findable is the <em>reasoning behind that decision</em> two months from now?</p>
 
 <div class="half-life">
   <div class="hl-row">
@@ -197,31 +222,84 @@
   <div class="hl-row">
     <span class="hl-label">GitHub Issues + PR link</span>
     <div class="hl-track"><div class="hl-fill" style="background:var(--green);width:88%"></div></div>
-    <span class="hl-note">still findable months later</span>
+    <span class="hl-note">findable months later</span>
   </div>
   <div class="hl-row">
-    <span class="hl-label">Entire Checkpoints *</span>
+    <span class="hl-label">GitHub Agentic Workflows</span>
     <div class="hl-track"><div class="hl-fill" style="background:var(--blue);width:96%"></div></div>
-    <span class="hl-note">captured at every commit</span>
+    <span class="hl-note">reasoning tied to commit graph</span>
   </div>
 </div>
-<p style="font-size:12px;color:var(--subtle);margin-top:-8px">* <a href="https://entire.io" style="color:var(--subtle)">Entire</a> is a new startup from the former GitHub CEO that captures agent reasoning alongside code. Worth watching &mdash; it's building into this exact gap.</p>
+<p style="font-size:12px;color:var(--subtle);margin-top:-8px">GitHub Agentic Workflows, launched February 2026, ties multi-step agent reasoning directly to the GitHub event graph &mdash; attributed, searchable, and recoverable without a third-party capture layer.</p>
 
 <p>When five developers run external agents, the team's collective reasoning about the codebase is stored almost entirely in individual chat histories that nobody can search. When they work through GitHub, that reasoning accumulates in Issues and PRs &mdash; findable, searchable, and available to the next agent that picks up the work.</p>
 
 <hr>
 
-<h2>The one thing to remember in a conversation</h2>
+<h2>Where GitHub wins the agent conversation</h2>
 
-<p>You'll meet developers who love Claude Code. They should &mdash; it's exceptional. The solo-developer experience with an external AI agent is genuinely better than Copilot on many dimensions. Don't argue that point.</p>
+<p>The field question is almost never "is Copilot smarter than Claude Code?" Developers who love Claude Code should &mdash; it's exceptional for solo work. Don't argue that point.</p>
 
-<p>The conversation to have instead:</p>
+<p>The question to raise instead is about coordination. GitHub is the only platform where agents operate <em>inside</em> the development infrastructure rather than alongside it.</p>
 
-<div class="callout" style="border-left-color:var(--purple);background:var(--purple-bg)">
-  <p style="color:var(--purple-text)">“Your developers are already using AI agents. I'm not here to take that away. The question is whether those agents have a shared understanding of what the codebase is doing &mdash; or whether they're brilliant caddies who've never talked, operating on a course with no rules. GitHub is the course. The PR is the tee sheet. And right now, a lot of teams are about to find out the hard way that the course matters more than the caddie.”</p>
+<div class="win-row">
+  <div class="win-cell gh">
+    <div class="win-cell-label gh">GitHub wins</div>
+    <ul>
+      <li>Teams of 5 or more developers</li>
+      <li>Multiple agents running in parallel</li>
+      <li>Any workflow requiring shared context</li>
+      <li>Regulated industries needing audit trails</li>
+      <li>Long-lived codebases where intent must survive</li>
+      <li>Customers who've already felt the merge chaos</li>
+    </ul>
+  </div>
+  <div class="win-cell ext">
+    <div class="win-cell-label ext">Where external agents shine</div>
+    <ul>
+      <li>Solo developer, deep focus work</li>
+      <li>Short-lived, self-contained tasks</li>
+      <li>Greenfield exploration with no shared state</li>
+      <li>Tasks where context fits in one conversation</li>
+    </ul>
+  </div>
 </div>
 
-<p>The customer at five or more developers has probably already felt this problem. They may have called it something else: merge conflicts that didn't make sense, architectural decisions that got reversed because nobody remembered why they were made, agents generating technically correct code that missed the point. When you name the pattern, they recognize it.</p>
+<div class="three-things" style="margin-top:32px">
+  <div class="thing">
+    <div class="thing-num">1</div>
+    <div class="thing-body">
+      <h3>Lead with the coordination problem, not the agent comparison</h3>
+      <p>"Your developers are already using AI agents. The question isn't which one is smarter &mdash; it's whether they share a model of the codebase. Right now, most teams have five brilliant caddies who've never spoken. GitHub is the course that makes coordination possible."</p>
+    </div>
+  </div>
+  <div class="thing">
+    <div class="thing-num">2</div>
+    <div class="thing-body">
+      <h3>Ask about the merge chaos &mdash; they've already felt it</h3>
+      <p>Customers who've run multiple agents in parallel don't need convincing about the problem. They need a name for it. "Have you seen hub file conflicts that didn't make sense? Architectural decisions that got reversed because nobody remembered why they were made?" When you name the pattern, they recognize it immediately.</p>
+    </div>
+  </div>
+  <div class="thing">
+    <div class="thing-num">3</div>
+    <div class="thing-body">
+      <h3>For regulated industries: compliance is the forcing function</h3>
+      <p>In automotive, aerospace, and industrial accounts, close with the audit question: "Can you show an auditor the reasoning chain from requirement to commit?" External agents can't answer that. GitHub Agentic Workflows &mdash; inside the pull request, tied to the issue, linked to the branch &mdash; can. That's not a feature comparison. That's a qualification conversation.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<h2>The one thing to remember</h2>
+
+<p>The best development teams of the next five years won't be the ones with the smartest agents. They'll be the ones whose agents share a memory.</p>
+
+<p>GitHub is the only platform that holds what agents need to share: not just the code, but the <em>why</em> behind it &mdash; the attributed, timestamped, immutable causal chain that makes parallel agent work coherent instead of chaotic.</p>
+
+<div class="callout" style="border-left-color:var(--purple);background:var(--purple-bg)">
+  <p style="color:var(--purple-text)">"Your developers are already using AI agents. I'm not here to take that away. The question is whether those agents have a shared understanding of what the codebase is doing &mdash; or whether they're brilliant caddies who've never talked, operating on a course with no rules. GitHub is the course. The PR is the tee sheet. And right now, a lot of teams are about to find out the hard way that the course matters more than the caddie."</p>
+</div>
 
 <hr>
 
@@ -230,23 +308,28 @@
 <p style="color:var(--muted);margin-bottom:20px">The pages below show the actual math and let you run simulations. Useful if you want to demonstrate the problem live in a conversation &mdash; the sprint conflict simulation in particular makes the abstract very concrete in about 30 seconds.</p>
 
 <div class="nav-cards">
+  <a class="nav-card" href="/finishing-problem.html">
+    <div class="nav-card-label">Interactive model</div>
+    <h3>The Finishing Problem</h3>
+    <p>See how 95% accuracy per step compounds to 8% workflow success at 50 steps. Drag the sliders to break the math in real time.</p>
+  </a>
   <a class="nav-card" href="/team-scale-math.html">
     <div class="nav-card-label">Interactive model</div>
     <h3>The team scale math</h3>
     <p>Drag a slider from 1 to 5 developers and watch the unmanaged conflict edges multiply. Run a sprint simulation to see hub files light up red.</p>
   </a>
+</div>
+
+<div class="nav-cards">
   <a class="nav-card" href="/token-cost-economics.html">
     <div class="nav-card-label">Interactive model</div>
     <h3>Token cost economics</h3>
     <p>Why early human intervention in an agent workflow is worth 10x more than the same correction made later. The compound cost argument for keeping humans in the loop.</p>
   </a>
-</div>
-
-<div class="nav-cards" style="grid-template-columns:1fr">
   <a class="nav-card" href="https://github.com/ClayNelson/agent-patterns" target="_blank">
     <div class="nav-card-label">Research repository</div>
     <h3>Agent patterns &mdash; ClayNelson/agent-patterns</h3>
-    <p>The source research behind this page: framework docs, experimental cases, and a watchlist of startups (Entire, Atomic) building into this space.</p>
+    <p>The source research behind this page: framework docs, experimental cases, and a watchlist of startups building into this space.</p>
   </a>
 </div>
 
