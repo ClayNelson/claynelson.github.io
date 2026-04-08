@@ -65,6 +65,25 @@
     width:36px;text-align:center;line-height:1;padding-top:2px;}
   .thing-body h3{font-size:15px;margin-bottom:4px;}
   .thing-body p{font-size:14px;margin-bottom:0;}
+  /* Conversation questions */
+  .q-list{list-style:none;padding:0;margin:20px 0;}
+  .q-list li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;
+    border-bottom:.5px solid var(--border);font-size:14px;color:var(--muted);}
+  .q-list li:last-child{border-bottom:none;}
+  .q-bullet{width:20px;height:20px;border-radius:50%;background:var(--green-bg);
+    color:var(--green-text);font-size:11px;font-weight:600;display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+  /* Objection handling */
+  .objections{margin:20px 0;}
+  .objection{background:var(--surface);border:.5px solid var(--border);
+    border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+  .objection-q{font-size:14px;font-weight:500;color:var(--text);margin-bottom:10px;
+    padding-bottom:10px;border-bottom:.5px solid var(--border);}
+  .objection-q::before{content:"Objection: ";color:var(--red);font-weight:600;}
+  .objection-a{font-size:14px;color:var(--muted);line-height:1.65;margin:0;}
+  .objection-a::before{content:"Response: ";color:var(--green);font-weight:600;
+    font-size:11px;text-transform:uppercase;letter-spacing:.3px;}
+  /* Nav cards */
   .nav-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:28px 0;}
   @media(max-width:480px){.nav-cards{grid-template-columns:1fr;}}
   .nav-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;
@@ -85,6 +104,7 @@
   .win-cell ul{list-style:none;padding:0;}
   .win-cell ul li{font-size:13px;color:var(--muted);padding:4px 0;border-bottom:.5px solid var(--border);}
   .win-cell ul li:last-child{border-bottom:none;}
+  /* Glossary */
   .glossary{margin:28px 0;}
   .glossary dl{display:grid;row-gap:0;}
   .glossary dt{font-size:14px;font-weight:600;color:var(--text);padding:14px 0 4px;
@@ -165,7 +185,7 @@
 </div>
 
 <div class="callout" style="border-left-color:var(--red);background:var(--red-bg)">
-  <p style="color:var(--red-text)"><strong>The Finishing Problem:</strong> When five agents each complete individual steps at 95% accuracy, a 50-step workflow succeeds roughly 8% of the time &mdash; and no single agent reports a failure. The math doesn't care how smart each agent is. It cares whether they share a model of what <em>done</em> looks like. <a href="/finishing-problem.html" style="color:var(--red-text);text-decoration:underline">Run the simulation &rarr;</a></p>
+  <p style="color:var(--red-text)"><strong>The Finishing Problem:</strong> When five agents each complete individual steps at 95% accuracy, a 50-step workflow succeeds roughly 8% of the time &mdash; and no single agent reports a failure. The math doesn't care how smart each agent is. It cares whether they share a model of what <em>done</em> looks like. <a href="/finishing-problem.html" style="color:var(--red-text);text-decoration:underline">Run the simulation &#8594;</a></p>
 </div>
 
 <hr>
@@ -274,6 +294,46 @@
       <h3>For regulated industries: compliance is the forcing function</h3>
       <p>In automotive, aerospace, and industrial accounts, close with the audit question: &ldquo;Can you show an auditor the reasoning chain from requirement to commit?&rdquo; External agents can't answer that. GitHub Agentic Workflows &mdash; inside the pull request, tied to the issue, linked to the branch &mdash; can. That's not a feature comparison. That's a qualification conversation.</p>
     </div>
+  </div>
+</div>
+
+<h2>Questions that open the real conversation</h2>
+
+<p>Stop leading with &ldquo;our agent is better than Claude.&rdquo; Start here instead &mdash; customers who have scaled beyond 3&ndash;5 heavy AI users will recognize these problems immediately:</p>
+
+<ul class="q-list">
+  <li>
+    <span class="q-bullet">?</span>
+    <span>&ldquo;How much merge chaos and rework are you seeing when multiple developers use AI agents in parallel?&rdquo;</span>
+  </li>
+  <li>
+    <span class="q-bullet">?</span>
+    <span>&ldquo;When an agent makes a big architectural decision, how does the rest of the team understand <em>why</em> it was made six weeks later?&rdquo;</span>
+  </li>
+  <li>
+    <span class="q-bullet">?</span>
+    <span>&ldquo;In your regulated environments, how are you capturing the full reasoning chain for auditors &mdash; not just the output, but the decision trail?&rdquo;</span>
+  </li>
+</ul>
+
+<h2>Objection handling</h2>
+
+<div class="objections">
+  <div class="objection">
+    <p class="objection-q">&ldquo;But our agents can already read the whole repo and use git.&rdquo;</p>
+    <p class="objection-a">They can read a snapshot, but they don't share memory or intent across developers and sessions. Reading the repo is not the same as holding the causal chain of why it became what it is. That's where coordination breaks &mdash; and that's what GitHub provides natively.</p>
+  </div>
+  <div class="objection">
+    <p class="objection-q">&ldquo;Claude / Cursor is way better at coding than Copilot.&rdquo;</p>
+    <p class="objection-a">You're right &mdash; for a single developer on a focused task, external agents are often excellent. Don't argue that. The question changes at team scale: how do you make <em>multiple</em> excellent agents work together without creating chaos? That's not an agent quality problem. It's a coordination infrastructure problem.</p>
+  </div>
+  <div class="objection">
+    <p class="objection-q">&ldquo;We can just orchestrate everything with LangGraph / CrewAI.&rdquo;</p>
+    <p class="objection-a">Orchestration helps sequencing, but it still needs a durable source of truth and an audit trail. GitHub provides that natively &mdash; every agent action is tied to the commit graph, the PR, the issue. That's especially critical for compliance and for long-lived codebases where intent must outlive any single session.</p>
+  </div>
+  <div class="objection">
+    <p class="objection-q">&ldquo;This sounds theoretical.&rdquo;</p>
+    <p class="objection-a">Ask your customer directly: how many times have they had to untangle conflicting agent changes on the same files? How many architectural decisions got quietly reversed because nobody could find the original reasoning? At three or more heavy AI users, they've felt this. They may just not have had a name for it yet.</p>
   </div>
 </div>
 
