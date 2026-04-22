@@ -4,107 +4,109 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clay Nelson</title>
-<style>
-:root {
-  --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
-  --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
-    --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
-  }
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.7; }
-.container { max-width: 740px; margin: 0 auto; padding: 56px 24px 80px; }
-h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; }
-h2 { font-size: 21px; font-weight: 500; margin: 52px 0 18px; letter-spacing: -0.01em; }
-h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
-p { margin-bottom: 16px; }
-em { font-style: italic; }
-a { color: var(--link); text-decoration: none; }
-a:hover { text-decoration: underline; }
-.byline { color: var(--muted); font-size: 14px; margin: 6px 0 40px; }
-.caveat { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 32px 0; font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 0 8px 8px 0; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin: 20px 0; }
-.card h3 { margin-bottom: 10px; }
-.card p:last-child { margin-bottom: 0; }
-.diagram-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 20px 20px; margin: 24px 0; overflow-x: auto; }
-.fig-label { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: block; }
-svg { display: block; width: 100%; }
-.t-h { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; font-weight: 500; fill: #2C2C2A; }
-.t-s { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #5F5E5A; }
-.z-p { fill: #EEEDFE; stroke: #7F77DD; stroke-width: 0.5; }
-.z-a { fill: #FAEEDA; stroke: #BA7517; stroke-width: 0.5; }
-.z-t { fill: #E1F5EE; stroke: #1D9E75; stroke-width: 0.5; }
-.z-g { fill: #F1EFE8; stroke: #B4B2A9; stroke-width: 0.5; }
-.z-r { fill: #FCEBEB; stroke: #E24B4A; stroke-width: 0.5; }
-.z-c { fill: #FAECE7; stroke: #D85A30; stroke-width: 0.5; }
-.arr-l { stroke: #888780; stroke-width: 1.5; fill: none; }
-.ldr { stroke: #D3D1C7; stroke-width: 0.5; stroke-dasharray: 4 3; fill: none; }
-.pill-links { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.pill-links a { padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--text); background: var(--surface); }
-.pill-links a:hover { border-color: var(--link); color: var(--link); text-decoration: none; }
-hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
-footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
-@media (prefers-color-scheme: dark) {
-  .t-h { fill: #E8E6DE; } .t-s { fill: #B4B2A9; }
-  .z-p { fill: #26215C; stroke: #AFA9EC; } .z-a { fill: #412402; stroke: #EF9F27; }
-  .z-t { fill: #04342C; stroke: #5DCAA5; } .z-g { fill: #2C2C2A; stroke: #5F5E5A; }
-  .z-r { fill: #501313; stroke: #F09595; } .z-c { fill: #4A1B0C; stroke: #F0997B; }
-  .arr-l { stroke: #888780; } .ldr { stroke: #444441; }
-}
-</style>
+<meta name="description" content="Writing and work on AI, compliance, and the architectures that make autonomous systems trustworthy in regulated environments.">
+<link rel="stylesheet" href="/site.css">
 </head>
 <body>
 <div class="container">
 
-<h1>Clay Nelson</h1>
-<p class="byline">Research, thinking, and experiments. Sandy Springs, GA &mdash; April 2026.</p>
+<section class="hero">
+  <div class="eyebrow">Essays &middot; Frameworks &middot; Speaking</div>
+  <h1 class="name">Clay Nelson</h1>
+  <p class="lede">Writing and work on AI, compliance, and the architectures that make autonomous systems trustworthy in regulated environments.</p>
+  <p class="meta">Sandy Springs, GA &mdash; updated April 2026</p>
+  <p class="caveat">Everything here is personal &mdash; my own thinking and experimentation, not the views of any employer or client. Working hypotheses published because the problems are real and the conversation is worth having.</p>
+</section>
 
-<div class="caveat">
-  Everything here is my own thinking and experimentation &mdash; not the views of any employer or client. These are working hypotheses published because the problems are real and the conversation is worth having.
-</div>
+<section class="block" id="writing">
+  <h2 class="section-title">Writing</h2>
 
-<h2>Current research threads</h2>
+  <article class="essay featured">
+    <div class="eyebrow">Medium &middot; April 2026 &middot; Featured</div>
+    <h3 class="essay-title"><a href="/proof-problem.html">Automotive&rsquo;s AI Problem Isn&rsquo;t Speed. It&rsquo;s Proof.</a></h3>
+    <p class="excerpt">The industry&rsquo;s AI conversation is pinned to the wrong axis. Code generation throughput isn&rsquo;t the bottleneck &mdash; continuous attestation is. Moving the trust boundary from the developer&rsquo;s laptop to the governed platform is what turns agentic work from a productivity story into a compliance story.</p>
+    <a class="read" href="/proof-problem.html">Read &rarr;</a>
+  </article>
 
-<div class="card">
-<h3>AI governance and the coordination gate problem</h3>
-<p>Where do oversight mechanisms belong in a multi-agent system? Most AI safety discussion focuses on capability constraints. I'm more interested in protocol design: how you structure the layer that coordinates agents without turning the human into the bottleneck. I've been developing a three-ring constitutional framework and testing it against empirical evidence from the Dochkina self-organizing agents paper (arXiv:2603.28990, March 2026), which found that self-organizing LLM agents outperform designed hierarchical structures &mdash; but only when the constitutional layer is intact.</p>
-<p style="margin-bottom:0">&rarr; <a href="https://medium.com/@claynelson/the-kirk-problem-why-ai-agents-need-human-override-and-humans-need-agents-5e042577780d">The Kirk Problem: Why AI Agents Need Human Override &mdash; And Humans Need Agents</a> &mdash; Medium, April 2026</p>
-</div>
+  <article class="essay">
+    <div class="eyebrow">Medium &middot; April 2026</div>
+    <h3 class="essay-title"><a href="https://medium.com/@claynelson/the-kirk-problem-why-ai-agents-need-human-override-and-humans-need-agents-5e042577780d">The Kirk Problem: Why AI Agents Need Human Override &mdash; And Humans Need Agents</a></h3>
+    <p class="excerpt">On where oversight mechanisms belong in a multi-agent system, and why the interesting work is protocol design rather than capability constraint. Tested against empirical evidence from the Dochkina self-organizing agents paper: self-organizing LLM agents outperform designed hierarchical structures &mdash; but only when the constitutional layer is intact.</p>
+    <a class="read" href="https://medium.com/@claynelson/the-kirk-problem-why-ai-agents-need-human-override-and-humans-need-agents-5e042577780d">Read on Medium &rarr;</a>
+  </article>
 
-<div class="card">
-<h3>The team scale problem: where external AI tools break</h3>
-<p>Claude Code external dominates for the solo developer &mdash; Command Intent stays intact, context is coherent, design philosophy doesn't leak. That advantage inverts at roughly 3&ndash;5 developers. Coordination edges scale as N(N&minus;1)/2. Each developer running 3 agents is effectively a team, not a person. Git's line-based merge algorithm produces false conflicts on 48% of independent changes. Hub files &mdash; config registries, routing tables, schemas &mdash; become near-certain collision points every sprint.</p>
-<p>&rarr; <a href="/why-it-matters.html">Plain language explainer: start here if you're new to this argument</a></p>
-<p style="margin-bottom:0">&rarr; <a href="/team-scale-math.html">Interactive model: adjust team size and agent count to see the conflict surface and coordination math live</a></p>
-</div>
+  <article class="essay">
+    <div class="eyebrow">Explainer &middot; April 2026</div>
+    <h3 class="essay-title"><a href="/why-it-matters.html">Why the Best AI Tool for One Developer Breaks at Five</a></h3>
+    <p class="excerpt">The team scale problem, in plain language. Five developers each running three AI agents is not five people &mdash; it&rsquo;s fifteen. Coordination edges, hub files, and the vanishing of strategic memory when the conversation closes.</p>
+    <a class="read" href="/why-it-matters.html">Read &rarr;</a>
+  </article>
+</section>
 
-<div class="card">
-<h3>Governing intelligence across multi-agent development workflows</h3>
-<p>When you work across Claude, Claude Code, GitHub Copilot, and GitHub simultaneously, you experience a structural problem: reasoning degrades at each boundary crossing. The intent that generates a decision lives in conversation. By the time it reaches code, only acceptance criteria survive. I'm sketching an architecture &mdash; a protocol layer I'm calling <em>governing intelligence</em> &mdash; that preserves reasoning provenance across agent handoffs. The diagrams below are the working model.</p>
-<p style="margin-bottom:0">The core claim: <em>capability threshold determines autonomy threshold</em>. Ring 2, the protocol layer, is where that threshold gets encoded. In most systems right now, Ring 2 is absent. The human fills the gap. That is both the problem and the opportunity.</p>
-</div>
+<section class="block" id="frameworks">
+  <h2 class="section-title">Frameworks</h2>
+  <p class="section-intro">The intellectual apparatus underneath the writing &mdash; the concepts that travel between essays, keynotes, and customer conversations.</p>
 
-<div class="card">
-<h3>Family as the original coordination design problem</h3>
-<p>I'm building <a href="https://haklo.app">Haklo</a>, a weekly meeting ritual app for families. The design challenge is structurally identical to the enterprise coordination problem: how do you give agents enough autonomy to operate effectively while maintaining coherent intent across time? Haklo's memoir flywheel &mdash; decision ancestry chains, values-aware coaching, narrative timeline &mdash; is the Ring 2 problem applied at household scale.</p>
-<p>The irony I keep returning to: I'm building a system to help families hold the thread of their own story together, while the development workflow for that very system loses the thread at every agent boundary.</p>
-<p style="margin-bottom:0">&rarr; <a href="/haklo-landing.html">Haklo landing page design &mdash; Still Water v0.1</a></p>
-</div>
+  <div class="framework">
+    <h3><a href="/proof-problem.html">The Trust Boundary</a></h3>
+    <p>The line between systems your organization can attest to and systems it cannot. You cannot sign what you did not observe. The architectural test for any AI strategy in a regulated context.</p>
+  </div>
 
-<div class="card">
-<h3>The economics of human-in-the-loop AI</h3>
-<p>LLM token costs grow quadratically with conversation length &mdash; every call re-sends the entire history, so input spend scales as N(N+1)/2 across turns. A single well-placed human question that redirects an agent at turn 8 doesn't just save one call; it collapses the entire compound cost of the wrong path. This is the compute-economics argument for Ring 2: good protocol design moves the human upstream, where their intervention is cheapest and the leverage is highest.</p>
-<p style="margin-bottom:0">&rarr; <a href="/token-cost-economics.html">Interactive model: adjust model pricing, conversation shape, and intervention timing to find your break-even point</a></p>
-</div>
+  <div class="framework">
+    <h3><a href="#three-ring">Three-Ring Governance</a></h3>
+    <p>Mission, protocol, emergence. The protocol ring &mdash; gates, traces, capability thresholds &mdash; is where most multi-agent systems fail, because emergence is asked to fill what protocol should hold.</p>
+  </div>
 
-<hr>
+  <div class="framework">
+    <h3><a href="#throughline">The Capability Threshold</a></h3>
+    <p>Capability threshold determines autonomy threshold. A principle that generalizes from AI governance to family operating systems to development workflows.</p>
+  </div>
 
-<h2>Working diagrams</h2>
-<p>Architecture sketches built in conversation with Claude &mdash; the kind of visual model I make when I need to see a structure before I can describe it in prose.</p>
+  <div class="framework">
+    <h3><a href="/token-cost-economics.html">Token Economics of Human-in-the-Loop</a></h3>
+    <p>LLM token costs scale quadratically with conversation length. A well-placed human question at turn 8 collapses the compound cost of a wrong path. The compute-economics argument for Ring 2.</p>
+  </div>
+
+  <div class="framework">
+    <h3><a href="/team-scale-math.html">Team Scale Math</a></h3>
+    <p>Interactive model. Adjust team size and agent count, watch unmanaged conflict edges multiply. Run a sprint simulation to see hub files light up red.</p>
+  </div>
+</section>
+
+<section class="block" id="speaking">
+  <h2 class="section-title">Speaking</h2>
+
+  <div class="talk">
+    <div class="eyebrow">Keynote &middot; April 21, 2026 &middot; Frankfurt</div>
+    <h3>Unburden: AI and the Future of Automotive Verification</h3>
+    <p>GitHub Shift: Automotive. The trust boundary argument delivered to OEM safety engineers, Tier 1 CTOs, and compliance architects. Companion essay: <a href="/proof-problem.html">Automotive&rsquo;s AI Problem Isn&rsquo;t Speed. It&rsquo;s Proof.</a></p>
+  </div>
+
+  <div class="talk">
+    <div class="eyebrow">Participation &middot; April 22&ndash;23, 2026 &middot; Porto</div>
+    <h3>COVESA All Member Meeting</h3>
+    <p>Software-defined vehicle ecosystem convening. Continuation of the Frankfurt arc.</p>
+  </div>
+</section>
+
+<section class="block" id="research">
+  <h2 class="section-title">Research notes</h2>
+  <p class="section-intro">Working threads. Less polished than the essays, but useful if you want to see what I&rsquo;m currently chewing on.</p>
+
+  <div class="research-note">
+    <h3>Governing intelligence across multi-agent development workflows</h3>
+    <p>When you work across Claude, Claude Code, GitHub Copilot, and GitHub simultaneously, reasoning degrades at each boundary crossing. The intent that generates a decision lives in conversation; by the time it reaches code, only acceptance criteria survive. Sketch of a protocol layer that preserves reasoning provenance across agent handoffs. See working diagrams below.</p>
+  </div>
+
+  <div class="research-note">
+    <h3>Family as the original coordination design problem</h3>
+    <p>Building <a href="https://haklo.app">Haklo</a>, a weekly meeting ritual app for families. The design challenge is structurally identical to enterprise coordination: how do you give agents enough autonomy to operate effectively while maintaining coherent intent across time? Memoir flywheel &mdash; decision ancestry, values-aware coaching, narrative timeline &mdash; is the Ring 2 problem at household scale. &nbsp;<a href="/haklo-landing.html">Haklo landing page design, Still Water v0.1</a>.</p>
+  </div>
+</section>
+
+<section class="block" id="three-ring">
+  <h2 class="section-title">Working diagrams</h2>
+  <p class="section-intro">Architecture sketches built in conversation with Claude. The kind of visual model I make when I need to see a structure before I can describe it in prose.</p>
 
 <div class="diagram-wrap">
 <span class="fig-label">Figure 1 &mdash; AI-assisted development system: three zones and the missing protocol layer</span>
@@ -203,29 +205,27 @@ footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
 <line class="ldr" x1="280" y1="290" x2="466" y2="354" marker-end="url(#arr3)"/>
 </svg>
 </div>
+</section>
 
-<hr>
+<section class="block" id="throughline">
+  <h2 class="section-title">Intellectual throughline</h2>
+  <p style="font-family: var(--serif); font-size: 17px; color: var(--text); line-height: 1.65; margin-bottom: 18px; max-width: 620px;">The essays above, the Dochkina findings, Haklo&rsquo;s meeting architecture, the automotive trust-boundary argument, and enterprise multi-team coordination are expressions of one question: <em>in a system that includes both humans and autonomous agents, what determines which decisions require a gate?</em></p>
+  <p style="font-family: var(--serif); font-size: 17px; color: var(--text); line-height: 1.65; margin-bottom: 18px; max-width: 620px;">The three-ring model is my current answer. Ring 1 holds mission and values. Ring 2 holds protocol: approval gates, handoff mechanisms, capability thresholds, reasoning traces that let downstream agents understand why a decision was made. Ring 3 is where agents work autonomously within those constraints.</p>
+  <p style="font-family: var(--serif); font-size: 17px; color: var(--text); line-height: 1.65; margin-bottom: 18px; max-width: 620px;">The failure mode in almost every multi-agent system I&rsquo;ve studied is that Ring 2 work gets pushed into Ring 3: emergence tries to fill what protocol should hold. This produces systems that are locally coherent and globally incoherent. The fix isn&rsquo;t more constraints. It&rsquo;s better Ring 2 design.</p>
+  <p style="font-family: var(--serif); font-size: 17px; color: var(--text); line-height: 1.65; margin-bottom: 0; max-width: 620px;">The capability threshold is the autonomy threshold. That principle applies whether you&rsquo;re designing an AI governance framework, a family operating system, a development workflow that coordinates three AI agents and a human founder, or a compliance control plane for safety-critical automotive software.</p>
+</section>
 
-<h2>Intellectual throughline</h2>
-<p>The Kirk Problem essay, the Dochkina findings, Haklo's meeting architecture, and enterprise multi-team coordination are four expressions of one question: <em>in a system that includes both humans and autonomous agents, what determines which decisions require a gate?</em></p>
-<p>The three-ring model is my current answer. Ring 1 holds mission and values. Ring 2 holds protocol: approval gates, handoff mechanisms, capability thresholds, reasoning traces that let downstream agents understand why a decision was made. Ring 3 is where agents work autonomously within those constraints.</p>
-<p>The failure mode in almost every multi-agent system I've studied is that Ring 2 work gets pushed into Ring 3: emergence tries to fill what protocol should hold. This produces systems that are locally coherent and globally incoherent. The fix isn't more constraints. It's better Ring 2 design.</p>
-<p style="margin-bottom:0">The capability threshold is the autonomy threshold. That principle applies whether you're designing an AI governance framework, a family operating system, or a development workflow that coordinates three AI agents and a human founder.</p>
+<section class="block" id="contact">
+  <h2 class="section-title">Elsewhere</h2>
+  <div class="links">
+    <a href="https://medium.com/@claynelson">Medium</a>
+    <a href="https://www.linkedin.com/in/claynelson">LinkedIn</a>
+    <a href="https://github.com/ClayNelson">GitHub</a>
+    <a href="https://haklo.app">Haklo</a>
+  </div>
+</section>
 
-<hr>
-
-<div class="pill-links">
-  <a href="https://medium.com/@claynelson">Medium</a>
-  <a href="https://github.com/ClayNelson">GitHub</a>
-  <a href="https://haklo.app">Haklo</a>
-  <a href="/haklo-landing.html">Haklo Design</a>
-  <a href="/why-it-matters.html">Why it matters</a>
-  <a href="/team-scale-math.html">Team Scale Math</a>
-  <a href="/token-cost-economics.html">Token Economics</a>
-  <a href="https://www.linkedin.com/in/claynelson">LinkedIn</a>
-</div>
-
-<footer>
+<footer class="site-footer">
   <p>Personal research. Views my own. Last updated April 2026.</p>
 </footer>
 
