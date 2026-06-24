@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Positioning Against the Barbell — Clay Nelson</title>
+<meta name="description" content="An interactive portfolio allocator that re-tilts named holdings across supply-chain layers as the six surplus-migration levers move.">
+<style>
+:root {
+  --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
+  --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
+  --edge: #1D9E75; --mid: #888780; --frontier: #BA7517; --harness: #7F77DD; --verif: #534AB7;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
+    --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
+    --edge: #5DCAA5; --mid: #B4B2A9; --frontier: #EF9F27; --harness: #AFA9EC; --verif: #7F77DD;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.7; }
+.container { max-width: 740px; margin: 0 auto; padding: 56px 24px 80px; }
+h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; }
+h2 { font-size: 21px; font-weight: 500; margin: 52px 0 18px; letter-spacing: -0.01em; }
+h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+p { margin-bottom: 16px; }
+em { font-style: italic; }
+strong { font-weight: 500; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.byline { color: var(--muted); font-size: 14px; margin: 6px 0 40px; }
+.caveat { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 32px 0; font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 0 8px 8px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin: 20px 0; }
+.card p:last-child { margin-bottom: 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
+.back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
+.lever-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lever { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.lever-head { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+.lever-head b { color: var(--text); font-weight: 500; }
+input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
+.conv-row { display: flex; align-items: center; gap: 12px; margin: 14px 0 0; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+.conv-row span { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.conv-row input { flex: 1; margin: 0; }
+.row { cursor: pointer; margin-bottom: 9px; }
+.row-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 3px; }
+.row-pct { font-weight: 500; }
+.row-track { height: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.row-fill { height: 100%; border-radius: 6px; transition: width .25s ease; }
+.sleeve { display: flex; height: 28px; border-radius: 8px; overflow: hidden; margin-bottom: 8px; border: 1px solid var(--border); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 12px; color: var(--muted); }
+.legend span { display: flex; align-items: center; gap: 5px; }
+.sw { width: 10px; height: 10px; border-radius: 2px; }
+.verdict { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 20px 0 0; font-size: 14px; color: var(--muted); background: var(--bg); border-radius: 0 8px 8px 0; }
+.note { font-size: 13px; color: var(--subtle); border-left: 2px solid var(--border); padding: 8px 16px; margin: 16px 0 0; line-height: 1.55; }
+@media (max-width: 620px) { .lever-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<a href="/" class="back">&larr; Clay Nelson</a>
+
+<h1>Positioning against the barbell</h1>
+<p class="byline">A companion to the surplus model: if value migrates to the tips, what does a portfolio that believes it look like? June 2026.</p>
+
+<p>The <a href="/surplus-migration.html">surplus-migration model</a> answers where value lands as inference commoditizes. This one answers the next question: how would you position against that, in named equities, rather than in the abstract. It takes the same six levers and runs them through a set of real names, each carrying an <em>exposure vector</em> &mdash; its revenue split across the five layers.</p>
+
+<p>The mechanism is the part worth understanding. A name&rsquo;s attractiveness is its exposure vector dotted with where surplus currently sits. When you move a lever, the surplus vector shifts, and every name re-scores automatically &mdash; the ones exposed to layers gaining surplus rise, the ones selling into the squeezed middle fade. The suggested allocation is then a tilt over those scores, and it rolls back up into a layer view so you can read, in one bar, whether you are long the barbell or long the middle.</p>
+
+<h2>Interactive allocator</h2>
+<p>Move the levers to set the regime; move conviction to set how hard the allocation tilts away from equal-weight. Tap any name to interrogate its exposure vector.</p>
+
+<div class="tool-wrap">
+  <p class="section-label">Regime levers</p>
+  <div class="lever-grid">
+    <div class="lever"><div class="lever-head"><span>Inference cost decline</span><b id="vInfra">fast</b></div><input type="range" min="0" max="100" value="70" step="1" id="sInfra"></div>
+    <div class="lever"><div class="lever-head"><span>SLM threshold</span><b id="vSlm">half</b></div><input type="range" min="0" max="100" value="50" step="1" id="sSlm"></div>
+    <div class="lever"><div class="lever-head"><span>Edge amortization</span><b id="vEdge">moderate</b></div><input type="range" min="0" max="100" value="45" step="1" id="sEdge"></div>
+    <div class="lever"><div class="lever-head"><span>Harness maturity</span><b id="vHarness">emerging</b></div><input type="range" min="0" max="100" value="40" step="1" id="sHarness"></div>
+    <div class="lever"><div class="lever-head"><span>Verification weight</span><b id="vVerif">high</b></div><input type="range" min="0" max="100" value="65" step="1" id="sVerif"></div>
+    <div class="lever"><div class="lever-head"><span>Trust accrual</span><b id="vTrust">slow</b></div><input type="range" min="0" max="100" value="35" step="1" id="sTrust"></div>
+  </div>
+  <div class="conv-row"><span>Conviction</span><input type="range" min="0" max="100" value="55" step="1" id="sConv"><span id="vConv">tilt vs equal-weight</span></div>
+
+  <p class="section-label" style="margin-top:22px">Suggested allocation by name</p>
+  <div id="rows"></div>
+
+  <p class="section-label" style="margin-top:20px">Rolls up to, by layer</p>
+  <div class="sleeve" id="sleeve"></div>
+  <div class="legend" id="legend"></div>
+
+  <div class="verdict" id="verdict"></div>
+</div>
+
+<h2>How to read the tilt</h2>
+
+<p>The conviction slider is what makes this an allocation tool rather than a ranking. At low conviction everything compresses toward equal-weight &mdash; the honest setting when you don&rsquo;t trust the lever positions. At high conviction it concentrates hard into the names exposed to the winning layers &mdash; appropriate only when you believe the regime read. Conviction should track how much you trust the weakest link in the chain of assumptions, not how much you like the conclusion.</p>
+
+<p>Two names repay attention. Push the SLM threshold to <em>most</em> and the edge-pure names and the workstation capex sleeve climb while the metered-middle names fade &mdash; the edge tip lighting up as small models clear real workloads. Then drop trust accrual to the floor and the harness and verification names sag even with verification weight high: the trust rate-limiter from the parent model propagates straight into position sizing, because realized harness work is what those names are exposed to.</p>
+
+<div class="caveat">
+  <strong>Exposure vectors are theses, not measurements.</strong> Each name&rsquo;s split across layers is a judgment about its revenue mix, set by hand and contestable. Nvidia is the most consequential call in the table &mdash; placed mostly in the metered middle on datacenter dominance, with a growing edge slice &mdash; and reasonable people would weight it differently. The allocator also scores names by <em>alignment with where surplus sits</em>, not by valuation: a name perfectly exposed to the winning layer can still be a poor buy if the market has already priced it. This sizes a tilt; it is not investment advice.
+</div>
+
+<p style="margin-bottom:0">&larr; <a href="/surplus-migration.html">Back to the surplus model</a> &middot; <a href="/">index</a></p>
+
+<footer><p>Personal research. Views my own. June 2026.</p></footer>
+
+</div>
+
+<script>
+const layers=['edge','mid','frontier','harness','verif'];
+const layerMeta={
+  edge:{name:'Edge silicon',color:'var(--edge)'},
+  mid:{name:'Metered middle',color:'var(--mid)'},
+  frontier:{name:'Frontier model',color:'var(--frontier)'},
+  harness:{name:'Harness',color:'var(--harness)'},
+  verif:{name:'Verification',color:'var(--verif)'}
+};
+const names=[
+  {label:'Arm', v:{edge:0.45,mid:0.30,frontier:0,harness:0.15,verif:0.10}},
+  {label:'Ambarella / edge-pure', v:{edge:0.90,mid:0,frontier:0,harness:0.10,verif:0}},
+  {label:'Nvidia', v:{edge:0.25,mid:0.60,frontier:0,harness:0.15,verif:0}},
+  {label:'Hyperscalers (MSFT/AMZN/GOOGL)', v:{edge:0.05,mid:0.55,frontier:0.30,harness:0.10,verif:0}},
+  {label:'Frontier labs (proxy)', v:{edge:0,mid:0.20,frontier:0.70,harness:0.10,verif:0}},
+  {label:'GitHub / dev-platform', v:{edge:0,mid:0,frontier:0.10,harness:0.55,verif:0.35}},
+  {label:'Compliance / verification SaaS', v:{edge:0,mid:0,frontier:0,harness:0.20,verif:0.80}},
+  {label:'New workstations (capex sleeve)', v:{edge:0.95,mid:0,frontier:0,harness:0.05,verif:0}}
+];
+function band(v,a,b,c){ return v<33?a:v<67?b:c; }
+function layerSurplus(){
+  const infra=+document.getElementById('sInfra').value/100;
+  const slm=+document.getElementById('sSlm').value/100;
+  const edge=+document.getElementById('sEdge').value/100;
+  const harness=+document.getElementById('sHarness').value/100;
+  const verif=+document.getElementById('sVerif').value/100;
+  const trust=+document.getElementById('sTrust').value/100;
+  const realized=harness*(0.4+0.6*trust);
+  let s={};
+  s.edge=(slm*edge)*(0.5+0.5*infra);
+  s.mid=((1-slm)*(1-0.6*infra)*0.6 + (1-slm)*(1-0.4*infra)*0.5)/2;
+  s.frontier=(1-slm)*(1-0.4*infra)*0.5;
+  s.harness=realized*1.2;
+  s.verif=verif*(0.6+0.4*realized);
+  const tot=s.edge+s.mid+s.frontier+s.harness+s.verif||1;
+  for(const k in s) s[k]=s[k]/tot;
+  return s;
+}
+function render(){
+  const surplus=layerSurplus();
+  const conv=+document.getElementById('sConv').value/100;
+  const scores=names.map(n=>{ let dot=0; for(const l of layers) dot+=(n.v[l]||0)*surplus[l]; return {n,dot}; });
+  const k=0.5+conv*6;
+  const exps=scores.map(s=>Math.exp(k*s.dot));
+  const sumExp=exps.reduce((a,b)=>a+b,0);
+  const alloc=scores.map((s,i)=>({n:s.n,w:exps[i]/sumExp})).sort((a,b)=>b.w-a.w);
+  const rows=document.getElementById('rows'); rows.innerHTML='';
+  const maxW=Math.max(...alloc.map(a=>a.w));
+  alloc.forEach(a=>{
+    const pct=Math.round(a.w*100);
+    const dom=layers.reduce((best,l)=>(a.n.v[l]||0)>(a.n.v[best]||0)?l:best,'edge');
+    const row=document.createElement('div'); row.className='row';
+    row.onclick=()=>sendPrompt('Interrogate the exposure vector for '+a.n.label+': is the split across edge/middle/frontier/harness/verification defensible given current revenue mix? Should I revise it?');
+    row.innerHTML='<div class="row-head"><span>'+a.n.label+'</span><span class="row-pct">'+pct+'%</span></div>'+
+      '<div class="row-track"><div class="row-fill" style="width:'+Math.round(a.w/maxW*100)+'%;background:'+layerMeta[dom].color+'"></div></div>';
+    rows.appendChild(row);
+  });
+  let st={}; layers.forEach(l=>st[l]=0);
+  alloc.forEach(a=>{ for(const l of layers) st[l]+=a.w*(a.n.v[l]||0); });
+  const ssum=layers.reduce((s,l)=>s+st[l],0)||1;
+  const sleeve=document.getElementById('sleeve'); sleeve.innerHTML='';
+  const legend=document.getElementById('legend'); legend.innerHTML='';
+  layers.forEach(l=>{
+    const pct=st[l]/ssum*100;
+    const seg=document.createElement('div'); seg.style.cssText='width:'+pct+'%;background:'+layerMeta[l].color+';transition:width .25s ease;';
+    sleeve.appendChild(seg);
+    const li=document.createElement('span'); li.innerHTML='<span class="sw" style="background:'+layerMeta[l].color+'"></span>'+layerMeta[l].name+' '+Math.round(pct)+'%';
+    legend.appendChild(li);
+  });
+  document.getElementById('vInfra').textContent=band(+document.getElementById('sInfra').value,'slow','moderate','fast');
+  document.getElementById('vSlm').textContent=band(+document.getElementById('sSlm').value,'few','half','most');
+  document.getElementById('vEdge').textContent=band(+document.getElementById('sEdge').value,'low','moderate','high');
+  document.getElementById('vHarness').textContent=band(+document.getElementById('sHarness').value,'nascent','emerging','mature');
+  document.getElementById('vVerif').textContent=band(+document.getElementById('sVerif').value,'low','moderate','high');
+  document.getElementById('vTrust').textContent=band(+document.getElementById('sTrust').value,'slow','building','fast');
+  document.getElementById('vConv').textContent=conv<0.33?'gentle tilt':conv<0.67?'tilt vs equal-weight':'high-conviction';
+  const edgeTip=Math.round(st.edge/ssum*100);
+  const mid=Math.round((st.mid+st.frontier)/ssum*100);
+  const valTip=Math.round((st.harness+st.verif)/ssum*100);
+  const top=alloc[0];
+  let msg;
+  if(edgeTip+valTip>=62 && mid<=32){
+    msg='Barbell allocation. The tilt concentrates in the two tips \u2014 edge silicon ('+edgeTip+'%) and the harness/verification layer ('+valTip+'%) \u2014 and underweights the metered middle ('+mid+'%). '+top.n.label+' carries the largest single weight. This is the portfolio the regime implies if you believe the levers as set.';
+  } else if(mid>=45){
+    msg='Middle-weighted allocation. With the levers here, metered inference and frontier compute still hold '+mid+'% of exposure, and '+top.n.label+' leads. The barbell hasn\u2019t triggered \u2014 the names that win are the ones selling into the layer consensus still prices richly.';
+  } else {
+    msg='Transitional allocation. Exposure is spread \u2014 tips at '+(edgeTip+valTip)+'%, middle at '+mid+'% \u2014 with '+top.n.label+' on top. Move the SLM threshold or trust accrual to see the tilt resolve toward a barbell or fall back to the middle.';
+  }
+  document.getElementById('verdict').textContent=msg;
+}
+['sInfra','sSlm','sEdge','sHarness','sVerif','sTrust','sConv'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+render();
+</script>
+</body>
+</html>
