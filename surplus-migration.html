@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where the Surplus Lands — Clay Nelson</title>
+<meta name="description" content="An interactive supply-chain model for where economic surplus migrates as inference cost falls in the age of agents. The barbell thesis, made manipulable.">
+<style>
+:root {
+  --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
+  --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
+  --edge: #1D9E75; --mid: #888780; --val: #534AB7;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
+    --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
+    --edge: #5DCAA5; --mid: #B4B2A9; --val: #7F77DD;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.7; }
+.container { max-width: 740px; margin: 0 auto; padding: 56px 24px 80px; }
+h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; }
+h2 { font-size: 21px; font-weight: 500; margin: 52px 0 18px; letter-spacing: -0.01em; }
+h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+p { margin-bottom: 16px; }
+em { font-style: italic; }
+strong { font-weight: 500; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.byline { color: var(--muted); font-size: 14px; margin: 6px 0 40px; }
+.caveat { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 32px 0; font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 0 8px 8px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin: 20px 0; }
+.card p:last-child { margin-bottom: 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
+.back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
+.eq { font-family: 'SF Mono', 'Fira Mono', 'Consolas', monospace; font-size: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 20px 0; color: var(--text); line-height: 2; overflow-x: auto; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
+.slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.slider-label { font-size: 13px; color: var(--muted); width: 150px; flex-shrink: 0; line-height: 1.3; }
+.slider-val { font-size: 13px; font-weight: 500; color: var(--text); width: 84px; text-align: right; flex-shrink: 0; }
+input[type=range] { flex: 1; accent-color: var(--link); }
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.bars { margin: 4px 0 0; }
+.bar-row { margin-bottom: 12px; }
+.bar-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+.bar-name { color: var(--text); }
+.bar-sub { color: var(--subtle); font-size: 12px; }
+.bar-pct { font-weight: 500; color: var(--text); }
+.bar-track { height: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 7px; transition: width .25s ease; }
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0 0; }
+.metric { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; text-align: center; }
+.metric-label { font-size: 11px; color: var(--muted); margin: 0 0 4px; }
+.metric-value { font-size: 22px; font-weight: 500; color: var(--text); margin: 0; }
+.metric-sub { font-size: 11px; color: var(--subtle); margin: 2px 0 0; }
+.verdict { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 20px 0 0; font-size: 14px; color: var(--muted); background: var(--bg); border-radius: 0 8px 8px 0; }
+@media (max-width: 620px) { .tool-grid { grid-template-columns: 1fr; } .slider-label { width: 130px; } .metric-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<a href="/" class="back">&larr; Clay Nelson</a>
+
+<h1>Where the surplus lands</h1>
+<p class="byline">A working model for how economic value migrates across the software supply chain as inference commoditizes. June 2026.</p>
+
+<p>The instinct, when you watch inference cost fall, is to model a cost curve: software gets cheaper to build, margins compress, everyone benefits a little. That is the boring version, and it is wrong in the way that matters. Falling inference cost is not value destruction. It is value <em>relocation</em>. Every dollar that leaves the metered token reappears somewhere else in the chain. The only interesting question &mdash; the one that prices stocks &mdash; is <em>where</em>.</p>
+
+<p>This is the commoditization-of-complements move. When one layer commoditizes, margin migrates to the adjacent layer that is not yet commoditized and that the now-cheap layer makes <em>more</em> valuable. So the variables below are not independent cost inputs. They are competitors for the same migrating surplus. That competition is the spine of the model.</p>
+
+<h2>The chain, as five layers competing for one pool</h2>
+
+<p>Restate the usual list &mdash; cost of inference, model size, edge compute, harness maturity &mdash; not as costs but as the things that <em>move surplus</em>:</p>
+
+<div class="card">
+<p><strong>Edge silicon.</strong> When a good-enough model runs on an amortized workstation, inference converts from opex (metered, per-token, captured by whoever sells tokens) to capex (fixed, depreciating, captured once by the silicon). This is the most under-priced shift, because it requires believing the small-model threshold gets crossed for real development work.</p>
+<p><strong>Metered inference &amp; the frontier model.</strong> The middle. This is the only layer that <em>cannot win</em>: falling cost is pure margin erosion for whoever sells the token, because the token is the product. Via negativa &mdash; its value lives in what it cannot defend once the thing it sells deflates.</p>
+<p><strong>Harness &amp; orchestration.</strong> What converts unreliable per-step inference into reliable multi-step work. Errors don&rsquo;t cancel; they stack. 95% per-step reliability over 50 steps is 7.7% success. The harness exists to fight that compounding, and its maturity is measured in how many autonomous steps it can chain before a human must intervene.</p>
+<p><strong>Verification &amp; compliance evidence.</strong> The deflation-immune pool. Compliance value does not fall when tokens get cheap. In a regulated, safety-critical context the <em>evidence</em> that the chain succeeded is itself the product &mdash; and whoever holds the audit-grade record captures margin immune to inference commoditization.</p>
+</div>
+
+<h2>Interactive model</h2>
+<p>Six levers, restated as the things that actually move surplus rather than raw cost inputs. The bars show each layer&rsquo;s captured share of total chain surplus; the three cards collapse them into the structural story &mdash; two tips and a squeezed middle. Defaults encode a fast-decline, half-crossed-threshold, high-compliance world. Push them to find the regime where the thesis breaks.</p>
+
+<div class="tool-wrap">
+  <div class="tool-grid">
+    <div>
+      <p class="section-label">Commoditization forces</p>
+      <div class="slider-row"><span class="slider-label">Inference cost decline</span><input type="range" id="sInfra" min="0" max="100" step="1" value="70"><span class="slider-val" id="vInfra">fast</span></div>
+      <div class="slider-row"><span class="slider-label">SLM good-enough threshold</span><input type="range" id="sSlm" min="0" max="100" step="1" value="50"><span class="slider-val" id="vSlm">half</span></div>
+      <div class="slider-row"><span class="slider-label">Edge amortization</span><input type="range" id="sEdge" min="0" max="100" step="1" value="45"><span class="slider-val" id="vEdge">moderate</span></div>
+    </div>
+    <div>
+      <p class="section-label">Value-capture forces</p>
+      <div class="slider-row"><span class="slider-label">Harness maturity</span><input type="range" id="sHarness" min="0" max="100" step="1" value="40"><span class="slider-val" id="vHarness">emerging</span></div>
+      <div class="slider-row"><span class="slider-label">Verification weight</span><input type="range" id="sVerif" min="0" max="100" step="1" value="65"><span class="slider-val" id="vVerif">high</span></div>
+      <div class="slider-row"><span class="slider-label">Trust accrual rate</span><input type="range" id="sTrust" min="0" max="100" step="1" value="35"><span class="slider-val" id="vTrust">slow</span></div>
+    </div>
+  </div>
+
+  <p class="section-label" style="margin-top:22px">Share of chain surplus captured, by layer</p>
+  <div class="bars" id="bars"></div>
+
+  <div class="metric-grid">
+    <div class="metric"><p class="metric-label">Edge tip</p><p class="metric-value" id="mEdge" style="color:var(--edge)">&mdash;</p><p class="metric-sub">capex, captured once</p></div>
+    <div class="metric"><p class="metric-label">Squeezed middle</p><p class="metric-value" id="mMid">&mdash;</p><p class="metric-sub">metered, sold by token</p></div>
+    <div class="metric"><p class="metric-label">Value tip</p><p class="metric-value" id="mVal" style="color:var(--val)">&mdash;</p><p class="metric-sub">recurring, deflation-immune</p></div>
+  </div>
+
+  <div class="verdict" id="verdict"><span id="verdictText"></span></div>
+</div>
+
+<h2>The barbell</h2>
+
+<p>Take the small-model thesis and the harness-as-bottleneck seriously and the model predicts a barbell. Surplus migrates <em>down</em> to commoditized edge silicon &mdash; captured once, as capex &mdash; and <em>up</em> to the verification, trust, and orchestration layer &mdash; captured continuously, immune to token deflation. It gets squeezed out of the middle: metered frontier inference sold by the token for general development work.</p>
+
+<p>The middle is where consensus currently prices the most value. That gap &mdash; between where consensus puts the value and where the structure of the chain says it lands &mdash; is the trade.</p>
+
+<div class="eq">realized_work = harness_maturity &times; (0.4 + 0.6 &times; trust_accrual)</div>
+
+<p>One relationship in the model deserves singling out, because it is the most testable. A brilliant harness with no trust behind it does not convert: the term above means realized autonomous work is gated by trust, which compounds slowly and collapses fast. Crank harness maturity alone and watch how little moves until trust rises with it. Trust is the rate limiter on the largest surplus pool in the chain.</p>
+
+<div class="caveat">
+  <strong>Announced vs. demonstrated.</strong> This is a Stage 1 abstraction, and it earns the same skepticism I&rsquo;d apply to anyone else&rsquo;s claim. The <em>shape</em> of the relationships reflects a deliberate thesis; the specific coefficients are placeholders chosen to make the dynamics legible, not estimated from data. And the model treats total chain surplus as fixed &mdash; it asks only how the pool is divided, not how it <em>grows</em> as cheaper inference expands the total amount of software built. That Jevons expansion is real and belongs in Stage 2, where the coefficients get real ranges and the layers can be tested against actual names.
+</div>
+
+<h2>Why this is the leverage question</h2>
+
+<p>If the audit-evidence layer is genuinely the most defensible margin in the chain &mdash; the one pool that does not erode when tokens go to zero &mdash; then the strategic contest is over who holds that record. The thesis underneath the whole model is that the commit chain could become the system of record for software development in an agentic world, rather than remaining downstream of the tools that generate the work. Whoever holds the evidence holds the deflation-immune tip of the barbell.</p>
+
+<hr>
+
+<p style="margin-bottom:0">&larr; <a href="/">Back to index</a></p>
+
+<footer><p>Personal research. Views my own. June 2026.</p></footer>
+
+</div>
+
+<script>
+function band(v, lo, mid, hi) { return v < 33 ? lo : v < 67 ? mid : hi; }
+function compute() {
+  const infra = +document.getElementById('sInfra').value / 100;
+  const slm = +document.getElementById('sSlm').value / 100;
+  const edge = +document.getElementById('sEdge').value / 100;
+  const harness = +document.getElementById('sHarness').value / 100;
+  const verif = +document.getElementById('sVerif').value / 100;
+  const trust = +document.getElementById('sTrust').value / 100;
+  const realized = harness * (0.4 + 0.6 * trust);
+  let s = {};
+  s.edge = (slm * edge) * (0.5 + 0.5 * infra);
+  s.infra = (1 - slm) * (1 - 0.6 * infra) * 0.6;
+  s.model = (1 - slm) * (1 - 0.4 * infra) * 0.5;
+  s.harness = realized * 1.2;
+  s.verif = verif * (0.6 + 0.4 * realized);
+  const raw = s.edge + s.infra + s.model + s.harness + s.verif;
+  if (raw < 1e-9) { s.degenerate = true; return s; }
+  for (const k in s) s[k] = s[k] / raw;
+  return s;
+}
+const layers = [
+  { id: 'edge', name: 'Edge silicon', sub: 'capex, captured once', color: 'var(--edge)' },
+  { id: 'infra', name: 'Cloud / metered inference', sub: 'sold by the token', color: 'var(--mid)' },
+  { id: 'model', name: 'Frontier model', sub: 'per-workload pricing power', color: 'var(--mid)' },
+  { id: 'harness', name: 'Harness / orchestration', sub: 'converts tokens to work', color: 'var(--val)' },
+  { id: 'verif', name: 'Verification / evidence', sub: 'compliance system of record', color: 'var(--val)' }
+];
+function updateLabels() {
+  document.getElementById('vInfra').textContent = band(+document.getElementById('sInfra').value, 'slow', 'moderate', 'fast');
+  document.getElementById('vSlm').textContent = band(+document.getElementById('sSlm').value, 'few', 'half', 'most');
+  document.getElementById('vEdge').textContent = band(+document.getElementById('sEdge').value, 'low', 'moderate', 'high');
+  document.getElementById('vHarness').textContent = band(+document.getElementById('sHarness').value, 'nascent', 'emerging', 'mature');
+  document.getElementById('vVerif').textContent = band(+document.getElementById('sVerif').value, 'low', 'moderate', 'high');
+  document.getElementById('vTrust').textContent = band(+document.getElementById('sTrust').value, 'slow', 'building', 'fast');
+}
+function render() {
+  const s = compute();
+  const bars = document.getElementById('bars');
+  bars.innerHTML = '';
+  layers.forEach(l => {
+    const pct = s.degenerate ? 0 : Math.round(s[l.id] * 100);
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML =
+      '<div class="bar-head"><span class="bar-name">' + l.name + ' <span class="bar-sub">&middot; ' + l.sub + '</span></span><span class="bar-pct">' + pct + '%</span></div>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + l.color + '"></div></div>';
+    bars.appendChild(row);
+  });
+  updateLabels();
+  if (s.degenerate) {
+    document.getElementById('mEdge').textContent = '0%';
+    document.getElementById('mMid').textContent = '0%';
+    document.getElementById('mVal').textContent = '0%';
+    document.getElementById('verdictText').textContent = 'No surplus to allocate. With the harness and verification layers both floored and edge unable to catch what commoditization releases, no layer captures anything \u2014 an economy where cheap inference produces no reliable, attestable work to pay for. A boundary case, not a forecast: it shows the model has no surplus when nothing converts tokens into trusted output.';
+    return;
+  }
+  const edgeTip = Math.round(s.edge * 100);
+  const mid = Math.round((s.infra + s.model) * 100);
+  const valTip = Math.round((s.harness + s.verif) * 100);
+  document.getElementById('mEdge').textContent = edgeTip + '%';
+  document.getElementById('mMid').textContent = mid + '%';
+  document.getElementById('mVal').textContent = valTip + '%';
+  const barbell = edgeTip + valTip;
+  let msg;
+  if (barbell >= 62 && mid <= 30) {
+    msg = 'Barbell regime. Surplus has migrated to the two tips \u2014 edge silicon (' + edgeTip + '%, captured once as capex) and the verification / harness layer (' + valTip + '%, recurring and deflation-immune). The metered middle is hollowed to ' + mid + '%. This is the configuration the small-model / edge thesis predicts, and the gap between it and consensus pricing of the middle is the trade.';
+  } else if (mid >= 45) {
+    msg = 'Middle still holds. Metered inference and frontier pricing retain ' + mid + '% \u2014 either small models haven\u2019t crossed the good-enough threshold for real development work, or harnesses are too immature to relocate surplus downstream yet. Consensus is roughly right here; the thesis hasn\u2019t triggered.';
+  } else {
+    msg = 'Transitional. Surplus is mid-migration: tips hold ' + barbell + '%, middle ' + mid + '%. Watch the threshold-crossing events (small models clearing workloads) and trust accrual \u2014 they are the discrete triggers that tip this toward the barbell.';
+  }
+  document.getElementById('verdictText').textContent = msg;
+}
+['sInfra', 'sSlm', 'sEdge', 'sHarness', 'sVerif', 'sTrust'].forEach(id =>
+  document.getElementById(id).addEventListener('input', render));
+render();
+</script>
+</body>
+</html>
