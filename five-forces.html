@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Five Forces, From Five Vantages — Clay Nelson</title>
+<meta name="description" content="An interactive Porter five-forces model for the agentic development market, with a swappable focal player and the six surplus-migration levers reshaping each force live.">
+<style>
+:root {
+  --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
+  --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
+  --force: #534AB7; --gridline: rgba(44,44,42,0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
+    --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
+    --force: #AFA9EC; --gridline: rgba(255,255,255,0.12);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.7; }
+.container { max-width: 740px; margin: 0 auto; padding: 56px 24px 80px; }
+h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; }
+h2 { font-size: 21px; font-weight: 500; margin: 52px 0 18px; letter-spacing: -0.01em; }
+p { margin-bottom: 16px; }
+em { font-style: italic; }
+strong { font-weight: 500; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.byline { color: var(--muted); font-size: 14px; margin: 6px 0 40px; }
+.caveat { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 32px 0; font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 0 8px 8px 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
+.back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
+.picker { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.pick { font-size: 13px; padding: 6px 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text); font-family: inherit; }
+.pick.on { border: 2px solid var(--link); color: var(--link); }
+.lever-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lever { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.lever-head { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+.lever-head b { color: var(--text); font-weight: 500; }
+input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
+.pressure { display: flex; justify-content: space-between; align-items: center; margin: 10px 4px 0; }
+.pressure span { font-size: 13px; color: var(--muted); }
+.pressure b { font-size: 18px; font-weight: 500; color: var(--text); }
+.verdict { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 18px 0 0; font-size: 14px; color: var(--muted); background: var(--bg); border-radius: 0 8px 8px 0; }
+@media (max-width: 620px) { .lever-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<a href="/" class="back">&larr; Clay Nelson</a>
+
+<h1>Five forces, from five vantages</h1>
+<p class="byline">Porter is always read from one player&rsquo;s seat. The same market draws a different threat shape depending on who is sitting in it. June 2026.</p>
+
+<p>A five-forces diagram is not a property of an industry. It is a property of a <em>position</em> in an industry &mdash; the view looking outward from one company. GitHub&rsquo;s forces look nothing like a frontier lab&rsquo;s. So this model lets you swap the focal player and watch the pentagon redraw, and it wires each force to the same six levers from the <a href="/surplus-migration.html">surplus model</a>, because the forces are the mechanism by which migrating value actually gets captured or competed away.</p>
+
+<p>Each force pushes its vertex outward as it strengthens. A tight pentagon near the center is a defensible seat; a large one is a squeeze. The point of the swap is the asymmetry: a lever that relieves one player&rsquo;s supplier pressure raises another&rsquo;s buyer power. There is no good or bad regime in the abstract &mdash; only good or bad relative to where you stand.</p>
+
+<h2>Interactive pentagon</h2>
+<p>Pick the focal player, then move the levers. Watch which vertices push out and which pull in &mdash; and swap players at fixed lever settings to see the same market produce a different shape.</p>
+
+<div class="tool-wrap">
+  <p class="section-label">Focal player &mdash; forces read from this seat</p>
+  <div class="picker" id="picker"></div>
+
+  <p class="section-label">Regime levers</p>
+  <div class="lever-grid">
+    <div class="lever"><div class="lever-head"><span>Inference cost decline</span><b id="vInfra">fast</b></div><input type="range" min="0" max="100" value="70" step="1" id="sInfra"></div>
+    <div class="lever"><div class="lever-head"><span>SLM threshold</span><b id="vSlm">half</b></div><input type="range" min="0" max="100" value="50" step="1" id="sSlm"></div>
+    <div class="lever"><div class="lever-head"><span>Edge amortization</span><b id="vEdge">moderate</b></div><input type="range" min="0" max="100" value="45" step="1" id="sEdge"></div>
+    <div class="lever"><div class="lever-head"><span>Harness maturity</span><b id="vHarness">emerging</b></div><input type="range" min="0" max="100" value="40" step="1" id="sHarness"></div>
+    <div class="lever"><div class="lever-head"><span>Verification weight</span><b id="vVerif">high</b></div><input type="range" min="0" max="100" value="65" step="1" id="sVerif"></div>
+    <div class="lever"><div class="lever-head"><span>Trust accrual</span><b id="vTrust">slow</b></div><input type="range" min="0" max="100" value="35" step="1" id="sTrust"></div>
+  </div>
+
+  <svg id="penta" width="100%" viewBox="0 0 680 400" role="img" style="display:block; margin-top:18px;"><title>Porter five forces pentagon</title><desc>Five competitive forces plotted as a pentagon; a larger area means a more squeezed focal player.</desc></svg>
+
+  <div class="pressure"><span>Overall competitive pressure</span><b id="pVal">&mdash;</b></div>
+  <div class="verdict" id="verdict"></div>
+</div>
+
+<h2>What the asymmetry shows</h2>
+
+<p>GitHub draws the tightest pentagon, and the reason is structural rather than flattering. Verification weight suppresses three forces at once &mdash; buyer power, new entrants, and substitutes all pull inward &mdash; because the compliance moat is a single asset defending three sides. Drop the verification lever and all three vertices push out together. That simultaneous movement is the deflation-immune-tip thesis rendered as geometry: one moat, three forces.</p>
+
+<p>Cursor&rsquo;s pentagon stays stubbornly large on two vertices, honestly so. Supplier power doesn&rsquo;t collapse even with its own model, because it still routes hard reasoning to frontier models it doesn&rsquo;t own. And its new-entrant and substitute vertices stay out because it has little verification moat to suppress them. Its real defense is agility &mdash; but the model deliberately can&rsquo;t draw agility as a moat, because speed is a flow, not a stock.</p>
+
+<div class="caveat">
+  <strong>Porter measures structure, not momentum.</strong> The framework systematically under-credits agility and over-credits incumbency &mdash; so a fast-moving challenger reads weaker than its trajectory suggests, precisely because structural position is what Porter sees and speed is what it can&rsquo;t. The force intensities here are theses about how the levers translate into competitive pressure, set by hand and contestable. Not investment advice.
+</div>
+
+<p style="margin-bottom:0">&larr; <a href="/surplus-migration.html">Back to the surplus model</a> &middot; <a href="/">index</a></p>
+
+<footer><p>Personal research. Views my own. June 2026.</p></footer>
+
+</div>
+
+<script>
+const forces=['Rivalry','Supplier power','Buyer power','New entrants','Substitutes'];
+const players={
+  github:{name:'GitHub / Copilot', verifMoat:0.90, ownModel:0.70, distribution:0.95, workflowLock:0.85},
+  cursor:{name:'Cursor', verifMoat:0.30, ownModel:0.55, distribution:0.55, workflowLock:0.60},
+  claude:{name:'Claude Code', verifMoat:0.50, ownModel:0.95, distribution:0.45, workflowLock:0.40},
+  nvidia:{name:'Nvidia', verifMoat:0.20, ownModel:0.30, distribution:0.80, workflowLock:0.70},
+  arm:{name:'Arm', verifMoat:0.20, ownModel:0.25, distribution:0.85, workflowLock:0.75}
+};
+let focal='github';
+function band(v,a,b,c){ return v<33?a:v<67?b:c; }
+function clamp(x){ return Math.max(0.05,Math.min(1,x)); }
+function forceVec(){
+  const infra=+document.getElementById('sInfra').value/100;
+  const slm=+document.getElementById('sSlm').value/100;
+  const harness=+document.getElementById('sHarness').value/100;
+  const verif=+document.getElementById('sVerif').value/100;
+  const trust=+document.getElementById('sTrust').value/100;
+  const p=players[focal];
+  return {
+    'Rivalry': clamp(0.35 + 0.5*harness - 0.25*p.workflowLock + 0.2*slm),
+    'Supplier power': clamp(0.30 + 0.6*(1-p.ownModel) - 0.4*infra + 0.2*(1-slm)),
+    'Buyer power': clamp(0.30 + 0.4*infra + 0.3*slm - 0.5*(p.verifMoat*verif) - 0.2*(p.workflowLock*trust)),
+    'New entrants': clamp(0.30 + 0.5*slm + 0.3*infra - 0.7*(p.verifMoat*verif) - 0.2*p.distribution),
+    'Substitutes': clamp(0.35 + 0.4*harness + 0.2*slm - 0.4*(p.verifMoat*verif) - 0.2*p.workflowLock)
+  };
+}
+function renderPicker(){
+  const wrap=document.getElementById('picker'); wrap.innerHTML='';
+  Object.keys(players).forEach(k=>{
+    const b=document.createElement('button');
+    b.className='pick'+(k===focal?' on':'');
+    b.textContent=players[k].name;
+    b.onclick=()=>{ focal=k; renderPicker(); render(); };
+    wrap.appendChild(b);
+  });
+}
+function render(){
+  const f=forceVec();
+  const cx=250, cy=200, R=140;
+  const svg=document.getElementById('penta');
+  let grid='', axes='', labels='', dots='', pts=[];
+  for(let r=0.25;r<=1.001;r+=0.25){
+    let ring='';
+    forces.forEach((name,i)=>{
+      const ang=-Math.PI/2 + i*2*Math.PI/5;
+      const x=cx+Math.cos(ang)*R*r, y=cy+Math.sin(ang)*R*r;
+      ring+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
+    });
+    grid+='<path d="'+ring+'Z" fill="none" stroke="var(--gridline)" stroke-width="0.5"/>';
+  }
+  forces.forEach((name,i)=>{
+    const ang=-Math.PI/2 + i*2*Math.PI/5;
+    const ex=cx+Math.cos(ang)*R, ey=cy+Math.sin(ang)*R;
+    axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke="var(--gridline)" stroke-width="0.5"/>';
+    const val=f[name];
+    const px=cx+Math.cos(ang)*R*val, py=cy+Math.sin(ang)*R*val;
+    pts.push([px,py]);
+    dots+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3" fill="var(--force)"/>';
+    const lx=cx+Math.cos(ang)*(R+34), ly=cy+Math.sin(ang)*(R+34);
+    const anchor = Math.abs(Math.cos(ang))<0.25 ? 'middle' : (Math.cos(ang)>0?'start':'end');
+    labels+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="13" font-family="inherit" fill="var(--muted)">'+name+'</text>';
+    labels+='<text x="'+lx.toFixed(1)+'" y="'+(ly+15).toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="12" font-family="inherit" fill="var(--subtle)">'+Math.round(val*100)+'</text>';
+  });
+  let poly='';
+  pts.forEach((p,i)=>{ poly+=(i===0?'M':'L')+p[0].toFixed(1)+' '+p[1].toFixed(1)+' '; });
+  poly+='Z';
+  svg.innerHTML='<title>Porter five forces pentagon for '+players[focal].name+'</title><desc>Five competitive forces; a larger area means more competitive pressure on the focal player.</desc>'+
+    grid+axes+
+    '<path d="'+poly+'" fill="var(--force)" fill-opacity="0.14" stroke="var(--force)" stroke-width="1.5" stroke-linejoin="round"/>'+
+    dots+labels+
+    '<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="inherit" fill="var(--subtle)">'+players[focal].name+'</text>';
+  const avg=(f.Rivalry+f['Supplier power']+f['Buyer power']+f['New entrants']+f.Substitutes)/5;
+  document.getElementById('pVal').textContent=Math.round(avg*100)+' / 100';
+  document.getElementById('vInfra').textContent=band(+document.getElementById('sInfra').value,'slow','moderate','fast');
+  document.getElementById('vSlm').textContent=band(+document.getElementById('sSlm').value,'few','half','most');
+  document.getElementById('vEdge').textContent=band(+document.getElementById('sEdge').value,'low','moderate','high');
+  document.getElementById('vHarness').textContent=band(+document.getElementById('sHarness').value,'nascent','emerging','mature');
+  document.getElementById('vVerif').textContent=band(+document.getElementById('sVerif').value,'low','moderate','high');
+  document.getElementById('vTrust').textContent=band(+document.getElementById('sTrust').value,'slow','building','fast');
+  const sorted=[...forces].sort((a,b)=>f[b]-f[a]);
+  const top=sorted[0], low=sorted[4];
+  const p=players[focal];
+  let read;
+  if(avg<=0.42){ read=p.name+'\u2019s pentagon is tight \u2014 overall pressure '+Math.round(avg*100)+'/100. Strongest force is '+top.toLowerCase()+', weakest '+low.toLowerCase()+'. '; }
+  else if(avg>=0.58){ read=p.name+' faces broad pressure ('+Math.round(avg*100)+'/100), led by '+top.toLowerCase()+'. '; }
+  else { read=p.name+' sits in a mixed field ('+Math.round(avg*100)+'/100); '+top.toLowerCase()+' is the binding force. '; }
+  if(focal==='github'){ read+='Verification weight is doing the work \u2014 it suppresses buyer power, entrants, and substitutes at once, because the compliance moat is one asset defending three forces.'; }
+  else if(focal==='cursor'){ read+='Supplier power stays high even with its own model \u2014 it still resells frontier tokens for hard tasks, and has little verification moat to suppress entrants. Its defense is agility, which the model can\u2019t draw as a moat.'; }
+  else if(focal==='claude'){ read+='Owning the frontier model collapses supplier power \u2014 the supplier vertex sits near the center because it is its own supplier. Its exposure is distribution: it must win the workflow it doesn\u2019t yet own.'; }
+  else { read+='As a layer-below supplier to the coding tools, this seat\u2019s forces are driven by edge amortization and distribution rather than the harness contest above it.'; }
+  document.getElementById('verdict').textContent=read;
+}
+['sInfra','sSlm','sEdge','sHarness','sVerif','sTrust'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+renderPicker();
+render();
+</script>
+</body>
+</html>
