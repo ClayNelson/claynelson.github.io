@@ -10,12 +10,14 @@
   --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
   --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
   --force: #534AB7; --gridline: rgba(44,44,42,0.12);
+  --up: #A32D2D; --down: #0F6E56;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
     --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
     --force: #AFA9EC; --gridline: rgba(255,255,255,0.12);
+    --up: #F09595; --down: #5DCAA5;
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +35,7 @@ a:hover { text-decoration: underline; }
 hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
 footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
 .back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
-.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; position: relative; }
 .section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
 .picker { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
 .pick { font-size: 13px; padding: 6px 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text); font-family: inherit; }
@@ -47,7 +49,18 @@ input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
 .pressure span { font-size: 13px; color: var(--muted); }
 .pressure b { font-size: 18px; font-weight: 500; color: var(--text); }
 .verdict { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 18px 0 0; font-size: 14px; color: var(--muted); background: var(--bg); border-radius: 0 8px 8px 0; }
-@media (max-width: 620px) { .lever-grid { grid-template-columns: 1fr; } }
+.hint { font-size: 12px; color: var(--subtle); margin: 6px 4px 0; }
+#tip { position: absolute; pointer-events: none; z-index: 5; width: 260px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; opacity: 0; transition: opacity .12s ease; box-shadow: 0 4px 18px rgba(0,0,0,0.10); }
+#tip.on { opacity: 1; }
+#tip .tip-name { font-size: 14px; font-weight: 500; color: var(--text); }
+#tip .tip-score { font-size: 12px; color: var(--muted); margin-left: 6px; }
+#tip .tip-def { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 6px 0 8px; }
+#tip .tip-driver { font-size: 12px; line-height: 1.5; display: flex; gap: 6px; }
+#tip .tip-driver .dir { font-weight: 500; flex-shrink: 0; }
+#tip .up { color: var(--up); }
+#tip .down { color: var(--down); }
+.dot-hit { cursor: pointer; }
+@media (max-width: 620px) { .lever-grid { grid-template-columns: 1fr; } #tip { width: 200px; } }
 </style>
 </head>
 <body>
@@ -63,7 +76,7 @@ input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
 <p>Each force pushes its vertex outward as it strengthens. A tight pentagon near the center is a defensible seat; a large one is a squeeze. The point of the swap is the asymmetry: a lever that relieves one player&rsquo;s supplier pressure raises another&rsquo;s buyer power. There is no good or bad regime in the abstract &mdash; only good or bad relative to where you stand.</p>
 
 <h2>Interactive pentagon</h2>
-<p>Pick the focal player, then move the levers. Watch which vertices push out and which pull in &mdash; and swap players at fixed lever settings to see the same market produce a different shape.</p>
+<p>Pick the focal player, then move the levers. Hover or tap any vertex to see what the force means and what is currently pushing it out or pulling it in &mdash; the explanation recomputes as you move the levers.</p>
 
 <div class="tool-wrap">
   <p class="section-label">Focal player &mdash; forces read from this seat</p>
@@ -80,6 +93,8 @@ input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
   </div>
 
   <svg id="penta" width="100%" viewBox="0 0 680 400" role="img" style="display:block; margin-top:18px;"><title>Porter five forces pentagon</title><desc>Five competitive forces plotted as a pentagon; a larger area means a more squeezed focal player.</desc></svg>
+  <div id="tip" role="status" aria-live="polite"></div>
+  <p class="hint">Hover or focus a vertex for its definition and live drivers.</p>
 
   <div class="pressure"><span>Overall competitive pressure</span><b id="pVal">&mdash;</b></div>
   <div class="verdict" id="verdict"></div>
@@ -92,7 +107,7 @@ input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
 <p>Cursor&rsquo;s pentagon stays stubbornly large on two vertices, honestly so. Supplier power doesn&rsquo;t collapse even with its own model, because it still routes hard reasoning to frontier models it doesn&rsquo;t own. And its new-entrant and substitute vertices stay out because it has little verification moat to suppress them. Its real defense is agility &mdash; but the model deliberately can&rsquo;t draw agility as a moat, because speed is a flow, not a stock.</p>
 
 <div class="caveat">
-  <strong>Porter measures structure, not momentum.</strong> The framework systematically under-credits agility and over-credits incumbency &mdash; so a fast-moving challenger reads weaker than its trajectory suggests, precisely because structural position is what Porter sees and speed is what it can&rsquo;t. The force intensities here are theses about how the levers translate into competitive pressure, set by hand and contestable. Not investment advice.
+  <strong>Porter measures structure, not momentum.</strong> The framework systematically under-credits agility and over-credits incumbency &mdash; so a fast-moving challenger reads weaker than its trajectory suggests, precisely because structural position is what Porter sees and speed is what it can&rsquo;t. The force intensities here, and the driver weights shown in the tooltips, are theses about how the levers translate into competitive pressure, set by hand and contestable. Not investment advice.
 </div>
 
 <p style="margin-bottom:0">&larr; <a href="/surplus-migration.html">Back to the surplus model</a> &middot; <a href="/">index</a></p>
@@ -110,23 +125,62 @@ const players={
   nvidia:{name:'Nvidia', verifMoat:0.20, ownModel:0.30, distribution:0.80, workflowLock:0.70},
   arm:{name:'Arm', verifMoat:0.20, ownModel:0.25, distribution:0.85, workflowLock:0.75}
 };
+const defs={
+  'Rivalry':'How hard direct competitors fight for the same customers. Higher means more head-to-head pressure on price and feature pace.',
+  'Supplier power':'Leverage held by whoever supplies the key input \u2014 here, the model providers whose tokens get resold. Higher means more margin captured upstream.',
+  'Buyer power':'Leverage held by customers \u2014 their ability to switch, negotiate, or walk. Higher means less pricing and lock-in power for the focal player.',
+  'New entrants':'How easily a new competitor can enter and contest the market. Higher means lower barriers protecting the incumbent.',
+  'Substitutes':'Pressure from different ways of solving the same problem \u2014 a terminal agent instead of an editor, say. Higher means the product is more replaceable.'
+};
 let focal='github';
 function band(v,a,b,c){ return v<33?a:v<67?b:c; }
 function clamp(x){ return Math.max(0.05,Math.min(1,x)); }
-function forceVec(){
-  const infra=+document.getElementById('sInfra').value/100;
-  const slm=+document.getElementById('sSlm').value/100;
-  const harness=+document.getElementById('sHarness').value/100;
-  const verif=+document.getElementById('sVerif').value/100;
-  const trust=+document.getElementById('sTrust').value/100;
-  const p=players[focal];
+function levers(){
   return {
-    'Rivalry': clamp(0.35 + 0.5*harness - 0.25*p.workflowLock + 0.2*slm),
-    'Supplier power': clamp(0.30 + 0.6*(1-p.ownModel) - 0.4*infra + 0.2*(1-slm)),
-    'Buyer power': clamp(0.30 + 0.4*infra + 0.3*slm - 0.5*(p.verifMoat*verif) - 0.2*(p.workflowLock*trust)),
-    'New entrants': clamp(0.30 + 0.5*slm + 0.3*infra - 0.7*(p.verifMoat*verif) - 0.2*p.distribution),
-    'Substitutes': clamp(0.35 + 0.4*harness + 0.2*slm - 0.4*(p.verifMoat*verif) - 0.2*p.workflowLock)
+    infra:+document.getElementById('sInfra').value/100,
+    slm:+document.getElementById('sSlm').value/100,
+    harness:+document.getElementById('sHarness').value/100,
+    verif:+document.getElementById('sVerif').value/100,
+    trust:+document.getElementById('sTrust').value/100
   };
+}
+function forceData(){
+  const L=levers(); const p=players[focal];
+  const out={};
+  out['Rivalry']={ base:0.35, terms:[
+    {label:'harness maturity intensifies the agentic feature race', amt:0.5*L.harness, dir:'up'},
+    {label:'SLM threshold lets more rivals reach parity', amt:0.2*L.slm, dir:'up'},
+    {label:'this player\u2019s workflow lock-in dampens rivalry', amt:0.25*p.workflowLock, dir:'down'}
+  ]};
+  out['Supplier power']={ base:0.30, terms:[
+    {label:'reliance on outside models it doesn\u2019t own', amt:0.6*(1-p.ownModel), dir:'up'},
+    {label:'before SLMs clear workloads, model suppliers keep leverage', amt:0.2*(1-L.slm), dir:'up'},
+    {label:'falling inference cost erodes supplier pricing power', amt:0.4*L.infra, dir:'down'}
+  ]};
+  out['Buyer power']={ base:0.30, terms:[
+    {label:'cheap inference lets buyers switch models freely', amt:0.4*L.infra, dir:'up'},
+    {label:'good-enough SLMs widen buyer choice', amt:0.3*L.slm, dir:'up'},
+    {label:'compliance moat raises switching cost', amt:0.5*(p.verifMoat*L.verif), dir:'down'},
+    {label:'workflow lock-in compounds as trust accrues', amt:0.2*(p.workflowLock*L.trust), dir:'down'}
+  ]};
+  out['New entrants']={ base:0.30, terms:[
+    {label:'open SLM bases let anyone build a good-enough model', amt:0.5*L.slm, dir:'up'},
+    {label:'cheap inference lowers the cost to enter', amt:0.3*L.infra, dir:'up'},
+    {label:'compliance moat is a procurement barrier', amt:0.7*(p.verifMoat*L.verif), dir:'down'},
+    {label:'distribution reach deters entrants', amt:0.2*p.distribution, dir:'down'}
+  ]};
+  out['Substitutes']={ base:0.35, terms:[
+    {label:'maturing harnesses make alternative form factors viable', amt:0.4*L.harness, dir:'up'},
+    {label:'SLM parity multiplies substitute approaches', amt:0.2*L.slm, dir:'up'},
+    {label:'compliance moat resists substitution', amt:0.4*(p.verifMoat*L.verif), dir:'down'},
+    {label:'workflow lock-in resists substitution', amt:0.2*p.workflowLock, dir:'down'}
+  ]};
+  for(const k in out){
+    let v=out[k].base;
+    out[k].terms.forEach(t=>{ v += t.dir==='up'? t.amt : -t.amt; });
+    out[k].value=clamp(v);
+  }
+  return out;
 }
 function renderPicker(){
   const wrap=document.getElementById('picker'); wrap.innerHTML='';
@@ -134,12 +188,13 @@ function renderPicker(){
     const b=document.createElement('button');
     b.className='pick'+(k===focal?' on':'');
     b.textContent=players[k].name;
-    b.onclick=()=>{ focal=k; renderPicker(); render(); };
+    b.onclick=()=>{ focal=k; renderPicker(); render(); hideTip(); };
     wrap.appendChild(b);
   });
 }
+let lastData=null, lastPts=null;
 function render(){
-  const f=forceVec();
+  const data=forceData(); lastData=data;
   const cx=250, cy=200, R=140;
   const svg=document.getElementById('penta');
   let grid='', axes='', labels='', dots='', pts=[];
@@ -156,15 +211,17 @@ function render(){
     const ang=-Math.PI/2 + i*2*Math.PI/5;
     const ex=cx+Math.cos(ang)*R, ey=cy+Math.sin(ang)*R;
     axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke="var(--gridline)" stroke-width="0.5"/>';
-    const val=f[name];
+    const val=data[name].value;
     const px=cx+Math.cos(ang)*R*val, py=cy+Math.sin(ang)*R*val;
     pts.push([px,py]);
-    dots+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3" fill="var(--force)"/>';
     const lx=cx+Math.cos(ang)*(R+34), ly=cy+Math.sin(ang)*(R+34);
     const anchor = Math.abs(Math.cos(ang))<0.25 ? 'middle' : (Math.cos(ang)>0?'start':'end');
     labels+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="13" font-family="inherit" fill="var(--muted)">'+name+'</text>';
     labels+='<text x="'+lx.toFixed(1)+'" y="'+(ly+15).toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="12" font-family="inherit" fill="var(--subtle)">'+Math.round(val*100)+'</text>';
+    dots+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3" fill="var(--force)"/>';
+    dots+='<circle class="dot-hit" cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="13" fill="transparent" tabindex="0" role="button" aria-label="'+name+', '+Math.round(val*100)+' of 100. Show drivers." data-force="'+i+'"></circle>';
   });
+  lastPts=pts;
   let poly='';
   pts.forEach((p,i)=>{ poly+=(i===0?'M':'L')+p[0].toFixed(1)+' '+p[1].toFixed(1)+' '; });
   poly+='Z';
@@ -173,7 +230,15 @@ function render(){
     '<path d="'+poly+'" fill="var(--force)" fill-opacity="0.14" stroke="var(--force)" stroke-width="1.5" stroke-linejoin="round"/>'+
     dots+labels+
     '<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="inherit" fill="var(--subtle)">'+players[focal].name+'</text>';
-  const avg=(f.Rivalry+f['Supplier power']+f['Buyer power']+f['New entrants']+f.Substitutes)/5;
+  svg.querySelectorAll('.dot-hit').forEach(el=>{
+    const i=+el.getAttribute('data-force');
+    el.addEventListener('mouseenter',()=>showTip(i));
+    el.addEventListener('mouseleave',hideTip);
+    el.addEventListener('focus',()=>showTip(i));
+    el.addEventListener('blur',hideTip);
+  });
+  const vals=forces.map(n=>data[n].value);
+  const avg=vals.reduce((a,b)=>a+b,0)/5;
   document.getElementById('pVal').textContent=Math.round(avg*100)+' / 100';
   document.getElementById('vInfra').textContent=band(+document.getElementById('sInfra').value,'slow','moderate','fast');
   document.getElementById('vSlm').textContent=band(+document.getElementById('sSlm').value,'few','half','most');
@@ -181,7 +246,7 @@ function render(){
   document.getElementById('vHarness').textContent=band(+document.getElementById('sHarness').value,'nascent','emerging','mature');
   document.getElementById('vVerif').textContent=band(+document.getElementById('sVerif').value,'low','moderate','high');
   document.getElementById('vTrust').textContent=band(+document.getElementById('sTrust').value,'slow','building','fast');
-  const sorted=[...forces].sort((a,b)=>f[b]-f[a]);
+  const sorted=[...forces].sort((a,b)=>data[b].value-data[a].value);
   const top=sorted[0], low=sorted[4];
   const p=players[focal];
   let read;
@@ -194,6 +259,33 @@ function render(){
   else { read+='As a layer-below supplier to the coding tools, this seat\u2019s forces are driven by edge amortization and distribution rather than the harness contest above it.'; }
   document.getElementById('verdict').textContent=read;
 }
+function showTip(i){
+  const name=forces[i]; const d=lastData[name];
+  const tip=document.getElementById('tip');
+  const up=d.terms.filter(t=>t.dir==='up'&&t.amt>0.001).sort((a,b)=>b.amt-a.amt)[0];
+  const down=d.terms.filter(t=>t.dir==='down'&&t.amt>0.001).sort((a,b)=>b.amt-a.amt)[0];
+  let html='<div><span class="tip-name">'+name+'</span><span class="tip-score">'+Math.round(d.value*100)+' / 100</span></div>';
+  html+='<div class="tip-def">'+defs[name]+'</div>';
+  if(up) html+='<div class="tip-driver"><span class="dir up">\u2191 pushing out</span><span>'+up.label+'</span></div>';
+  if(down) html+='<div class="tip-driver" style="margin-top:4px"><span class="dir down">\u2193 pulling in</span><span>'+down.label+'</span></div>';
+  tip.innerHTML=html;
+  const svg=document.getElementById('penta');
+  const rect=svg.getBoundingClientRect();
+  const wrap=svg.parentElement.getBoundingClientRect();
+  const scale=rect.width/680;
+  const px=lastPts[i][0]*scale + (rect.left-wrap.left);
+  const py=lastPts[i][1]*scale + (rect.top-wrap.top);
+  tip.classList.add('on');
+  const tw=tip.offsetWidth, th=tip.offsetHeight;
+  let left=px+18, top=py-th/2;
+  if(left+tw > wrap.width-8) left=px-tw-18;
+  if(left<8) left=8;
+  if(top<8) top=8;
+  if(top+th > wrap.height-8) top=wrap.height-th-8;
+  tip.style.left=left+'px';
+  tip.style.top=top+'px';
+}
+function hideTip(){ document.getElementById('tip').classList.remove('on'); }
 ['sInfra','sSlm','sEdge','sHarness','sVerif','sTrust'].forEach(id=>document.getElementById(id).addEventListener('input',render));
 renderPicker();
 render();
