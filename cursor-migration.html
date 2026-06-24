@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursor, Migrating — Clay Nelson</title>
+<meta name="description" content="A worked example of an exposure vector in motion: how Cursor walked from pure model-reseller to vertically integrated harness platform, and what it did to gross margin.">
+<style>
+:root {
+  --bg: #FAF8F3; --surface: #FFFFFF; --text: #2C2C2A; --muted: #5F5E5A;
+  --subtle: #B4B2A9; --border: rgba(44,44,42,0.10); --link: #185FA5; --accent: #8FA08C;
+  --edge: #1D9E75; --mid: #888780; --frontier: #BA7517; --harness: #7F77DD; --verif: #534AB7;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1A1A18; --surface: #242422; --text: #E8E6DE; --muted: #B4B2A9;
+    --subtle: #5F5E5A; --border: rgba(255,255,255,0.08); --link: #85B7EB; --accent: #8FA08C;
+    --edge: #5DCAA5; --mid: #B4B2A9; --frontier: #EF9F27; --harness: #AFA9EC; --verif: #7F77DD;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.7; }
+.container { max-width: 740px; margin: 0 auto; padding: 56px 24px 80px; }
+h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; }
+h2 { font-size: 21px; font-weight: 500; margin: 52px 0 18px; letter-spacing: -0.01em; }
+p { margin-bottom: 16px; }
+em { font-style: italic; }
+strong { font-weight: 500; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.byline { color: var(--muted); font-size: 14px; margin: 6px 0 40px; }
+.caveat { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 32px 0; font-size: 14px; color: var(--muted); background: var(--surface); border-radius: 0 8px 8px 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
+.back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
+.tl-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+.tl-row span { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.tl-row b { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; min-width: 96px; text-align: right; }
+.tl-row input { flex: 1; accent-color: var(--link); }
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.metric { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; text-align: center; }
+.metric-label { font-size: 11px; color: var(--muted); margin: 0 0 4px; }
+.metric-value { font-size: 22px; font-weight: 500; margin: 0; }
+.metric-sub { font-size: 11px; color: var(--subtle); margin: 2px 0 0; }
+.row { margin-bottom: 10px; }
+.row-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 3px; }
+.row-pct { font-weight: 500; }
+.row-track { height: 13px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.row-fill { height: 100%; border-radius: 6px; transition: width .3s ease; }
+.sleeve { display: flex; height: 26px; border-radius: 8px; overflow: hidden; margin-bottom: 4px; border: 1px solid var(--border); }
+.verdict { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 20px 0 0; font-size: 14px; color: var(--muted); background: var(--bg); border-radius: 0 8px 8px 0; }
+@media (max-width: 620px) { .metric-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<a href="/" class="back">&larr; Clay Nelson</a>
+
+<h1>Cursor, migrating</h1>
+<p class="byline">A worked example for the allocator: an exposure vector is not a fixed attribute. It is the visible residue of strategy. June 2026.</p>
+
+<p>The <a href="/portfolio-allocator.html">allocator</a> assigns each name an exposure vector across the five layers. The obvious objection is that those vectors are static guesses. Cursor is the counter-argument. Over eighteen months it walked deliberately across the chain &mdash; and the walk is legible in the one number that can&rsquo;t be spun, gross margin.</p>
+
+<p>It began as the canonical thing the squeezed middle was supposed to commoditize: a VS Code fork reselling other people&rsquo;s models by the token. The economics proved the thesis against it &mdash; inference ran an estimated forty to seventy cents on every revenue dollar, so gross margin sat structurally below normal software. A harness-layer company bleeding surplus upward to the frontier labs whose tokens it resold.</p>
+
+<p>Then it did what the value-tip layers do to defend themselves: it integrated vertically to stop the bleed. Composer, shipped in late 2025, was built on an open base model &mdash; so Cursor didn&rsquo;t climb into the frontier tier, it climbed into the <em>good-enough small-model</em> tier, which is the SLM-threshold lever expressed as corporate strategy. Routing its own model for fast edits, frontier models for hard reasoning, and a cheap third model for long-context work, it decoupled revenue from the API bill and the margin inflected positive on enterprise.</p>
+
+<h2>The vector in motion</h2>
+<p>Scrub the timeline. The exposure vector and the gross-margin consequence move together, because the vertical integration that fixed the economics <em>is</em> the maneuver across layers.</p>
+
+<div class="tool-wrap">
+  <div class="tl-row"><span>Timeline</span><input type="range" min="0" max="3" value="0" step="1" id="sStage"><b id="vStage">early 2025</b></div>
+  <div class="metric-grid">
+    <div class="metric"><p class="metric-label">Gross margin</p><p class="metric-value" id="mMargin">&mdash;</p><p class="metric-sub" id="mMarginSub">on inference resale</p></div>
+    <div class="metric"><p class="metric-label">Inference bill</p><p class="metric-value" id="mBill">&mdash;</p><p class="metric-sub">per $1 revenue</p></div>
+    <div class="metric"><p class="metric-label">ARR run-rate</p><p class="metric-value" id="mArr">&mdash;</p><p class="metric-sub">annualized</p></div>
+  </div>
+  <p class="section-label">Exposure across layers</p>
+  <div id="bars"></div>
+  <div class="sleeve" id="sleeve" style="margin-top:14px"></div>
+  <div class="verdict" id="verdict"></div>
+</div>
+
+<h2>The tip it does not hold</h2>
+
+<p>Across every stage, the verification sleeve barely moves above five percent. Cursor climbed hard into the harness tip and stopped the upward bleed, but it never built into the deflation-immune verification tip &mdash; because the product optimizes for velocity, and audit-grade evidence is a different muscle. In a regulated-industry frame, that absent sliver is the whole system-of-record argument rendered as a structural fact: two companies contest the harness layer, but only one is positioned for the compliance tip, and the model shows that as geometry rather than assertion.</p>
+
+<p>That is the lesson the allocator needed. Exposure vectors are not guesses pinned to a name forever. They are claims about a moment, and companies actively maneuver across the chain &mdash; the maneuvering shows up in the financials before it shows up in the narrative.</p>
+
+<div class="caveat">
+  <strong>Ownership is unresolved.</strong> As of writing, a SpaceX/xAI acquisition of Anysphere at roughly sixty billion is reported but pending close and regulatory approval, on mostly secondary sourcing. If it lands, Cursor stops being an independent exposure and becomes a line inside a complex that also owns a frontier model &mdash; the frontier weight jumps and the standalone vector above no longer applies. Treat this page as Cursor as it operates today, with the ownership question flagged rather than priced.
+</div>
+
+<p style="margin-bottom:0">&larr; <a href="/portfolio-allocator.html">Back to the allocator</a> &middot; <a href="/">index</a></p>
+
+<footer><p>Personal research. Views my own. June 2026.</p></footer>
+
+</div>
+
+<script>
+const layers=['edge','mid','frontier','harness','verif'];
+const meta={
+  edge:{name:'Edge / SLM',color:'var(--edge)'},
+  mid:{name:'Metered middle',color:'var(--mid)'},
+  frontier:{name:'Frontier model',color:'var(--frontier)'},
+  harness:{name:'Harness',color:'var(--harness)'},
+  verif:{name:'Verification',color:'var(--verif)'}
+};
+const stages=[
+  {label:'early 2025', v:{edge:0,mid:0.55,frontier:0.30,harness:0.15,verif:0}, margin:'~ -20%', marginSub:'loss on heavy users', bill:'$0.40\u2013$0.70', arr:'~$0.5B',
+   note:'A VS Code fork reselling frontier models by the token. Every query is pass-through cost \u2014 the harness layer bleeding surplus upward to the labs whose models it resells. This is the thin wrapper the squeezed middle was meant to commoditize, and the unit economics prove it.'},
+  {label:'Nov 2025', v:{edge:0.05,mid:0.40,frontier:0.25,harness:0.30,verif:0}, margin:'~ break-even', marginSub:'inflecting', bill:'falling', arr:'~$1.0B',
+   note:'Composer ships, built on an open base model. It doesn\u2019t climb into the frontier tier \u2014 it climbs into the good-enough small-model tier, which is the SLM-threshold lever as corporate strategy. Routing half of autocomplete in-house starts decoupling revenue from the API bill.'},
+  {label:'early 2026', v:{edge:0.10,mid:0.15,frontier:0.15,harness:0.55,verif:0.05}, margin:'positive', marginSub:'on enterprise', bill:'much lower', arr:'~$2\u20133B',
+   note:'A three-tier inference stack \u2014 own model for fast edits, frontier for hard reasoning, a cheap third model for long-context. Margin inflects positive on enterprise. The vector has walked toward the harness tip and stopped the upward bleed: a name maneuvering across layers exactly as the barbell predicts.'},
+  {label:'agent platform', v:{edge:0.10,mid:0.10,frontier:0.20,harness:0.55,verif:0.05}, margin:'positive', marginSub:'enterprise-led', bill:'structurally lower', arr:'~$3B+',
+   note:'The product reframes as an operating system for software development \u2014 fleets of agents, one management pane. Deep in the harness tip. But verification stays at ~5%: it optimizes for velocity, not attestable evidence. That absent tip is precisely the system-of-record gap a compliance-grade competitor is built to occupy.'}
+];
+function render(){
+  const i=+document.getElementById('sStage').value;
+  const s=stages[i];
+  document.getElementById('vStage').textContent=s.label;
+  document.getElementById('mMargin').textContent=s.margin;
+  document.getElementById('mMarginSub').textContent=s.marginSub;
+  document.getElementById('mBill').textContent=s.bill;
+  document.getElementById('mArr').textContent=s.arr;
+  const bars=document.getElementById('bars'); bars.innerHTML='';
+  layers.forEach(l=>{
+    const pct=Math.round(s.v[l]*100);
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML='<div class="row-head"><span>'+meta[l].name+'</span><span class="row-pct">'+pct+'%</span></div>'+
+      '<div class="row-track"><div class="row-fill" style="width:'+pct+'%;background:'+meta[l].color+'"></div></div>';
+    bars.appendChild(row);
+  });
+  const sleeve=document.getElementById('sleeve'); sleeve.innerHTML='';
+  layers.forEach(l=>{ const pct=s.v[l]*100; if(pct<=0) return; const seg=document.createElement('div'); seg.style.cssText='width:'+pct+'%;background:'+meta[l].color+';transition:width .3s ease;'; sleeve.appendChild(seg); });
+  document.getElementById('verdict').textContent=s.note;
+}
+document.getElementById('sStage').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
