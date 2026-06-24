@@ -92,20 +92,20 @@
 <div class="page">
 
 <h1>The Team Scale Problem</h1>
-<div class="lede">Why Claude Code external dominates solo — and why that advantage inverts at N≥3 developers. Built from empirical research, not talking points.</div>
+<div class="lede">External tools like Claude Code are great for one developer working alone. Past about three developers, that strength turns into a problem. Here's why — with the research to back it up, not just talking points.</div>
 
 <div class="tabs" id="main-tabs">
-  <button class="tab active" onclick="show('mult',this)">⚖️ The multiplier</button>
-  <button class="tab" onclick="show('conflict',this)">🧨 Conflict surface</button>
-  <button class="tab" onclick="show('coord',this)">🎯 The coordination layer</button>
+  <button class="tab active" onclick="show('mult',this)">⚖️ How fast it adds up</button>
+  <button class="tab" onclick="show('conflict',this)">🧨 Where things collide</button>
+  <button class="tab" onclick="show('coord',this)">🎯 Keeping everyone in sync</button>
 </div>
 
 <!-- TAB 1 -->
 <div class="tabview on" id="tv-mult">
   <div class="surface">
-    <h3>Brooks' Law — now compressed to hours</h3>
-    <p>Fred Brooks (1975): "Adding manpower to a late software project makes it later." Communication overhead scales as <strong>N(N−1)/2</strong> — not linearly. AI agents don't repeal this. They accelerate it. Coordination costs that once appeared over months now appear over hours.</p>
-    <p style="margin-bottom:0">The new variable: each developer running AI agents is no longer one contributor — they're a small team. The coordination math that used to apply between <em>developers</em> now applies between <em>agents</em>.</p>
+    <h3>Adding people doesn't add capacity in a straight line</h3>
+    <p>Back in 1975, Fred Brooks pointed out something that still holds: when you add people to a software project, the work of keeping everyone in sync grows faster than the headcount. Two people have one relationship to manage. Five people have ten. The connections pile up much faster than the bodies do. AI agents don't fix this — they speed it up, so coordination problems that used to take months to show up now show up in hours.</p>
+    <p style="margin-bottom:0">Here's the new twist: a developer running three AI agents isn't one worker anymore — they're a small team of four. So the sync problem that used to be between <em>people</em> is now between <em>agents</em>, and most of those agents have no idea the others exist.</p>
     <div class="sources">
       <a class="source" href="https://www.augmentcode.com/blog/the-end-of-linear-work" target="_blank">📄 Augment Code — "The End of Linear Work" (2026)</a>
       <a class="source" href="https://arxiv.org/abs/2601.15195" target="_blank">📄 Ehsani et al., arXiv 2601.15195 (Jan 2026) — 33k agent PRs</a>
@@ -125,7 +125,7 @@
     <div class="leg"><svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="#0969da" stroke-width="1" opacity=".4"/></svg>Same-dev (you manage)</div>
   </div>
   <h2 style="margin-top:20px">The lookup table</h2>
-  <p>Cross-developer conflict edges = the coordination problem GitHub's PR layer has to absorb. Note how they multiply vs. Brooks' baseline as agent count increases.</p>
+  <p>Each "cross-dev edge" is a place where one person's agents could collide with another's — the mess GitHub's pull requests have to sort out. Watch how fast they pile up once you add a second and third agent per person.</p>
   <table class="compact" id="mult-table"></table>
   <div class="punchline" id="mult-punch" style="margin-top:16px"></div>
 </div>
@@ -133,9 +133,9 @@
 <!-- TAB 2 -->
 <div class="tabview" id="tv-conflict">
   <div class="surface">
-    <h3>Git's 48% false conflict rate — empirically measured</h3>
-    <p>A 2026 benchmark of 31 merge scenarios found Git's line-based merge algorithm produced false conflicts on <strong>48% of cases</strong> where two branches made independent, non-conflicting changes to the same file. Git sees flat text lines — not functions, classes, or intent.</p>
-    <p>The worst files are <strong>hub files</strong> — config registries, routing tables, schema files. Every feature touches them. Conflict probability on these approaches 1.0 as team + agent count grows.</p>
+    <h3>Git flags a "conflict" almost half the time when there isn't one</h3>
+    <p>A 2026 benchmark ran 31 merge scenarios where two branches made separate changes to the same file that didn't actually clash. Git called them conflicts anyway <strong>48% of the time</strong>. The reason: Git compares lines of text. It doesn't understand what the code <em>means</em> — so two compatible edits to the same area look like a fight to it.</p>
+    <p>The worst offenders are <strong>hub files</strong> — the handful of files almost every feature has to touch, like config, routing, or the database schema. The more people and agents you add, the closer the odds of a collision on these files get to certain.</p>
     <div class="sources">
       <a class="source" href="https://thenote.app/post/en/gits-line-based-merge-is-broken-for-the-ai-agent-era-1xm5pmgiey" target="_blank">📄 Git's Line-Based Merge is Broken (Feb 2026)</a>
       <a class="source" href="https://arxiv.org/abs/2601.15195" target="_blank">📄 Ehsani et al. — not-merged PRs touch more files (Jan 2026)</a>
@@ -167,15 +167,15 @@
     <strong id="cf-outcome-head" style="display:block;font-size:14px;margin-bottom:4px"></strong>
     <span id="cf-outcome-body" style="font-size:13px;color:var(--text2)"></span>
   </div>
-  <h2 style="margin-top:20px">What the empirical data says about AI PRs that fail</h2>
-  <p>From large-scale studies of agent-authored pull requests on GitHub (2025–2026):</p>
+  <h2 style="margin-top:20px">What the research says about AI pull requests that fail</h2>
+  <p>From large studies of agent-written pull requests on GitHub (2025–2026):</p>
   <div style="margin-bottom:6px">
     <div class="bar-row"><span class="blbl">Bug-fix task PRs merged</span><div class="btrack"><div class="bfill" style="background:var(--amber);width:0" id="bfill-bug"><span class="bval">—</span></div></div></div>
     <div class="bar-row"><span class="blbl">Docs / CI task PRs merged</span><div class="btrack"><div class="bfill" style="background:var(--green);width:0" id="bfill-doc"><span class="bval">—</span></div></div></div>
     <div class="bar-row"><span class="blbl">Claude Code PRs merged (solo)</span><div class="btrack"><div class="bfill" style="background:var(--blue);width:0" id="bfill-cc"><span class="bval">—</span></div></div></div>
-    <div class="bar-row"><span class="blbl">Merged PRs requiring human edit</span><div class="btrack"><div class="bfill" style="background:var(--purple);width:0" id="bfill-he"><span class="bval">—</span></div></div></div>
+    <div class="bar-row"><span class="blbl">Merged PRs a human had to fix</span><div class="btrack"><div class="bfill" style="background:var(--purple);width:0" id="bfill-he"><span class="bval">—</span></div></div></div>
   </div>
-  <p style="font-size:11px;color:var(--text3)">The "human edit required" bar is the coordination tax — the work that happens <em>after</em> the agent finishes because context was lost, files overlapped, or project norms weren't captured anywhere findable. At team scale, this multiplies by N.</p>
+  <p style="font-size:11px;color:var(--text3)">That last bar — "needed a human to fix it" — is the hidden tax. It's the cleanup that happens <em>after</em> the agent says it's done, because context got lost, files overlapped, or nobody wrote down how the project actually works. With a team, you pay that tax once per person.</p>
   <div class="sources">
     <a class="source" href="https://arxiv.org/abs/2509.14745" target="_blank">📄 Kashiwa et al., arXiv 2509.14745 — 567 Claude Code PRs (Sep 2025)</a>
     <a class="source" href="https://arxiv.org/abs/2602.00164" target="_blank">📄 Alam et al., arXiv 2602.00164 — fix PR failure catalog (Jan 2026)</a>
@@ -185,17 +185,17 @@
 <!-- TAB 3 -->
 <div class="tabview" id="tv-coord">
   <div class="surface">
-    <h3>The bottleneck is shifting</h3>
-    <p>Harvey.ai (2026): <em>"Our engineers are now so productive that they are harder to coordinate. The bottlenecks are shifting away from implementation and toward review, prioritization, coordination, and operating design. That is what the new leverage looks like."</em></p>
-    <p style="margin-bottom:0">The answer isn't a faster agent. It's a coordination layer — a place where agents have shared context, decisions are durable, and the PR is the contract between parallel workstreams.</p>
+    <h3>The slow part isn't writing the code anymore</h3>
+    <p>Harvey.ai put it well in 2026: <em>"Our engineers are now so productive that they are harder to coordinate. The bottlenecks are shifting away from implementation and toward review, prioritization, coordination, and operating design. That is what the new leverage looks like."</em></p>
+    <p style="margin-bottom:0">The fix isn't a smarter agent. It's a shared place to work — where every agent can see the same context, where decisions stick around, and where the pull request acts as the handshake between people working in parallel.</p>
     <div class="sources">
       <a class="source" href="https://www.harvey.ai/blog/autonomous-agents-legal-is-next" target="_blank">📄 Harvey.ai — "Autonomous Agents" (Apr 2026)</a>
       <a class="source" href="https://arxiv.org/html/2602.01011v2" target="_blank">📄 "Multi-Agent Teams Hold Experts Back" (Feb 2026) — coordination costs dilute expertise</a>
     </div>
   </div>
 
-  <h2>Decision half-life: how long is reasoning findable?</h2>
-  <p>AI-assisted development generates reasoning fast. The critical question is how long that reasoning is <em>findable</em> after a decision is made. Drag the slider forward in time.</p>
+  <h2>How long can you still find the "why" behind a decision?</h2>
+  <p>AI helps you make decisions fast. The real question is whether anyone can still find the reasoning behind one of those decisions weeks later. Drag the slider forward in time and watch what survives.</p>
   <div class="ctrl-row">
     <div class="ctrl-group">Weeks since decision<input type="range" id="hl-weeks" min="0" max="12" value="0" oninput="updateHL()"><span class="val-badge" id="hl-out">0</span></div>
   </div>
@@ -218,55 +218,55 @@
     </div>
   </div>
 
-  <h2 style="margin-top:24px">Coordination layer comparison</h2>
+  <h2 style="margin-top:24px">Working alone vs. working in GitHub</h2>
   <table class="compact" style="margin-bottom:14px">
-    <thead><tr><th>Dimension</th><th>External (Claude Code)</th><th>Inside GitHub (Copilot)</th></tr></thead>
+    <thead><tr><th>What matters</th><th>External (Claude Code)</th><th>Inside GitHub (Copilot)</th></tr></thead>
     <tbody>
-      <tr><td><strong>Context scope</strong></td><td>Per-session, per-developer</td><td>Shared repo — Issues, PRs, branch state</td></tr>
-      <tr><td><strong>Agent-to-agent awareness</strong></td><td style="color:var(--red)">None — blind to other agents</td><td style="color:var(--green)">PR is the negotiation interface</td></tr>
-      <tr><td><strong>Command Intent survival</strong></td><td style="color:var(--red)">Dies when context window closes</td><td style="color:var(--green)">Lives in Issues — survives handoff</td></tr>
-      <tr><td><strong>Conflict arbitration</strong></td><td style="color:var(--amber)">Manual — developer resolves post-hoc</td><td style="color:var(--green)">PR blocks merge until resolved</td></tr>
-      <tr><td><strong>Audit / governance</strong></td><td style="color:var(--red)">None by default</td><td style="color:var(--green)">Policy enforcement, access controls</td></tr>
-      <tr class="hl"><td><strong>Solo developer</strong></td><td style="color:var(--green)">✓ Wins — Command Intent preserved</td><td>Adequate</td></tr>
-      <tr class="warn"><td><strong>5+ developers</strong></td><td style="color:var(--red)">✗ 90+ uncoordinated cross-dev edges</td><td style="color:var(--green)">✓ PR is the coordination primitive</td></tr>
+      <tr><td><strong>What the agent can see</strong></td><td>Just this chat, just this person</td><td>The whole repo — Issues, PRs, branches</td></tr>
+      <tr><td><strong>Do agents know about each other?</strong></td><td style="color:var(--red)">No — each works blind to the rest</td><td style="color:var(--green)">Yes — the PR is where they meet</td></tr>
+      <tr><td><strong>Does the reasoning stick around?</strong></td><td style="color:var(--red)">Gone when the chat window closes</td><td style="color:var(--green)">Saved in Issues — survives a handoff</td></tr>
+      <tr><td><strong>Who sorts out conflicts?</strong></td><td style="color:var(--amber)">You do, by hand, after the fact</td><td style="color:var(--green)">The PR blocks the merge until it's fixed</td></tr>
+      <tr><td><strong>Audit and governance</strong></td><td style="color:var(--red)">None out of the box</td><td style="color:var(--green)">Policy rules and access controls built in</td></tr>
+      <tr class="hl"><td><strong>One developer</strong></td><td style="color:var(--green)">✓ Wins — the reasoning stays with you</td><td>Fine</td></tr>
+      <tr class="warn"><td><strong>Five or more developers</strong></td><td style="color:var(--red)">✗ 90+ collision points nobody's tracking</td><td style="color:var(--green)">✓ The PR keeps everyone in sync</td></tr>
     </tbody>
   </table>
 
-  <h2>The inflection zone</h2>
+  <h2>Where it tips over</h2>
   <div class="mets">
     <div class="met"><div class="met-l">Edges at N=1, 3 agents</div><div class="met-v b">3</div><div class="met-sub">you manage all — no cross-dev</div></div>
     <div class="met"><div class="met-l">Edges at N=3, 3 agents</div><div class="met-v a">36</div><div class="met-sub">18 cross-dev — needs structure</div></div>
     <div class="met"><div class="met-l">Edges at N=5, 3 agents</div><div class="met-v r">105</div><div class="met-sub">90 cross-dev — informal breaks</div></div>
   </div>
-  <p style="font-size:12px;color:var(--text3)">Practical ceiling observed: 5–7 concurrent agents before review bottleneck and conflict overhead consume the productivity gain — regardless of agent quality or model. The constraint is coordination, not capability.</p>
+  <p style="font-size:12px;color:var(--text3)">In practice, teams hit a wall around 5–7 agents running at once — the time spent reviewing and untangling conflicts eats up the speed the agents gave you. A smarter model doesn't move that wall. The limit is coordination, not how good the agent is.</p>
 
   <div class="punchline">
     <strong style="font-size:14px;display:block;margin-bottom:5px">The one sentence</strong>
-    Your developers are already running 3–5 agents each. The question isn't whether they're using AI — it's whether those agents have a shared understanding of what the codebase is doing, or whether they're 15 blind workers competing for the same hub files. GitHub is the only platform where agents have shared context and where the decisions they make are durable enough to govern the next decision.
+    Your developers are already running three to five agents each. The question isn't whether they're using AI — it's whether those agents understand what the rest of the codebase is doing, or whether they're fifteen blind workers all grabbing for the same handful of files. GitHub is the one place where agents share what they know, and where today's decisions are still around to guide tomorrow's.
   </div>
 
   <h2>Proposed experiments</h2>
   <div class="surface">
     <div style="display:flex;flex-direction:column;gap:10px">
       <div style="border-left:3px solid var(--blue);padding-left:10px">
-        <strong style="font-size:12px">False conflict rate at N=1 vs N=5</strong>
-        <p style="margin:0;font-size:12px">Run identical task decomposition on a real codebase with 1 dev vs 5 devs each with Claude Code. Count actual Git conflicts per sprint. Baseline against the empirical 48% false-conflict rate.</p>
+        <strong style="font-size:12px">Count real conflicts: 1 developer vs. 5</strong>
+        <p style="margin:0;font-size:12px">Give the same set of tasks to one developer with Claude Code, then to five developers each with their own. Count the actual Git conflicts per sprint. Compare against the 48% false-conflict rate from the benchmark above.</p>
       </div>
       <div style="border-left:3px solid var(--green);padding-left:10px">
-        <strong style="font-size:12px">Command Intent survival test</strong>
-        <p style="margin:0;font-size:12px">Two weeks after a sprint, ask each developer to explain the rationale for an architectural decision made via an agent session. Measure how many are findable in the Issue record vs. only the developer's memory.</p>
+        <strong style="font-size:12px">Can anyone explain the decision two weeks later?</strong>
+        <p style="margin:0;font-size:12px">Two weeks after a sprint, ask each developer why a particular design choice was made in an agent session. Count how many can point to a written record in GitHub Issues — versus how many are just going on memory.</p>
       </div>
       <div style="border-left:3px solid var(--amber);padding-left:10px">
-        <strong style="font-size:12px">Hub file collision frequency</strong>
-        <p style="margin:0;font-size:12px">Identify the top 5 most-touched files in any active repo. Instrument git log to count concurrent modification rate as AI agent usage increases vs. the N(N−1)/2 × agents² formula.</p>
+        <strong style="font-size:12px">How often do agents land on the same file?</strong>
+        <p style="margin:0;font-size:12px">Find the five most-touched files in an active repo. Track how often two agents hit them at the same time as AI usage climbs, and check it against the edge-count formula this page uses.</p>
       </div>
     </div>
   </div>
 
   <div class="surface" style="margin-top:8px">
-    <h3 style="margin-bottom:6px">Signals to watch in the market</h3>
-    <p style="margin-bottom:6px"><strong>Entire (Thomas Dohmke)</strong> — $60M seed, building a Git-compatible semantic DB + agent reasoning layer. First product: Checkpoints captures agent reasoning at every commit. This is a portable, open-source answer to the Command Intent survival problem — built by the person who ran GitHub. <a href="https://entire.io" target="_blank" class="source">entire.io →</a></p>
-    <p style="margin-bottom:0"><strong>Atomic (Lee Faus)</strong> — former GitHub + GitLab Field CTO building agent-native primitives. Newsletter: Be Atomic. Product TBD but practitioner credibility is real. <a href="https://atomic.dev" target="_blank" class="source">atomic.dev →</a></p>
+    <h3 style="margin-bottom:6px">Companies worth watching</h3>
+    <p style="margin-bottom:6px"><strong>Entire (Thomas Dohmke)</strong> — raised $60M to build a layer that remembers why an agent made each change, saved right alongside the code. Their first product, Checkpoints, captures that reasoning at every commit. Worth noting it's built by the person who used to run GitHub. <a href="https://entire.io" target="_blank" class="source">entire.io →</a></p>
+    <p style="margin-bottom:0"><strong>Atomic (Lee Faus)</strong> — a former GitHub and GitLab Field CTO building tools designed for agents from the ground up. Newsletter: Be Atomic. The product's still taking shape, but the track record is real. <a href="https://atomic.dev" target="_blank" class="source">atomic.dev →</a></p>
   </div>
 </div>
 
@@ -306,9 +306,9 @@ function updateMult(){
   drawNet(nd,na);
   buildTable(nd,na);
   document.getElementById('mult-punch').innerHTML=nd===1
-    ?`Solo: you orchestrate all ${ea} agent${ea>1?'s':''}. Zero cross-developer coordination overhead. Command Intent is fully yours to hold. This is the Claude Code sweet spot.`
-    :ce<=10?`At ${nd} devs × ${na} agents: ${ce} cross-dev edges. Still manageable with branch discipline — but watch hub file collisions.`
-    :`At ${nd} devs × ${na} agents: <strong>${ce} unmanaged cross-dev conflict edges</strong> vs. ${de} in Brooks' baseline. This is where informal Slack coordination fails and the PR layer becomes structurally necessary.`;
+    ?`On your own, you're running all ${ea} agent${ea>1?'s':''} yourself. Nobody else to sync with, and the reasoning stays in your head where you can use it. This is exactly where Claude Code shines.`
+    :ce<=10?`At ${nd} devs × ${na} agents you've got ${ce} places where work can collide across people. Still workable if you're careful about branches — but keep an eye on the shared files.`
+    :`At ${nd} devs × ${na} agents that's <strong>${ce} collision points nobody's tracking</strong>, against just ${de} back when it was people coordinating people. This is the point where a Slack thread stops cutting it and you need pull requests doing the work.`;
 }
 
 function drawNet(nd,na){
@@ -429,8 +429,8 @@ async function runSprintSim(){
   h.style.color=conflicts===0?'var(--green)':'var(--red)';
   h.textContent=conflicts===0?'✓ Clean sprint — no merge conflicts.':`✗ ${conflicts} conflict${conflicts!==1?'s':''} this sprint — manual resolution required.`;
   b.textContent=conflicts===0
-    ?`With ${nd} dev${nd!==1?'s':''} and ${na} agent${na!==1?'s':''} each, the hub files stayed clean. Run again — at these numbers it won't hold every sprint.`
-    :`Each conflict requires a developer to context-switch, understand what two agents independently intended, and reconcile. This is where agent productivity gains leak out. The PR gate is the only thing that can catch this systematically.`;
+    ?`With ${nd} dev${nd!==1?'s':''} and ${na} agent${na!==1?'s':''} each, the shared files came through clean this time. Run it again — at these numbers it won't stay clean every sprint.`
+    :`Every one of these means a developer has to stop, figure out what two agents were each trying to do, and reconcile them by hand. That's where the time the agents saved you quietly leaks back out. The pull request gate is the one thing that catches this every time.`;
   document.getElementById('cf-btn').disabled=false;
   updateConflict();
 }
@@ -448,10 +448,10 @@ function updateHL(){
   const w=+document.getElementById('hl-weeks').value;
   document.getElementById('hl-out').textContent=w;
   const decay=(v,rate)=>Math.max(2,100-w*rate);
-  [{id:'hlb-chat',val:decay(100,90),tick:w===0?'100% — session just happened':w<1?'Fading fast — context window not saved':`~${Math.round(decay(100,90))}% — likely gone after session ends`},
-   {id:'hlb-pr',val:decay(100,8),tick:w===0?'100%':w<=4?`~${Math.round(decay(100,8))}% — findable in PR description`:`~${Math.round(decay(100,8))}% — degrading as context grows stale`},
-   {id:'hlb-issue',val:decay(100,1.5),tick:w===0?'100%':`~${Math.round(decay(100,1.5))}% — linked Issues stay findable months later`},
-   {id:'hlb-entire',val:decay(100,0.5),tick:w===0?'100%':`~${Math.round(decay(100,0.5))}% — agent reasoning captured at every commit`}
+  [{id:'hlb-chat',val:decay(100,90),tick:w===0?'100% — the conversation just happened':w<1?'Fading fast — nothing saved the chat':`~${Math.round(decay(100,90))}% — probably gone once the chat closed`},
+   {id:'hlb-pr',val:decay(100,8),tick:w===0?'100%':w<=4?`~${Math.round(decay(100,8))}% — still in the PR description`:`~${Math.round(decay(100,8))}% — getting stale as things move on`},
+   {id:'hlb-issue',val:decay(100,1.5),tick:w===0?'100%':`~${Math.round(decay(100,1.5))}% — linked Issues stay findable for months`},
+   {id:'hlb-entire',val:decay(100,0.5),tick:w===0?'100%':`~${Math.round(decay(100,0.5))}% — saved with the code at every commit`}
   ].forEach(b=>{
     const el=document.getElementById(b.id),tl=document.getElementById(b.id.replace('hlb','hlt'));
     if(el)el.style.width=b.val+'%';
