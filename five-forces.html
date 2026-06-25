@@ -126,11 +126,11 @@ const players={
   arm:{name:'Arm', verifMoat:0.20, ownModel:0.25, distribution:0.85, workflowLock:0.75}
 };
 const defs={
-  'Rivalry':'How hard direct competitors fight for the same customers. Higher means more head-to-head pressure on price and feature pace.',
-  'Supplier power':'Leverage held by whoever supplies the key input \u2014 here, the model providers whose tokens get resold. Higher means more margin captured upstream.',
-  'Buyer power':'Leverage held by customers \u2014 their ability to switch, negotiate, or walk. Higher means less pricing and lock-in power for the focal player.',
-  'New entrants':'How easily a new competitor can enter and contest the market. Higher means lower barriers protecting the incumbent.',
-  'Substitutes':'Pressure from different ways of solving the same problem \u2014 a terminal agent instead of an editor, say. Higher means the product is more replaceable.'
+  'Rivalry':'How hard the direct competitors fight over the same customers. Higher means a tougher head-to-head scrap on price and on how fast everyone ships.',
+  'Supplier power':'How much power the people you buy your key ingredient from have over you \u2014 here, the model providers whose tokens you resell. Higher means more of the money ends up in their pocket, not yours.',
+  'Buyer power':'How much power your customers have \u2014 how easily they can switch, haggle, or walk away. Higher means you have less room to set prices or keep them locked in.',
+  'New entrants':'How easy it is for someone new to show up and start taking your customers. Higher means fewer barriers keeping newcomers out.',
+  'Substitutes':'The pressure from a different way of solving the same problem \u2014 say, a terminal agent instead of an editor. Higher means you\u2019re easier to swap out for something else.'
 };
 let focal='github';
 function band(v,a,b,c){ return v<33?a:v<67?b:c; }
@@ -148,32 +148,32 @@ function forceData(){
   const L=levers(); const p=players[focal];
   const out={};
   out['Rivalry']={ base:0.35, terms:[
-    {label:'harness maturity intensifies the agentic feature race', amt:0.5*L.harness, dir:'up'},
-    {label:'SLM threshold lets more rivals reach parity', amt:0.2*L.slm, dir:'up'},
-    {label:'this player\u2019s workflow lock-in dampens rivalry', amt:0.25*p.workflowLock, dir:'down'}
+    {label:'as the harness gets better, everyone races to ship agent features', amt:0.5*L.harness, dir:'up'},
+    {label:'good-enough small models let more rivals catch up', amt:0.2*L.slm, dir:'up'},
+    {label:'this player\u2019s grip on the workflow takes some heat off', amt:0.25*p.workflowLock, dir:'down'}
   ]};
   out['Supplier power']={ base:0.30, terms:[
-    {label:'reliance on outside models it doesn\u2019t own', amt:0.6*(1-p.ownModel), dir:'up'},
-    {label:'before SLMs clear workloads, model suppliers keep leverage', amt:0.2*(1-L.slm), dir:'up'},
-    {label:'falling inference cost erodes supplier pricing power', amt:0.4*L.infra, dir:'down'}
+    {label:'it leans on models it doesn\u2019t own', amt:0.6*(1-p.ownModel), dir:'up'},
+    {label:'until small models can handle the work, the model providers hold the cards', amt:0.2*(1-L.slm), dir:'up'},
+    {label:'cheaper inference chips away at what suppliers can charge', amt:0.4*L.infra, dir:'down'}
   ]};
   out['Buyer power']={ base:0.30, terms:[
-    {label:'cheap inference lets buyers switch models freely', amt:0.4*L.infra, dir:'up'},
-    {label:'good-enough SLMs widen buyer choice', amt:0.3*L.slm, dir:'up'},
-    {label:'compliance moat raises switching cost', amt:0.5*(p.verifMoat*L.verif), dir:'down'},
-    {label:'workflow lock-in compounds as trust accrues', amt:0.2*(p.workflowLock*L.trust), dir:'down'}
+    {label:'cheap inference lets buyers swap models whenever they like', amt:0.4*L.infra, dir:'up'},
+    {label:'good-enough small models give buyers more to choose from', amt:0.3*L.slm, dir:'up'},
+    {label:'the compliance moat makes switching costly', amt:0.5*(p.verifMoat*L.verif), dir:'down'},
+    {label:'the more they trust it, the more the workflow locks them in', amt:0.2*(p.workflowLock*L.trust), dir:'down'}
   ]};
   out['New entrants']={ base:0.30, terms:[
-    {label:'open SLM bases let anyone build a good-enough model', amt:0.5*L.slm, dir:'up'},
-    {label:'cheap inference lowers the cost to enter', amt:0.3*L.infra, dir:'up'},
-    {label:'compliance moat is a procurement barrier', amt:0.7*(p.verifMoat*L.verif), dir:'down'},
-    {label:'distribution reach deters entrants', amt:0.2*p.distribution, dir:'down'}
+    {label:'open small-model bases let anyone build something good enough', amt:0.5*L.slm, dir:'up'},
+    {label:'cheap inference makes it cheaper to get started', amt:0.3*L.infra, dir:'up'},
+    {label:'the compliance moat is a wall newcomers have to climb', amt:0.7*(p.verifMoat*L.verif), dir:'down'},
+    {label:'its reach makes it hard for newcomers to get noticed', amt:0.2*p.distribution, dir:'down'}
   ]};
   out['Substitutes']={ base:0.35, terms:[
-    {label:'maturing harnesses make alternative form factors viable', amt:0.4*L.harness, dir:'up'},
-    {label:'SLM parity multiplies substitute approaches', amt:0.2*L.slm, dir:'up'},
-    {label:'compliance moat resists substitution', amt:0.4*(p.verifMoat*L.verif), dir:'down'},
-    {label:'workflow lock-in resists substitution', amt:0.2*p.workflowLock, dir:'down'}
+    {label:'as harnesses mature, other kinds of tools become viable', amt:0.4*L.harness, dir:'up'},
+    {label:'good-enough small models open up more alternatives', amt:0.2*L.slm, dir:'up'},
+    {label:'the compliance moat makes it hard to swap in something else', amt:0.4*(p.verifMoat*L.verif), dir:'down'},
+    {label:'its grip on the workflow makes it hard to replace', amt:0.2*p.workflowLock, dir:'down'}
   ]};
   for(const k in out){
     let v=out[k].base;
