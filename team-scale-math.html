@@ -245,7 +245,7 @@
     Your developers are already running three to five agents each. The question isn't whether they're using AI — it's whether those agents understand what the rest of the codebase is doing, or whether they're fifteen blind workers all grabbing for the same handful of files. GitHub is the one place where agents share what they know, and where today's decisions are still around to guide tomorrow's.
   </div>
 
-  <h2>Proposed experiments</h2>
+  <h2>Ways to test this yourself</h2>
   <div class="surface">
     <div style="display:flex;flex-direction:column;gap:10px">
       <div style="border-left:3px solid var(--blue);padding-left:10px">
@@ -302,7 +302,7 @@ function updateMult(){
     <div class="met"><div class="met-l">Effective agents</div><div class="met-v b">${ea}</div><div class="met-sub">${nd}×${na}</div></div>
     <div class="met"><div class="met-l">Total edge pairs</div><div class="met-v ${te>50?'r':'a'}">${te}</div><div class="met-sub">all agent pairs</div></div>
     <div class="met"><div class="met-l">Cross-dev edges</div><div class="met-v ${ce>20?'r':ce>5?'a':'g'}">${ce}</div><div class="met-sub">unmanaged conflict surface</div></div>
-    <div class="met"><div class="met-l">Brooks baseline</div><div class="met-v ${de>6?'a':'g'}">${de}</div><div class="met-sub">dev-to-dev (no AI)</div></div>`;
+    <div class="met"><div class="met-l">People only, no AI</div><div class="met-v ${de>6?'a':'g'}">${de}</div><div class="met-sub">dev-to-dev baseline</div></div>`;
   drawNet(nd,na);
   buildTable(nd,na);
   document.getElementById('mult-punch').innerHTML=nd===1
