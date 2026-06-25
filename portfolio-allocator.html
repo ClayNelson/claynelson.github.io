@@ -36,12 +36,14 @@ a:hover { text-decoration: underline; }
 hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
 footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
 .back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
-.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; position: relative; }
 .section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
 .lever-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lever { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
 .lever-head { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
 .lever-head b { color: var(--text); font-weight: 500; }
+.lever-info { border-bottom: 1px dotted var(--subtle); cursor: help; }
+.lever-info:hover, .lever-info:focus { color: var(--text); outline: none; }
 input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
 .conv-row { display: flex; align-items: center; gap: 12px; margin: 14px 0 0; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
 .conv-row span { font-size: 13px; color: var(--muted); white-space: nowrap; }
@@ -57,6 +59,9 @@ input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
 .sw { width: 10px; height: 10px; border-radius: 2px; }
 .verdict { border-left: 2px solid var(--accent); padding: 12px 18px; margin: 20px 0 0; font-size: 14px; color: var(--muted); background: var(--bg); border-radius: 0 8px 8px 0; }
 .note { font-size: 13px; color: var(--subtle); border-left: 2px solid var(--border); padding: 8px 16px; margin: 16px 0 0; line-height: 1.55; }
+#tip { position: absolute; pointer-events: none; z-index: 5; width: 240px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; opacity: 0; transition: opacity .12s ease; box-shadow: 0 4px 18px rgba(0,0,0,0.10); font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+#tip.on { opacity: 1; }
+#tip b { color: var(--text); font-weight: 500; display: block; margin-bottom: 3px; }
 @media (max-width: 620px) { .lever-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -73,19 +78,19 @@ input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
 <p>The mechanism is the part worth understanding. A name&rsquo;s attractiveness is its exposure vector dotted with where surplus currently sits. When you move a lever, the surplus vector shifts, and every name re-scores automatically &mdash; the ones exposed to layers gaining surplus rise, the ones selling into the squeezed middle fade. The suggested allocation is then a tilt over those scores, and it rolls back up into a layer view so you can read, in one bar, whether you are long the barbell or long the middle.</p>
 
 <h2>Interactive allocator</h2>
-<p>Move the levers to set the regime; move conviction to set how hard the allocation tilts away from equal-weight. Tap any name to interrogate its exposure vector.</p>
+<p>Move the levers to set the regime; move conviction to set how hard the allocation tilts away from equal-weight. Hover any lever name for what it means. Tap any holding to interrogate its exposure vector.</p>
 
 <div class="tool-wrap">
   <p class="section-label">Regime levers</p>
   <div class="lever-grid">
-    <div class="lever"><div class="lever-head"><span>Inference cost decline</span><b id="vInfra">fast</b></div><input type="range" min="0" max="100" value="70" step="1" id="sInfra"></div>
-    <div class="lever"><div class="lever-head"><span>SLM threshold</span><b id="vSlm">half</b></div><input type="range" min="0" max="100" value="50" step="1" id="sSlm"></div>
-    <div class="lever"><div class="lever-head"><span>Edge amortization</span><b id="vEdge">moderate</b></div><input type="range" min="0" max="100" value="45" step="1" id="sEdge"></div>
-    <div class="lever"><div class="lever-head"><span>Harness maturity</span><b id="vHarness">emerging</b></div><input type="range" min="0" max="100" value="40" step="1" id="sHarness"></div>
-    <div class="lever"><div class="lever-head"><span>Verification weight</span><b id="vVerif">high</b></div><input type="range" min="0" max="100" value="65" step="1" id="sVerif"></div>
-    <div class="lever"><div class="lever-head"><span>Trust accrual</span><b id="vTrust">slow</b></div><input type="range" min="0" max="100" value="35" step="1" id="sTrust"></div>
+    <div class="lever"><div class="lever-head"><span class="lever-info" tabindex="0" data-tip="How fast the price of running AI models is falling. A faster decline pushes more value out of the metered middle, since the token is the thing getting cheaper.">Inference cost decline</span><b id="vInfra">fast</b></div><input type="range" min="0" max="100" value="70" step="1" id="sInfra"></div>
+    <div class="lever"><div class="lever-head"><span class="lever-info" tabindex="0" data-tip="How far small models have come at handling real development work. The further they&rsquo;ve crossed the good-enough line, the more inference can move off metered APIs and onto cheaper local hardware.">SLM threshold</span><b id="vSlm">half</b></div><input type="range" min="0" max="100" value="50" step="1" id="sSlm"></div>
+    <div class="lever"><div class="lever-head"><span class="lever-info" tabindex="0" data-tip="How much inference runs on owned, paid-for hardware instead of being rented by the token. This turns a running cost into a one-time one, captured once by whoever sells the silicon.">Edge amortization</span><b id="vEdge">moderate</b></div><input type="range" min="0" max="100" value="45" step="1" id="sEdge"></div>
+    <div class="lever"><div class="lever-head"><span class="lever-info" tabindex="0" data-tip="How good the orchestration is at chaining many AI steps into reliable work without a human stepping in. This is what converts raw model output into finished work.">Harness maturity</span><b id="vHarness">emerging</b></div><input type="range" min="0" max="100" value="40" step="1" id="sHarness"></div>
+    <div class="lever"><div class="lever-head"><span class="lever-info" tabindex="0" data-tip="How much the audit-and-compliance evidence layer matters in this market. It&rsquo;s the part that doesn&rsquo;t get cheaper when tokens do &mdash; the deflation-immune pool.">Verification weight</span><b id="vVerif">high</b></div><input type="range" min="0" max="100" value="65" step="1" id="sVerif"></div>
+    <div class="lever"><div class="lever-head"><span class="lever-info" tabindex="0" data-tip="How fast people come to trust the agents enough to let them do the work. It compounds slowly and collapses fast, and it&rsquo;s the rate-limiter on realized harness value.">Trust accrual</span><b id="vTrust">slow</b></div><input type="range" min="0" max="100" value="35" step="1" id="sTrust"></div>
   </div>
-  <div class="conv-row"><span>Conviction</span><input type="range" min="0" max="100" value="55" step="1" id="sConv"><span id="vConv">tilt vs equal-weight</span></div>
+  <div class="conv-row"><span class="lever-info" tabindex="0" data-tip="How hard the allocation tilts away from equal-weight. Low conviction is the honest setting when you don&rsquo;t trust the lever positions; high conviction concentrates into the winning layers. It should track your trust in the weakest assumption, not how much you like the answer.">Conviction</span><input type="range" min="0" max="100" value="55" step="1" id="sConv"><span id="vConv">tilt vs equal-weight</span></div>
 
   <p class="section-label" style="margin-top:22px">Suggested allocation by name</p>
   <div id="rows"></div>
@@ -95,6 +100,8 @@ input[type=range] { width: 100%; margin-top: 6px; accent-color: var(--link); }
   <div class="legend" id="legend"></div>
 
   <div class="verdict" id="verdict"></div>
+
+  <div id="tip" role="status" aria-live="polite"></div>
 </div>
 
 <h2>How to read the tilt</h2>
@@ -204,6 +211,36 @@ function render(){
   document.getElementById('verdict').textContent=msg;
 }
 ['sInfra','sSlm','sEdge','sHarness','sVerif','sTrust','sConv'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+
+// Lever tooltips
+(function(){
+  const tip = document.getElementById('tip');
+  const wrap = tip.parentElement;
+  function showTip(el){
+    const label = el.textContent;
+    tip.innerHTML = '<b>' + label + '</b>' + el.getAttribute('data-tip');
+    tip.classList.add('on');
+    const r = el.getBoundingClientRect();
+    const w = wrap.getBoundingClientRect();
+    let left = r.left - w.left;
+    let top = r.bottom - w.top + 8;
+    tip.style.left = '0px'; tip.style.top = '0px';
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    if (left + tw > w.width - 8) left = w.width - tw - 8;
+    if (left < 8) left = 8;
+    if (top + th > w.height - 8 && r.top - w.top - th - 8 > 0) top = r.top - w.top - th - 8;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function hideTip(){ tip.classList.remove('on'); }
+  document.querySelectorAll('.lever-info').forEach(el => {
+    el.addEventListener('mouseenter', () => showTip(el));
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('focus', () => showTip(el));
+    el.addEventListener('blur', hideTip);
+  });
+})();
+
 render();
 </script>
 <script src="/nav.js" defer></script>
