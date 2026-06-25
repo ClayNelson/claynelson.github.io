@@ -37,13 +37,18 @@ hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
 footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
 .back { font-size: 13px; color: var(--muted); margin-bottom: 32px; display: block; }
 .eq { font-family: 'SF Mono', 'Fira Mono', 'Consolas', monospace; font-size: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 20px 0; color: var(--text); line-height: 2; overflow-x: auto; }
-.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; }
+.tool-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; margin: 28px 0; position: relative; }
 .section-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
 .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.slider-label { font-size: 13px; color: var(--muted); width: 150px; flex-shrink: 0; line-height: 1.3; }
-.slider-val { font-size: 13px; font-weight: 500; color: var(--text); width: 84px; text-align: right; flex-shrink: 0; }
-input[type=range] { flex: 1; accent-color: var(--link); }
+.slider-label { font-size: 13px; color: var(--muted); width: 140px; flex-shrink: 0; line-height: 1.3; }
+.lever-info { border-bottom: 1px dotted var(--subtle); cursor: help; }
+.lever-info:hover, .lever-info:focus { color: var(--text); outline: none; }
+.slider-val { font-size: 13px; font-weight: 500; color: var(--text); width: 72px; text-align: right; flex-shrink: 0; }
+input[type=range] { flex: 1; min-width: 0; accent-color: var(--link); }
 .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+#tip { position: absolute; pointer-events: none; z-index: 5; width: 240px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; opacity: 0; transition: opacity .12s ease; box-shadow: 0 4px 18px rgba(0,0,0,0.10); font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+#tip.on { opacity: 1; }
+#tip b { color: var(--text); font-weight: 500; display: block; margin-bottom: 3px; }
 .bars { margin: 4px 0 0; }
 .bar-row { margin-bottom: 12px; }
 .bar-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
@@ -85,21 +90,21 @@ input[type=range] { flex: 1; accent-color: var(--link); }
 </div>
 
 <h2>Interactive model</h2>
-<p>Six levers, restated as the things that actually move surplus rather than raw cost inputs. The bars show each layer&rsquo;s captured share of total chain surplus; the three cards collapse them into the structural story &mdash; two tips and a squeezed middle. Defaults encode a fast-decline, half-crossed-threshold, high-compliance world. Push them to find the regime where the thesis breaks.</p>
+<p>Six levers, restated as the things that actually move surplus rather than raw cost inputs. Hover any lever name for what it means. The bars show each layer&rsquo;s captured share of total chain surplus; the three cards collapse them into the structural story &mdash; two tips and a squeezed middle. Defaults encode a fast-decline, half-crossed-threshold, high-compliance world. Push them to find the regime where the thesis breaks.</p>
 
 <div class="tool-wrap">
   <div class="tool-grid">
     <div>
       <p class="section-label">Commoditization forces</p>
-      <div class="slider-row"><span class="slider-label">Inference cost decline</span><input type="range" id="sInfra" min="0" max="100" step="1" value="70"><span class="slider-val" id="vInfra">fast</span></div>
-      <div class="slider-row"><span class="slider-label">SLM good-enough threshold</span><input type="range" id="sSlm" min="0" max="100" step="1" value="50"><span class="slider-val" id="vSlm">half</span></div>
-      <div class="slider-row"><span class="slider-label">Edge amortization</span><input type="range" id="sEdge" min="0" max="100" step="1" value="45"><span class="slider-val" id="vEdge">moderate</span></div>
+      <div class="slider-row"><span class="slider-label"><span class="lever-info" tabindex="0" data-tip="How fast the price of running AI models is falling. A faster decline pushes more value out of the metered middle, since the token is the thing getting cheaper.">Inference cost decline</span></span><input type="range" id="sInfra" min="0" max="100" step="1" value="70"><span class="slider-val" id="vInfra">fast</span></div>
+      <div class="slider-row"><span class="slider-label"><span class="lever-info" tabindex="0" data-tip="How far small models have come at handling real development work. The further they&rsquo;ve crossed the good-enough line, the more inference can move off metered APIs and onto cheaper local hardware.">SLM good-enough threshold</span></span><input type="range" id="sSlm" min="0" max="100" step="1" value="50"><span class="slider-val" id="vSlm">half</span></div>
+      <div class="slider-row"><span class="slider-label"><span class="lever-info" tabindex="0" data-tip="How much inference runs on owned, paid-for hardware instead of being rented by the token. This turns a running cost (opex) into a one-time one (capex), captured once by whoever sells the silicon.">Edge amortization</span></span><input type="range" id="sEdge" min="0" max="100" step="1" value="45"><span class="slider-val" id="vEdge">moderate</span></div>
     </div>
     <div>
       <p class="section-label">Value-capture forces</p>
-      <div class="slider-row"><span class="slider-label">Harness maturity</span><input type="range" id="sHarness" min="0" max="100" step="1" value="40"><span class="slider-val" id="vHarness">emerging</span></div>
-      <div class="slider-row"><span class="slider-label">Verification weight</span><input type="range" id="sVerif" min="0" max="100" step="1" value="65"><span class="slider-val" id="vVerif">high</span></div>
-      <div class="slider-row"><span class="slider-label">Trust accrual rate</span><input type="range" id="sTrust" min="0" max="100" step="1" value="35"><span class="slider-val" id="vTrust">slow</span></div>
+      <div class="slider-row"><span class="slider-label"><span class="lever-info" tabindex="0" data-tip="How good the orchestration is at chaining many AI steps into reliable work without a human stepping in. Errors stack across steps, so this is what converts raw model output into finished work.">Harness maturity</span></span><input type="range" id="sHarness" min="0" max="100" step="1" value="40"><span class="slider-val" id="vHarness">emerging</span></div>
+      <div class="slider-row"><span class="slider-label"><span class="lever-info" tabindex="0" data-tip="How much the audit-and-compliance evidence layer matters in the market being modeled. This is the part that doesn&rsquo;t get cheaper when tokens do &mdash; the deflation-immune pool.">Verification weight</span></span><input type="range" id="sVerif" min="0" max="100" step="1" value="65"><span class="slider-val" id="vVerif">high</span></div>
+      <div class="slider-row"><span class="slider-label"><span class="lever-info" tabindex="0" data-tip="How fast people come to trust the agents enough to let them actually do the work. It compounds slowly and collapses fast, and it&rsquo;s the rate-limiter on everything the harness could otherwise deliver.">Trust accrual rate</span></span><input type="range" id="sTrust" min="0" max="100" step="1" value="35"><span class="slider-val" id="vTrust">slow</span></div>
     </div>
   </div>
 
@@ -113,6 +118,8 @@ input[type=range] { flex: 1; accent-color: var(--link); }
   </div>
 
   <div class="verdict" id="verdict"><span id="verdictText"></span></div>
+
+  <div id="tip" role="status" aria-live="polite"></div>
 </div>
 
 <h2>The barbell</h2>
@@ -217,6 +224,36 @@ function render() {
 }
 ['sInfra', 'sSlm', 'sEdge', 'sHarness', 'sVerif', 'sTrust'].forEach(id =>
   document.getElementById(id).addEventListener('input', render));
+
+// Lever tooltips
+(function(){
+  const tip = document.getElementById('tip');
+  const wrap = tip.parentElement;
+  function showTip(el){
+    const label = el.textContent;
+    tip.innerHTML = '<b>' + label + '</b>' + el.getAttribute('data-tip');
+    tip.classList.add('on');
+    const r = el.getBoundingClientRect();
+    const w = wrap.getBoundingClientRect();
+    let left = r.left - w.left;
+    let top = r.bottom - w.top + 8;
+    tip.style.left = '0px'; tip.style.top = '0px';
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    if (left + tw > w.width - 8) left = w.width - tw - 8;
+    if (left < 8) left = 8;
+    if (top + th > w.height - 8 && r.top - w.top - th - 8 > 0) top = r.top - w.top - th - 8;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function hideTip(){ tip.classList.remove('on'); }
+  document.querySelectorAll('.lever-info').forEach(el => {
+    el.addEventListener('mouseenter', () => showTip(el));
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('focus', () => showTip(el));
+    el.addEventListener('blur', hideTip);
+  });
+})();
+
 render();
 </script>
 <script src="/nav.js" defer></script>
