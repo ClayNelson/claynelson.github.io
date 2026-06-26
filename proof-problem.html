@@ -42,9 +42,27 @@
 
     <p>This is why editor-resident AI has, perversely, made things worse rather than better. It attacks the part of the curve that was already fast &mdash; authoring &mdash; and leaves the expensive part untouched. At scale, it doesn&rsquo;t just fail to help. It adds load to the verification pipeline, because more generated code means more ungoverned, un-attested artifacts flowing into the bottleneck.</p>
 
-    <figure>
-      <img src="/assets/diagrams/finishing-curve.png" alt="Two horizontal bars comparing traditional software work to work with editor-resident AI. Both show a short authoring segment followed by a longer finishing segment covering integration, verification, traceability, and sign-off. AI compresses only the authoring segment, leaving the finishing segment unchanged. Caption: Productivity tools compressed the wrong part of the curve.">
-    </figure>
+    <div class="diagram-wrap">
+      <span class="fig-label">Figure 1 &mdash; The finishing problem: AI compresses authoring, not finishing</span>
+      <svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two horizontal bars comparing traditional software work to work with editor-resident AI. Both show a short authoring segment followed by a longer finishing segment covering integration, verification, traceability, and sign-off. AI compresses only the authoring segment, leaving the finishing segment unchanged.">
+        <text class="t-s" x="400" y="22" text-anchor="middle">Time to ship a feature, by segment</text>
+        <text class="t-h" x="150" y="84" text-anchor="end">Traditional</text>
+        <rect class="z-a" x="160" y="58" width="104" height="44" rx="6"/>
+        <rect class="z-p" x="264" y="58" width="376" height="44" rx="6"/>
+        <text class="t-s" x="212" y="84" text-anchor="middle">Authoring</text>
+        <text class="t-h" x="452" y="78" text-anchor="middle">Finishing</text>
+        <text class="t-s" x="452" y="94" text-anchor="middle">integration &middot; verification &middot; traceability &middot; sign-off</text>
+        <text class="t-h" x="150" y="154" text-anchor="end">With editor-</text>
+        <text class="t-h" x="150" y="172" text-anchor="end">resident AI</text>
+        <rect class="z-a" x="160" y="138" width="34" height="44" rx="6"/>
+        <rect class="z-p" x="194" y="138" width="376" height="44" rx="6"/>
+        <text class="t-h" x="382" y="158" text-anchor="middle">Finishing &mdash; unchanged</text>
+        <text class="t-s" x="382" y="174" text-anchor="middle">same integration &middot; verification &middot; traceability &middot; sign-off</text>
+        <line class="ldr" x1="264" y1="102" x2="194" y2="138"/>
+        <text class="t-s" x="300" y="124" text-anchor="start">authoring compressed by AI</text>
+        <text class="t-s" x="400" y="228" text-anchor="middle" style="font-style:italic">Productivity tools compressed the wrong part of the curve.</text>
+      </svg>
+    </div>
 
     <p>Call it the finishing problem. Productivity tools compressed the wrong part of the curve. The forty percent of R&amp;D spend going to V&amp;V doesn&rsquo;t shrink when authoring gets faster &mdash; it grows. That&rsquo;s the real math behind the frustration: the dashboards look better, the release gates don&rsquo;t move, and the senior safety engineer is still reviewing the same trace matrix for the fourth time.</p>
 
@@ -66,9 +84,45 @@
 
     <blockquote>You cannot attest to what you did not observe. Moving the trust boundary outward &mdash; from each developer&rsquo;s machine to the governed platform &mdash; is what turns agentic work from a productivity story into a compliance story.</blockquote>
 
-    <figure>
-      <img src="/assets/diagrams/trust-boundary.png" alt="Architectural diagram showing two zones separated by a trust boundary. Left zone contains ungoverned tools outside the boundary — developer workstation, editor-resident AI, third-party APIs. Right zone contains the governed platform — repository, agents, policy engine, identity provider, audit log, reviews — inside the boundary.">
-    </figure>
+    <div class="diagram-wrap">
+      <span class="fig-label">Figure 2 &mdash; The trust boundary: where execution happens decides what can be attested</span>
+      <svg viewBox="0 0 680 444" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Architectural diagram showing two zones separated by a trust boundary. The left zone contains ungoverned tools outside the boundary: developer workstation, editor-resident AI, third-party APIs. The right zone contains the governed platform inside the boundary: repository, agents, policy engine, identity provider, audit log, reviews.">
+        <text class="t-s" x="340" y="22" text-anchor="middle">Where execution happens determines what can be attested</text>
+        <text class="t-s" x="340" y="40" text-anchor="middle" style="fill:var(--accent);font-weight:600;letter-spacing:0.16em">TRUST BOUNDARY</text>
+        <line x1="340" y1="48" x2="340" y2="410" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 5"/>
+
+        <rect class="z-r" x="24" y="56" width="300" height="356" rx="12"/>
+        <text class="t-h" x="174" y="84" text-anchor="middle">Ungoverned</text>
+        <text class="t-s" x="174" y="102" text-anchor="middle">outside the boundary</text>
+        <rect class="z-g" x="48" y="120" width="252" height="74" rx="8"/>
+        <text class="t-h" x="174" y="150" text-anchor="middle">Developer workstation</text>
+        <text class="t-s" x="174" y="170" text-anchor="middle">personal endpoint</text>
+        <rect class="z-g" x="48" y="208" width="252" height="74" rx="8"/>
+        <text class="t-h" x="174" y="238" text-anchor="middle">Editor-resident AI</text>
+        <text class="t-s" x="174" y="258" text-anchor="middle">keys managed by the user</text>
+        <rect class="z-g" x="48" y="296" width="252" height="74" rx="8"/>
+        <text class="t-h" x="174" y="326" text-anchor="middle">Third-party APIs</text>
+        <text class="t-s" x="174" y="346" text-anchor="middle">outside the QM envelope</text>
+
+        <rect class="z-t" x="356" y="56" width="300" height="356" rx="12"/>
+        <text class="t-h" x="506" y="84" text-anchor="middle">Governed platform</text>
+        <text class="t-s" x="506" y="102" text-anchor="middle">inside the boundary</text>
+        <rect class="z-g" x="372" y="120" width="124" height="74" rx="8"/>
+        <text class="t-h" x="434" y="161" text-anchor="middle">Repository</text>
+        <rect class="z-g" x="508" y="120" width="132" height="74" rx="8"/>
+        <text class="t-h" x="574" y="161" text-anchor="middle">Agents</text>
+        <rect class="z-g" x="372" y="208" width="124" height="74" rx="8"/>
+        <text class="t-h" x="434" y="249" text-anchor="middle">Policy engine</text>
+        <rect class="z-g" x="508" y="208" width="132" height="74" rx="8"/>
+        <text class="t-h" x="574" y="249" text-anchor="middle">Identity provider</text>
+        <rect class="z-g" x="372" y="296" width="124" height="74" rx="8"/>
+        <text class="t-h" x="434" y="337" text-anchor="middle">Audit log</text>
+        <rect class="z-g" x="508" y="296" width="132" height="74" rx="8"/>
+        <text class="t-h" x="574" y="337" text-anchor="middle">Reviews</text>
+
+        <text class="t-s" x="340" y="436" text-anchor="middle" style="font-style:italic">You cannot sign what you did not observe.</text>
+      </svg>
+    </div>
 
     <p>That sentence is not a slogan. It is an architectural requirement. It tells you exactly what to look for when evaluating an AI strategy for a regulated context: does the execution happen where your identity provider can see it, where your policy engine can gate it, where your audit log can capture it? If the answer is no &mdash; if the boundary is still at the laptop &mdash; you don&rsquo;t have a compliance story. You have a productivity anecdote, and when the program review asks for the evidence chain, the release slips a quarter.</p>
 
