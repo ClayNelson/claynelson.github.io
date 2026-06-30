@@ -45,7 +45,7 @@ footer { font-size: 13px; color: var(--subtle); padding-top: 40px; }
 .lever-info:hover, .lever-info:focus { color: var(--text); outline: none; }
 .slider-val { font-size: 13px; font-weight: 500; color: var(--text); width: 72px; text-align: right; flex-shrink: 0; }
 input[type=range] { flex: 1; min-width: 0; accent-color: var(--link); }
-.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.tool-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
 #tip { position: absolute; pointer-events: none; z-index: 5; width: 240px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; opacity: 0; transition: opacity .12s ease; box-shadow: 0 4px 18px rgba(0,0,0,0.10); font-size: 12.5px; line-height: 1.5; color: var(--muted); }
 #tip.on { opacity: 1; }
 #tip b { color: var(--text); font-weight: 500; display: block; margin-bottom: 3px; }
